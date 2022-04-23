@@ -1,0 +1,40 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "type": "npm",
+      "script": "start",
+      "path": "demo/",
+      "isBackground": true,
+      "problemMatcher": [
+        {
+          "owner": "npm",
+          "background": {
+            "endsPattern": "Server running at.",
+            "beginsPattern": ".",
+            "activeOnStart": true
+          },
+          "pattern": {
+            "regexp": "."
+          }
+        }
+      ],
+      "label": "npm: start - demo",
+      "detail": "parcel"
+    },
+    {
+      "label": "terminate: all",
+      "command": "echo ${input:terminate}",
+      "type": "shell",
+      "problemMatcher": []
+    }
+  ],
+  "inputs": [
+    {
+      "id": "terminate",
+      "type": "command",
+      "command": "workbench.action.tasks.terminate",
+      "args": "terminateAll"
+    }
+  ]
+}

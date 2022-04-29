@@ -7,7 +7,8 @@ import {
   switchMap,
 } from 'rxjs';
 import { Directive } from '../component/directives/directive';
-import { BehaviorMutable } from '../tools/BehaviorMutable';
+import { BehaviorMutable } from '../tools/rx/BehaviorMutable';
+import { isNullOrWhiteSpace } from '../tools/stringTools';
 
 export type RexNodeChildren = RexNode | RexNode[] | string | string[] | null;
 
@@ -61,7 +62,9 @@ export class RexNode {
     );
     const selfText$ = combineLatest([this.tag$, attrtext$, content$]).pipe(
       map(([tag, attrs, content]) => {
-        return `<${tag} ${attrs} >${content}</${tag}>`;
+        return isNullOrWhiteSpace(tag)
+          ? ''
+          : `<${tag} ${attrs} >${content}</${tag}>`;
       }),
     );
     combineLatest([selfText$, this.directives$])

@@ -1,6 +1,6 @@
-import { DiContainer } from './di-container';
+import { DiContainer } from './diContainer';
 
-describe('di', () => {
+describe('diContainer', () => {
   test('provide-inject-symbolic', () => {
     const testObject = { foo: 'bar' };
     const container = new DiContainer();
@@ -17,5 +17,14 @@ describe('di', () => {
     container.register<typeof testObject>(testObject, 'test-obj');
     const injected = container.resolve<typeof testObject>('test-obj');
     expect(injected).toEqual(testObject);
+  });
+  test('provide-error', () => {
+    const testObject = { foo: 'bar' };
+    const container = new DiContainer();
+    const func = () => {
+      container.register<typeof testObject>(testObject, 'test-obj');
+      container.register<typeof testObject>(testObject, 'test-obj');
+    };
+    expect(func).toThrowError();
   });
 });

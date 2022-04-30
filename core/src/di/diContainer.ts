@@ -1,9 +1,14 @@
 export class DiContainer {
-  private dictionary: Record<symbol, unknown> = {};
+  protected dictionary: Record<symbol, unknown> = {};
 
   register<T>(something: T, description: string | undefined = undefined) {
     const sym =
       description == undefined ? Symbol(description) : Symbol.for(description);
+    if (this.dictionary[sym] != null) {
+      throw new Error(
+        `Value with key ${description ?? sym.toString} already exists!`,
+      );
+    }
     this.dictionary[sym] = something;
     return {
       token: sym,
@@ -16,5 +21,8 @@ export class DiContainer {
     } else {
       return this.dictionary[token] as T;
     }
+  }
+  isKeyFree(key: string): boolean {
+    return this.dictionary[Symbol.for(key)] != null;
   }
 }

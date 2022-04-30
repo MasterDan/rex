@@ -22,14 +22,8 @@ export class DiContainerWrapperReactive extends DiContainerReactive {
 
   resolveReactive<T>(key: string): BehaviorSubject<T | null> {
     if (this.isKeyFree(key)) {
-      console.log('Ключ свободен');
-
       this.dictionary[Symbol.for(key)] = new BehaviorSubject<T | null>(null);
     }
-    console.log(
-      'this.dictionary[Symbol.for(key)]',
-      this.dictionary[Symbol.for(key)],
-    );
     return (
       (this.dictionary[Symbol.for(key)] as BehaviorSubject<T | null>) ??
       this.parent.resolveReactive<T>(key)

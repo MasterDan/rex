@@ -23,6 +23,6 @@ export class DiContainer {
     }
   }
   isKeyFree(key: string): boolean {
-    return this.dictionary[Symbol.for(key)] != null;
+    return this.dictionary[Symbol.for(key)] == null;
   }
 }

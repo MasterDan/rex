@@ -2,9 +2,12 @@ import { RexNode } from './rexNode';
 
 describe('rexNode', () => {
   test('draw div', () => {
-    const rexNode = new RexNode('div', { class: 'foo-bar' });
+    const rexNode = new RexNode('div', { class: 'foo-bar' }, [
+      'lorem ipsum',
+      ' dolor',
+    ]);
     const sub = jest.fn((value: string) => {
-      expect(value).toBe('<div class="foo-bar" ></div>');
+      expect(value).toBe('<div class="foo-bar" >lorem ipsum dolor</div>');
     });
     rexNode.text$.subscribe(sub);
     expect(sub).toBeCalled();

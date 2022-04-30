@@ -8,7 +8,6 @@ export class DiContainerReactive extends DiContainer {
       (this.dictionary[sym] as BehaviorSubject<T | null>).next(something);
     }
     this.dictionary[sym] = new BehaviorSubject<T | null>(something);
-    console.log(key, 'registered');
   }
 
   resolveReactive<T>(key: string): BehaviorSubject<T | null> {

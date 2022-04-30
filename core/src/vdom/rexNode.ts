@@ -8,7 +8,7 @@ import {
   of,
   switchMap,
 } from 'rxjs';
-import { Directive } from '../component/directives/directive';
+import { Directive } from '../directives/directive';
 import { BehaviorMutable } from '../tools/rx/BehaviorMutable';
 import { isNullOrWhiteSpace } from '../tools/stringTools';
 

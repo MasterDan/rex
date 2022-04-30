@@ -1,4 +1,5 @@
 import { BehaviorSubject } from 'rxjs';
+import { DependencyResolverReactive } from './dependencyResolverReactive';
 import { DiContainer } from './diContainer';
 
 export class DiContainerReactive extends DiContainer {
@@ -15,6 +16,13 @@ export class DiContainerReactive extends DiContainer {
     if (this.dictionary[sym] == null) {
       this.dictionary[sym] = new BehaviorSubject<T | null>(null);
     }
-    return this.dictionary[sym] as BehaviorSubject<T | null>;
+    const result = this.dictionary[sym] as BehaviorSubject<T | null>;
+    if (
+      result instanceof DependencyResolverReactive &&
+      result.container$.value == null
+    ) {
+      result.setContainer(this);
+    }
+    return result;
   }
 }

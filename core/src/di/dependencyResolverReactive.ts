@@ -1,8 +1,8 @@
-import { BehaviorSubject, filter, Observable, switchMap } from 'rxjs';
+import { BehaviorSubject, filter, map, Observable, switchMap } from 'rxjs';
 import { DiContainerReactive } from './diContainerReactive';
 
 export abstract class DependencyResolverReactive {
-  protected container$ = new BehaviorSubject<DiContainerReactive | null>(null);
+  container$ = new BehaviorSubject<DiContainerReactive | null>(null);
 
   setContainer(container: DiContainerReactive) {
     this.container$.next(container);
@@ -13,6 +13,16 @@ export abstract class DependencyResolverReactive {
       filter((c): c is DiContainerReactive => c != null),
       switchMap((c) => c.resolveReactive<T>(key)),
       filter((v): v is T => v != null),
+      map((v) => {
+        if (
+          v instanceof DependencyResolverReactive &&
+          v.container$.value == null &&
+          this.container$.value != null
+        ) {
+          v.setContainer(this.container$.value);
+        }
+        return v;
+      }),
     );
   }
 }

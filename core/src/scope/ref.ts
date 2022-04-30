@@ -1,6 +1,7 @@
 import { BehaviorSubject, Observable } from 'rxjs';
 
-export class Ref<T = unknown> extends BehaviorSubject<T | null> {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export class Ref<T = any> extends BehaviorSubject<T | null> {
   constructor(from: Observable<T> | T, fallback: T | null = null) {
     if (from instanceof Observable) {
       super(fallback);

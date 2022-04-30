@@ -2,7 +2,7 @@ import { BehaviorSubject, filter, map, Observable } from 'rxjs';
 import { DiContainer } from './diContainer';
 
 export abstract class DependencyResolver {
-  private container$ = new BehaviorSubject<DiContainer | null>(null);
+  protected container$ = new BehaviorSubject<DiContainer | null>(null);
 
   setContainer(container: DiContainer) {
     this.container$.next(container);

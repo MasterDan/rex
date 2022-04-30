@@ -2,7 +2,7 @@ import { BehaviorSubject, filter, Observable, switchMap } from 'rxjs';
 import { DiContainerReactive } from './diContainerReactive';
 
 export abstract class DependencyResolverReactive {
-  private container$ = new BehaviorSubject<DiContainerReactive | null>(null);
+  protected container$ = new BehaviorSubject<DiContainerReactive | null>(null);
 
   setContainer(container: DiContainerReactive) {
     this.container$.next(container);

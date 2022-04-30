@@ -1,9 +1,9 @@
 import { filter } from 'rxjs';
-import { DependencyResolverReactive } from '../di/dependencyResolverReactive';
+import { DependencyProviderReactive } from '../di/dependencyProviserReactive';
 import { DiContainerWrapperReactive } from '../di/diContainerWrapperReactive';
 import { Ref } from './ref';
 
-export class Scope extends DependencyResolverReactive {
+export class Scope extends DependencyProviderReactive {
   constructor(state: Record<string, Ref>) {
     super();
     this.container$

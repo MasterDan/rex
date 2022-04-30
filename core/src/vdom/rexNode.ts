@@ -66,7 +66,7 @@ export class RexNode {
     const selfText$ = combineLatest([this.tag$, attrtext$, content$]).pipe(
       map(([tag, attrs, content]) => {
         return isNullOrWhiteSpace(tag)
-          ? ''
+          ? content
           : `<${tag} ${attrs} >${content}</${tag}>`;
       }),
     );

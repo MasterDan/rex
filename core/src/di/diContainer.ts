@@ -1,3 +1,5 @@
+import { DependencyResolver } from './dependencyResolver';
+
 export class DiContainer {
   protected dictionary: Record<symbol, unknown> = {};
 
@@ -16,11 +18,16 @@ export class DiContainer {
     };
   }
   resolve<T>(token: symbol | string): T {
+    let result: T;
     if (typeof token === 'string') {
-      return this.dictionary[Symbol.for(token)] as T;
+      result = this.dictionary[Symbol.for(token)] as T;
     } else {
-      return this.dictionary[token] as T;
+      result = this.dictionary[token] as T;
     }
+    if (result instanceof DependencyResolver && !result.hasContainer) {
+      result.setContainer(this);
+    }
+    return result;
   }
   isKeyFree(key: string): boolean {
     return this.dictionary[Symbol.for(key)] == null;

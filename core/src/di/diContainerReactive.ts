@@ -18,12 +18,10 @@ export class DiContainerReactive extends DiContainer {
     }
     const result = this.dictionary[sym] as BehaviorSubject<T | null>;
     if (
-      result instanceof DependencyResolverReactive &&
-      result.container$.value == null
+      result.value instanceof DependencyResolverReactive &&
+      !result.value.hasContainer
     ) {
-      console.log('setting container');
-
-      result.setContainer(this);
+      result.value.setContainer(this);
     }
     return result;
   }

@@ -4,6 +4,10 @@ import { DiContainer } from './diContainer';
 export abstract class DependencyResolver {
   protected container$ = new BehaviorSubject<DiContainer | null>(null);
 
+  get hasContainer(): boolean {
+    return this.container$.value != null;
+  }
+
   setContainer(container: DiContainer) {
     this.container$.next(container);
   }
@@ -12,16 +16,6 @@ export abstract class DependencyResolver {
     return this.container$.pipe(
       filter((c): c is DiContainer => c != null),
       map((c) => c.resolve<T>(key)),
-      map((v) => {
-        if (
-          v instanceof DependencyResolver &&
-          v.container$.value == null &&
-          this.container$.value != null
-        ) {
-          v.setContainer(this.container$.value);
-        }
-        return v;
-      }),
     );
   }
 }

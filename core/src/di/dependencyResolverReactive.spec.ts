@@ -1,7 +1,6 @@
 import { filter } from 'rxjs';
 import { Ref } from '../scope/ref';
 import { Scope } from '../scope/scope';
-import { DependencyResolverReactive } from './dependencyResolverReactive';
 import { DiContainerReactive } from './diContainerReactive';
 
 describe('reactive dependecyResolver', () => {
@@ -21,8 +20,8 @@ describe('reactive dependecyResolver', () => {
     const container = new DiContainerReactive();
     container.registerReactive<Scope>(new Scope({ ref }), 'scope');
     const scope = container.resolveReactive<Scope>('scope');
-    expect(scope.value instanceof DependencyResolverReactive).toBe(true);
-    expect(scope.value?.container$.value).not.toBeNull();
+
+    expect(scope.value?.hasContainer).toBe(true);
 
     const resolved$ = scope.value?.resolveReactive<Ref<string>>('ref');
     const sub = jest.fn((arg: Ref<string>) => {

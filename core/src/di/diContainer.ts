@@ -12,7 +12,7 @@ export class DiContainer {
     this.dictionary[sym] = something;
     return {
       token: sym,
-      resolve: (): T => this.dictionary[sym] as T,
+      resolve: (): T => this.resolve<T>(sym),
     };
   }
   resolve<T>(token: symbol | string): T {

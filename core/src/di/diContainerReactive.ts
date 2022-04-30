@@ -21,6 +21,8 @@ export class DiContainerReactive extends DiContainer {
       result instanceof DependencyResolverReactive &&
       result.container$.value == null
     ) {
+      console.log('setting container');
+
       result.setContainer(this);
     }
     return result;

@@ -3,15 +3,23 @@ import { RexNode } from './rexNode';
 describe('rexNode', () => {
   test('drawDiv', () => {
     const rexNode = new RexNode('div', { class: 'foo-bar' });
-    expect(rexNode.text$.value).toBe('<div class="foo-bar" ></div>');
+    const sub = jest.fn((value: string) => {
+      expect(value).toBe('<div class="foo-bar" ></div>');
+    });
+    rexNode.text$.subscribe(sub);
+    expect(sub).toBeCalled();
   });
   test('drawMany', () => {
     const rexNode = new RexNode('div', { class: 'foo-bar' }, [
       new RexNode('div', { class: 'foo-baz' }),
       new RexNode('div', { class: 'foo-baz' }),
     ]);
-    expect(rexNode.text$.value).toBe(
-      '<div class="foo-bar" ><div class="foo-baz" ></div><div class="foo-baz" ></div></div>',
-    );
+    const sub = jest.fn((value: string) => {
+      expect(value).toBe(
+        '<div class="foo-bar" ><div class="foo-baz" ></div><div class="foo-baz" ></div></div>',
+      );
+    });
+    rexNode.text$.subscribe(sub);
+    expect(sub).toBeCalled();
   });
 });

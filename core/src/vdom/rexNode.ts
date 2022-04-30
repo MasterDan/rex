@@ -2,7 +2,9 @@ import {
   BehaviorSubject,
   combineLatest,
   filter,
+  first,
   map,
+  Observable,
   of,
   switchMap,
 } from 'rxjs';
@@ -17,7 +19,6 @@ export class RexNode {
   attributes$: BehaviorSubject<Record<string, string> | null>;
   children$: BehaviorMutable<RexNodeChildren>;
 
-  text$ = new BehaviorSubject<string | null>(null);
   directives$ = new BehaviorMutable<Directive[]>([]);
 
   constructor(
@@ -30,7 +31,9 @@ export class RexNode {
       attributes,
     );
     this.children$ = new BehaviorMutable<RexNodeChildren>(children);
+  }
 
+  get text$(): Observable<string> {
     const attrtext$ = this.attributes$.pipe(
       map((attrs) => {
         if (attrs == null) {
@@ -67,42 +70,39 @@ export class RexNode {
           : `<${tag} ${attrs} >${content}</${tag}>`;
       }),
     );
-    combineLatest([selfText$, this.directives$])
-      .pipe(
-        switchMap(([text, dirs]) => {
-          if (dirs.length === 0) {
-            return of(text);
-          } else {
-            let nodes: RexNode | RexNode[] | null = null;
-            for (const dir of dirs) {
-              if (nodes == null) {
-                nodes = dir.__apply__(this);
-              } else if (nodes instanceof RexNode) {
-                nodes = dir.__apply__(nodes);
-              } else {
-                nodes = nodes
-                  .map((node) => {
-                    const transformed = dir.__apply__(node);
-                    if (transformed instanceof RexNode) {
-                      return [transformed];
-                    } else return transformed;
-                  })
-                  .reduce((a, c) => a.concat(c));
-              }
-            }
-            if (nodes instanceof RexNode) {
-              return nodes.text$.pipe(filter((v): v is string => v != null));
+    return combineLatest([selfText$, this.directives$]).pipe(
+      switchMap(([text, dirs]) => {
+        if (dirs.length === 0) {
+          return of(text);
+        } else {
+          let nodes: RexNode | RexNode[] | null = null;
+          for (const dir of dirs) {
+            if (nodes == null) {
+              nodes = dir.__apply__(this);
+            } else if (nodes instanceof RexNode) {
+              nodes = dir.__apply__(nodes);
             } else {
-              return combineLatest(
-                nodes?.map((n) =>
-                  n.text$.pipe(filter((v): v is string => v != null)),
-                ) ?? [],
-              ).pipe(map((arr) => arr.join('')));
+              nodes = nodes
+                .map((node) => {
+                  const transformed = dir.__apply__(node);
+                  if (transformed instanceof RexNode) {
+                    return [transformed];
+                  } else return transformed;
+                })
+                .reduce((a, c) => a.concat(c));
             }
           }
-        }),
-      )
-      .subscribe((text) => this.text$.next(text));
+          if (nodes instanceof RexNode) {
+            return nodes.text$;
+          } else {
+            return combineLatest(nodes?.map((n) => n.text$) ?? []).pipe(
+              map((arr) => arr.join('')),
+            );
+          }
+        }
+      }),
+      first(),
+    );
   }
 
   _addDirective(dir: Directive) {

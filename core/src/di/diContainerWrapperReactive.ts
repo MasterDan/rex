@@ -1,4 +1,4 @@
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, combineLatest, map } from 'rxjs';
 import { DiContainerReactive } from './diContainerReactive';
 
 export class DiContainerWrapperReactive extends DiContainerReactive {
@@ -20,13 +20,17 @@ export class DiContainerWrapperReactive extends DiContainerReactive {
     );
   }
 
-  resolveReactive<T>(key: string): BehaviorSubject<T | null> {
-    if (this.isKeyFree(key)) {
+  override resolveReactive<T>(key: string): BehaviorSubject<T | null> {
+    if (this.dictionary[Symbol.for(key)] == null) {
       this.dictionary[Symbol.for(key)] = new BehaviorSubject<T | null>(null);
     }
-    return (
-      (this.dictionary[Symbol.for(key)] as BehaviorSubject<T | null>) ??
-      this.parent.resolveReactive<T>(key)
-    );
+    const result = new BehaviorSubject<T | null>(null);
+    combineLatest([
+      this.dictionary[Symbol.for(key)] as BehaviorSubject<T | null>,
+      this.parent.resolveReactive<T>(key),
+    ])
+      .pipe(map(([current, old]) => current ?? old))
+      .subscribe((val) => result.next(val));
+    return result;
   }
 }

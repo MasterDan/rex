@@ -1,6 +1,6 @@
-import { DependencyResolver } from './dependencyResolver';
+import { DependencyResolverClassic } from './dependencyResolverClassic';
 
-export class DiContainer {
+export class DiContainerClassic {
   protected dictionary: Record<symbol, unknown> = {};
 
   register<T>(something: T, key: string | symbol | undefined = undefined) {
@@ -28,7 +28,7 @@ export class DiContainer {
     } else {
       result = this.dictionary[token] as T | undefined;
     }
-    if (result instanceof DependencyResolver && !result.hasContainer) {
+    if (result instanceof DependencyResolverClassic && !result.hasContainer) {
       result.setContainer(this);
     }
     return result;

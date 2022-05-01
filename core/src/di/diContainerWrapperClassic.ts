@@ -1,7 +1,7 @@
-import { DiContainer } from './diContainer';
+import { DiContainerClassic } from './diContainerClassic';
 
-export class DiContainerWrapper extends DiContainer {
-  constructor(private parent: DiContainer) {
+export class DiContainerWrapperClassic extends DiContainerClassic {
+  constructor(private parent: DiContainerClassic) {
     super();
   }
 

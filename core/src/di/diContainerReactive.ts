@@ -1,8 +1,8 @@
 import { BehaviorSubject } from 'rxjs';
 import { DependencyResolverReactive } from './dependencyResolverReactive';
-import { DiContainer } from './diContainer';
+import { DiContainerClassic } from './diContainerClassic';
 
-export class DiContainerReactive extends DiContainer {
+export class DiContainerReactive extends DiContainerClassic {
   registerReactive<T>(something: T, key: string) {
     const sym = Symbol.for(key);
     if (this.dictionary[sym] != null) {

@@ -1,12 +1,12 @@
-import { DependencyResolver } from './dependencyResolver';
-import { DiContainer } from './diContainer';
+import { DependencyResolverClassic } from './dependencyResolverClassic';
+import { DiContainerClassic } from './diContainerClassic';
 
-class TestResolverWrapper extends DependencyResolver {
+class TestResolverWrapper extends DependencyResolverClassic {
   foo = this.resolve<string>('foo');
   inner = this.resolve<TestResolver>('inner');
 }
 
-class TestResolver extends DependencyResolver {
+class TestResolver extends DependencyResolverClassic {
   foo = this.resolve<string>('foo');
   bar = this.resolve<string>('bar');
 }
@@ -16,7 +16,7 @@ describe('classic dependecy resolver', () => {
     const foo = 'foo';
     const bar = 'bar';
     const resolver = new TestResolver();
-    const di = new DiContainer();
+    const di = new DiContainerClassic();
     di.register<string>(foo, 'foo');
     di.register<string>(bar, 'bar');
     di.register<TestResolver>(resolver, 'resolver');
@@ -38,7 +38,7 @@ describe('classic dependecy resolver', () => {
     const bar = 'bar';
     const resolver = new TestResolver();
     const wrapper = new TestResolverWrapper();
-    const di = new DiContainer();
+    const di = new DiContainerClassic();
     di.register<string>(foo, 'foo');
     di.register<string>(bar, 'bar');
     di.register<TestResolver>(resolver, 'inner');

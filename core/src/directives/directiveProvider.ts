@@ -1,15 +1,14 @@
 import { filter, take } from 'rxjs';
+import { directivesKey } from '../di/constants';
 import { DependencyProvider } from '../di/dependencyProvider';
-import { DiContainer } from '../di/diContainer';
+import { DiContainerClassic } from '../di/diContainerClassic';
 import { Directive } from './directive';
 
-const directivesKey = Symbol('directives');
-
 export class DirectiveProvider extends DependencyProvider {
-  addDirective(...directives: Directive[]) {
+  addDirectives(...directives: Directive[]) {
     this.container$
       .pipe(
-        filter((c): c is DiContainer => c != null),
+        filter((c): c is DiContainerClassic => c != null),
         take(1),
       )
       .subscribe((di) => {

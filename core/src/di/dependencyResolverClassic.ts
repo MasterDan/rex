@@ -1,20 +1,20 @@
 import { BehaviorSubject, filter, map, Observable } from 'rxjs';
-import { DiContainer } from './diContainer';
+import { DiContainerClassic } from './diContainerClassic';
 
-export abstract class DependencyResolver {
-  protected container$ = new BehaviorSubject<DiContainer | null>(null);
+export abstract class DependencyResolverClassic {
+  protected container$ = new BehaviorSubject<DiContainerClassic | null>(null);
 
   get hasContainer(): boolean {
     return this.container$.value != null;
   }
 
-  setContainer(container: DiContainer) {
+  setContainer(container: DiContainerClassic) {
     this.container$.next(container);
   }
 
   resolve<T>(key: symbol | string): Observable<T | undefined> {
     return this.container$.pipe(
-      filter((c): c is DiContainer => c != null),
+      filter((c): c is DiContainerClassic => c != null),
       map((c) => c.resolve<T>(key)),
     );
   }

@@ -1,7 +1,7 @@
 import { BehaviorSubject } from 'rxjs';
-import { DependencyResolver } from '../di/dependencyResolver';
+import { DependencyResolverClassic } from '../di/dependencyResolverClassic';
 
-export class AttributePArser extends DependencyResolver {
+export class AttributePArser extends DependencyResolverClassic {
   source: BehaviorSubject<string>;
   constructor(str: string) {
     super();

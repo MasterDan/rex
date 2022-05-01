@@ -1,5 +1,5 @@
 import { filter } from 'rxjs';
-import { DependencyProviderReactive } from '../di/dependencyProviserReactive';
+import { DependencyProviderReactive } from '../di/dependencyProviderReactive';
 import { DiContainerWrapperReactive } from '../di/diContainerWrapperReactive';
 import { Ref } from './ref';
 

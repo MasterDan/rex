@@ -3,26 +3,30 @@ import { DependencyResolver } from './dependencyResolver';
 export class DiContainer {
   protected dictionary: Record<symbol, unknown> = {};
 
-  register<T>(something: T, description: string | undefined = undefined) {
+  register<T>(something: T, key: string | symbol | undefined = undefined) {
     const sym =
-      description == undefined ? Symbol(description) : Symbol.for(description);
+      typeof key === 'symbol'
+        ? key
+        : key == undefined
+        ? Symbol(key)
+        : Symbol.for(key);
     if (this.dictionary[sym] != null) {
       throw new Error(
-        `Value with key ${description ?? sym.toString} already exists!`,
+        `Value with key ${key?.toString() ?? sym.toString} already exists!`,
       );
     }
     this.dictionary[sym] = something;
     return {
       token: sym,
-      resolve: (): T => this.resolve<T>(sym),
+      resolve: (): T | undefined => this.resolve<T>(sym),
     };
   }
-  resolve<T>(token: symbol | string): T {
-    let result: T;
+  resolve<T>(token: symbol | string): T | undefined {
+    let result: T | undefined;
     if (typeof token === 'string') {
-      result = this.dictionary[Symbol.for(token)] as T;
+      result = this.dictionary[Symbol.for(token)] as T | undefined;
     } else {
-      result = this.dictionary[token] as T;
+      result = this.dictionary[token] as T | undefined;
     }
     if (result instanceof DependencyResolver && !result.hasContainer) {
       result.setContainer(this);

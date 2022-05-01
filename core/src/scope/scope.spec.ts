@@ -9,7 +9,7 @@ describe('scope', () => {
     const scope = new Scope({
       foo: new Ref<string>('fooo'),
     });
-    scope.setContainer(container);
+    container.provide(scope);
     const subscription = jest.fn((val: string | null) => {
       expect(val).toBe('fooo');
     });

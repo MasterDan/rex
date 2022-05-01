@@ -1,6 +1,6 @@
 import { filter, take } from 'rxjs';
 import { directivesKey } from '../di/constants';
-import { DependencyProvider } from '../di/dependencyProvider';
+import { DependencyProvider } from '../di/dependencyProviderClassic';
 import { DiContainerClassic } from '../di/diContainerClassic';
 import { Directive } from './directive';
 

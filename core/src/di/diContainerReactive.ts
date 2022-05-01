@@ -1,4 +1,5 @@
 import { BehaviorSubject } from 'rxjs';
+import { DependencyProviderReactive } from './dependencyProviderReactive';
 import { DependencyResolverReactive } from './dependencyResolverReactive';
 import { DiContainerClassic } from './diContainerClassic';
 
@@ -24,5 +25,11 @@ export class DiContainerReactive extends DiContainerClassic {
       result.value.setContainer(this);
     }
     return result;
+  }
+
+  provide(...providers: DependencyProviderReactive[]) {
+    for (const provider of providers) {
+      provider.setContainer(this);
+    }
   }
 }

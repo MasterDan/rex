@@ -5,7 +5,7 @@ export class DiContainerWrapper extends DiContainer {
     super();
   }
 
-  resolve<T>(token: string | symbol): T {
+  resolve<T>(token: string | symbol): T | undefined {
     return super.resolve(token) ?? this.parent.resolve(token);
   }
 

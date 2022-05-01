@@ -6,7 +6,7 @@ export class DiContainerWrapperReactive extends DiContainerReactive {
     super();
   }
 
-  resolve<T>(token: string | symbol): T {
+  resolve<T>(token: string | symbol): T | undefined {
     return super.resolve(token) ?? this.parent.resolve(token);
   }
 

@@ -1,4 +1,5 @@
 import { BehaviorSubject } from 'rxjs';
+import { Ctor } from '../tools/types/ctor';
 import { DependencyResolver } from './dependencyResolver';
 import { DependencyResolverClassic } from './dependencyResolverClassic';
 import { DependencyResolverReactive } from './dependencyResolverReactive';
@@ -12,7 +13,7 @@ export class DiContainer {
   private diReactive = new DiContainerReactive();
 
   register<T>(
-    something: T,
+    something: T | Ctor<T>,
     key: string | symbol | undefined = undefined,
   ): {
     token: symbol;

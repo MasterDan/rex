@@ -15,11 +15,10 @@ describe('classic dependecy resolver', () => {
   test('provide-resolve', () => {
     const foo = 'foo';
     const bar = 'bar';
-    const resolver = new TestResolver();
     const di = new DiContainerClassic();
     di.register<string>(foo, 'foo');
     di.register<string>(bar, 'bar');
-    di.register<TestResolver>(resolver, 'resolver');
+    di.register<TestResolver>(TestResolver, 'resolver');
     const resolved = di.resolve<TestResolver>('resolver');
     expect(resolved).not.toBe(null);
     const fooSub = jest.fn((foo) => {
@@ -36,13 +35,11 @@ describe('classic dependecy resolver', () => {
   test('resolve resolver classic', () => {
     const foo = 'foo';
     const bar = 'bar';
-    const resolver = new TestResolver();
-    const wrapper = new TestResolverWrapper();
     const di = new DiContainerClassic();
-    di.register<string>(foo, 'foo');
-    di.register<string>(bar, 'bar');
-    di.register<TestResolver>(resolver, 'inner');
-    di.register<TestResolverWrapper>(wrapper, 'wrapper');
+    di.register(foo, 'foo');
+    di.register(bar, 'bar');
+    di.register(TestResolver, 'inner');
+    di.register(TestResolverWrapper, 'wrapper');
     const resolved = di.resolve<TestResolverWrapper>('wrapper');
     expect(resolved).not.toBe(undefined);
     expect(resolved?.hasContainer).toBe(true);

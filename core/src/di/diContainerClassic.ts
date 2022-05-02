@@ -1,16 +1,19 @@
+import { Ctor } from '../tools/types/ctor';
 import { DependencyResolverClassic } from './dependencyResolverClassic';
 
 export class DiContainerClassic {
   protected dictionary: Record<symbol, unknown> = {};
 
-  register<T>(something: T, key: string | symbol | undefined = undefined) {
+  register<T>(
+    something: T | Ctor<T>,
+    key: string | symbol | undefined = undefined,
+  ) {
     const sym =
       typeof key === 'symbol'
         ? key
         : key == undefined
         ? Symbol(key)
         : Symbol.for(key);
-    console.log('register', key?.toString(), something, this.dictionary[sym]);
     if (this.dictionary[sym] != null) {
       throw new Error(
         `Value with key ${key?.toString() ?? sym.toString} already exists!`,
@@ -23,12 +26,14 @@ export class DiContainerClassic {
     };
   }
   resolve<T>(token: symbol | string): T | undefined {
-    let result: T | undefined;
+    let resolved: T | Ctor<T> | undefined;
     if (typeof token === 'string') {
-      result = this.dictionary[Symbol.for(token)] as T | undefined;
+      resolved = this.dictionary[Symbol.for(token)] as T | Ctor<T> | undefined;
     } else {
-      result = this.dictionary[token] as T | undefined;
+      resolved = this.dictionary[token] as T | Ctor<T> | undefined;
     }
+    const result =
+      typeof resolved === 'function' ? new (resolved as Ctor<T>)() : resolved;
     if (result instanceof DependencyResolverClassic && !result.hasContainer) {
       result.setContainer(this);
     }

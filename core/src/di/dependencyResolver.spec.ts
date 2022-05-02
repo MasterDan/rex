@@ -9,8 +9,7 @@ class Resolver extends DependencyResolver {
 describe('dependency resolver mixed', () => {
   test('simple resolve', () => {
     const di = new DiContainer();
-    const resolver = new Resolver();
-    di.register<Resolver>(resolver, 'r');
+    di.register<Resolver>(Resolver, 'r');
     di.registerReactive<string>('bar', 'bar');
     di.register<string>('foo', 'foo');
     const resolvedResolver = di.resolve<Resolver>('r');
@@ -26,7 +25,7 @@ describe('dependency resolver mixed', () => {
     expect(fooSub).toBeCalled();
     // scope
     const scopedDi = di.clone().createScope.classic();
-    scopedDi.register<string>('foo', 'fooo');
+    scopedDi.register<string>('fooo', 'foo');
     const fooScoped = scopedDi.resolve<string>('foo');
     expect(fooScoped).toBe('fooo');
     const resolvedFromScope = scopedDi.resolve<Resolver>('r');

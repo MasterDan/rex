@@ -1,3 +1,4 @@
+import { Ctor } from '../tools/types/ctor';
 import { DiContainerClassic } from './diContainerClassic';
 
 export class DiContainerWrapperClassic extends DiContainerClassic {
@@ -5,13 +6,14 @@ export class DiContainerWrapperClassic extends DiContainerClassic {
     super();
   }
 
+  override register<T>(
+    something: T | Ctor<T>,
+    key?: string | symbol | undefined,
+  ): { token: symbol; resolve: () => T | undefined } {
+    return super.register<T>(something, key);
+  }
+
   override resolve<T>(token: string | symbol): T | undefined {
-    console.log(
-      'here',
-      super.resolve(token),
-      'parent',
-      this.parent.resolve(token),
-    );
     return super.resolve(token) ?? this.parent.resolve(token);
   }
 

@@ -4,6 +4,8 @@ import { DependencyResolverClassic } from './dependencyResolverClassic';
 import { DependencyResolverReactive } from './dependencyResolverReactive';
 import { DiContainerClassic } from './diContainerClassic';
 import { DiContainerReactive } from './diContainerReactive';
+import { DiContainerWrapperClassic } from './diContainerWrapperClassic';
+import { DiContainerWrapperReactive } from './diContainerWrapperReactive';
 
 export class DiContainer {
   private diClassic = new DiContainerClassic();
@@ -41,5 +43,27 @@ export class DiContainer {
       result.setContainer(this);
     }
     return result;
+  }
+
+  createScope = {
+    classic: () => {
+      this.diClassic = new DiContainerWrapperClassic(this.diClassic);
+      return this;
+    },
+    reactive: () => {
+      this.diReactive = new DiContainerWrapperReactive(this.diReactive);
+      return this;
+    },
+  };
+
+  private static createFrom(other: DiContainer): DiContainer {
+    const result = new DiContainer();
+    result.diClassic = other.diClassic;
+    result.diReactive = other.diReactive;
+    return result;
+  }
+
+  clone(): DiContainer {
+    return DiContainer.createFrom(this);
   }
 }

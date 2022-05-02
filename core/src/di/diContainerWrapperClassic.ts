@@ -5,7 +5,13 @@ export class DiContainerWrapperClassic extends DiContainerClassic {
     super();
   }
 
-  resolve<T>(token: string | symbol): T | undefined {
+  override resolve<T>(token: string | symbol): T | undefined {
+    console.log(
+      'here',
+      super.resolve(token),
+      'parent',
+      this.parent.resolve(token),
+    );
     return super.resolve(token) ?? this.parent.resolve(token);
   }
 

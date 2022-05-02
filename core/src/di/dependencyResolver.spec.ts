@@ -27,6 +27,8 @@ describe('dependency resolver mixed', () => {
     // scope
     const scopedDi = di.clone().createScope.classic();
     scopedDi.register<string>('foo', 'fooo');
+    const fooScoped = scopedDi.resolve<string>('foo');
+    expect(fooScoped).toBe('fooo');
     const resolvedFromScope = scopedDi.resolve<Resolver>('r');
     expect(resolvedFromScope).not.toBe(undefined);
     const fooSubScoped = jest.fn((f) => {

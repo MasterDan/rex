@@ -10,6 +10,7 @@ export class DiContainerClassic {
         : key == undefined
         ? Symbol(key)
         : Symbol.for(key);
+    console.log('register', key?.toString(), something, this.dictionary[sym]);
     if (this.dictionary[sym] != null) {
       throw new Error(
         `Value with key ${key?.toString() ?? sym.toString} already exists!`,

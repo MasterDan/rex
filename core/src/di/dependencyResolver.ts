@@ -11,10 +11,11 @@ export class DependencyResolver {
       filter((v): v is T => v != null),
     );
   }
-  resolve<T>(key: symbol | string): Observable<T | undefined> {
+  resolve<T>(key: symbol | string): Observable<T> {
     return this.container$.pipe(
       filter((c): c is DiContainer => c != null),
       map((c) => c.resolve<T>(key)),
+      filter((v): v is T => v != null),
     );
   }
 

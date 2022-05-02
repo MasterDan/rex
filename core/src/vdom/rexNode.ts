@@ -8,14 +8,14 @@ import {
   of,
   switchMap,
 } from 'rxjs';
-import { DependencyResolverReactive } from '../di/dependencyResolverReactive';
+import { DependencyResolver } from '../di/dependencyResolver';
 import { Directive } from '../directives/directive';
 import { BehaviorMutable } from '../tools/rx/BehaviorMutable';
 import { isNullOrWhiteSpace } from '../tools/stringTools';
 
 export type RexNodeChildren = RexNode | RexNode[] | string | string[] | null;
 
-export class RexNode extends DependencyResolverReactive {
+export class RexNode extends DependencyResolver {
   tag$: BehaviorSubject<string>;
   attributes$: BehaviorSubject<Record<string, string> | null>;
   children$: BehaviorMutable<RexNodeChildren>;

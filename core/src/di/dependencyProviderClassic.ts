@@ -1,7 +1,7 @@
 import { BehaviorSubject, filter, take } from 'rxjs';
 import { DiContainerClassic } from './diContainerClassic';
 
-export abstract class DependencyProvider {
+export abstract class DependencyProviderClassic {
   protected container$ = new BehaviorSubject<DiContainerClassic | null>(null);
 
   get hasContainer(): boolean {

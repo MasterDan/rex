@@ -1,4 +1,4 @@
-import { BehaviorSubject, filter, switchMap } from 'rxjs';
+import { BehaviorSubject, filter, merge, switchMap } from 'rxjs';
 import { DependencyResolver } from '../di/dependencyResolver';
 import { RexNode } from '../vdom/rexNode';
 
@@ -25,5 +25,6 @@ export class DirectiveDetector extends DependencyResolver {
           !(children instanceof RexNode),
       ),
     );
+    merge(array$, simpleText$);
   }
 }

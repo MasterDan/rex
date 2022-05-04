@@ -1,7 +1,6 @@
 import {
   BehaviorSubject,
   combineLatest,
-  filter,
   first,
   map,
   Observable,
@@ -13,7 +12,7 @@ import { Directive } from '../directives/directive';
 import { BehaviorMutable } from '../tools/rx/BehaviorMutable';
 import { isNullOrWhiteSpace } from '../tools/stringTools';
 
-export type RexNodeChildren = RexNode | RexNode[] | string | string[] | null;
+export type RexNodeChildren = RexNode | string | Array<string | RexNode> | null;
 
 export class RexNode extends DependencyResolver {
   tag$: BehaviorSubject<string>;
@@ -53,14 +52,10 @@ export class RexNode extends DependencyResolver {
         } else if (typeof children === 'string') {
           return of(children);
         } else if (children instanceof RexNode) {
-          return children.text$.pipe(filter((t): t is string => t != null));
+          return children.text$;
         } else {
           return combineLatest(
-            children.map((c) =>
-              typeof c === 'string'
-                ? of(c)
-                : c.text$.pipe(filter((t): t is string => t != null)),
-            ),
+            children.map((c) => (typeof c === 'string' ? of(c) : c.text$)),
           ).pipe(map((arr) => arr.join('')));
         }
       }),

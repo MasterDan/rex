@@ -8,11 +8,21 @@ export class DirectiveDetector extends DependencyResolver {
     super();
     this.sourceNode$ = new BehaviorSubject<RexNode>(node);
 
-    this.sourceNode$.pipe(
+    const simpleText$ = this.sourceNode$.pipe(
       switchMap((node) => node.children$),
       filter(
         (children): children is string =>
           children != null && typeof children === 'string',
+      ),
+    );
+
+    const array$ = this.sourceNode$.pipe(
+      switchMap((node) => node.children$),
+      filter(
+        (children): children is Array<string | RexNode> =>
+          children != null &&
+          !(typeof children === 'string') &&
+          !(children instanceof RexNode),
       ),
     );
   }

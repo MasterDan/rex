@@ -75,13 +75,13 @@ export class RexNode extends DependencyResolver {
           let nodes: RexNode | RexNode[] | null = null;
           for (const dir of dirs) {
             if (nodes == null) {
-              nodes = dir.__apply__(this);
+              nodes = dir.init(this);
             } else if (nodes instanceof RexNode) {
-              nodes = dir.__apply__(nodes);
+              nodes = dir.init(nodes);
             } else {
               nodes = nodes
                 .map((node) => {
-                  const transformed = dir.__apply__(node);
+                  const transformed = dir.init(node);
                   if (transformed instanceof RexNode) {
                     return [transformed];
                   } else return transformed;

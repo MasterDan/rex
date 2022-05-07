@@ -1,5 +1,6 @@
 import { BehaviorSubject } from 'rxjs';
 import { Ctor } from '../tools/types/ctor';
+import { DependencyProviderReactive } from './dependencyProviderReactive';
 import { DependencyResolver } from './dependencyResolver';
 import { DependencyResolverClassic } from './dependencyResolverClassic';
 import { DependencyResolverReactive } from './dependencyResolverReactive';
@@ -44,6 +45,10 @@ export class DiContainer {
       result.setContainer(this);
     }
     return result;
+  }
+
+  provideReactive(...providers: DependencyProviderReactive[]) {
+    this.diReactive.provide(...providers);
   }
 
   createScope = {

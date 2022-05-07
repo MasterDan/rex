@@ -7,8 +7,10 @@ import {
   of,
   switchMap,
 } from 'rxjs';
+import { directiveDetectorKey } from '../di/constants';
 import { DependencyResolver } from '../di/dependencyResolver';
 import { Directive } from '../directives/directive';
+import { DirectiveDetector } from '../directives/directiveDetector';
 import { BehaviorMutable } from '../tools/rx/BehaviorMutable';
 import { isNullOrWhiteSpace } from '../tools/stringTools';
 
@@ -32,6 +34,12 @@ export class RexNode extends DependencyResolver {
       attributes,
     );
     this.children$ = new BehaviorMutable<RexNodeChildren>(children);
+
+    this.resolve<DirectiveDetector>(directiveDetectorKey).subscribe(
+      (detector) => {
+        detector.findStringTemplates(this);
+      },
+    );
   }
 
   get text$(): Observable<string> {

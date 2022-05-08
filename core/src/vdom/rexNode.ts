@@ -75,7 +75,10 @@ export class RexNode extends DependencyResolver {
           : `<${tag} ${attrs} >${content}</${tag}>`;
       }),
     );
-    return combineLatest([selfText$, this.directives$]).pipe(
+    return combineLatest([
+      selfText$,
+      this.directives$.pipe(map((dirs) => dirs.filter((d) => !d._initialized))),
+    ]).pipe(
       switchMap(([text, dirs]) => {
         if (dirs.length === 0) {
           return of(text);
@@ -83,13 +86,13 @@ export class RexNode extends DependencyResolver {
           let nodes: RexNode | RexNode[] | null = null;
           for (const dir of dirs) {
             if (nodes == null) {
-              nodes = dir.init(this);
+              nodes = dir.__apply(this);
             } else if (nodes instanceof RexNode) {
-              nodes = dir.init(nodes);
+              nodes = dir.__apply(nodes);
             } else {
               nodes = nodes
                 .map((node) => {
-                  const transformed = dir.init(node);
+                  const transformed = dir.__apply(node);
                   if (transformed instanceof RexNode) {
                     return [transformed];
                   } else return transformed;

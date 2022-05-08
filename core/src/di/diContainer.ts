@@ -53,7 +53,7 @@ export class DiContainer {
   }
 
   provide(...providers: DependencyProviderClassic[]) {
-    this.diClassic.provideReactive(...providers);
+    this.diClassic.provide(...providers);
   }
 
   createScope = {

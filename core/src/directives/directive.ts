@@ -13,6 +13,7 @@ export abstract class Directive<T = string> extends DependencyResolverReactive {
   shorthand: string | null = null;
   valueKey$: BehaviorSubject<string | null>;
   value$ = new BehaviorSubject<T | null>(null);
+  _initialized = false;
 
   protected get value(): T | null {
     return this.value$.value;
@@ -33,5 +34,11 @@ export abstract class Directive<T = string> extends DependencyResolverReactive {
 
   init(node: RexNode): RexNode | RexNode[] {
     return node;
+  }
+
+  __apply(node: RexNode): RexNode | RexNode[] {
+    const result = this.init(node);
+    this._initialized = true;
+    return result;
   }
 }

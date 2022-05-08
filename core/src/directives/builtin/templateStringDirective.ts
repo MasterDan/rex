@@ -45,10 +45,10 @@ export class TemplateStringDirective extends Directive {
           console.log('keys', keys);
           const resolved = keys.map((key) =>
             this.resolveReactive<Ref<string>>(key).pipe(
-              switchMap((v) => v),
               tap((v) => {
-                console.log('value for key', v);
+                console.log('value for key', key, 'is', v);
               }),
+              switchMap((v) => v),
               map((v) => (v == null ? '' : v)),
               map((value) => ({
                 key,

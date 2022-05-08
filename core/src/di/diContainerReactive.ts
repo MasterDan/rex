@@ -27,7 +27,7 @@ export class DiContainerReactive extends DiContainerClassic {
     return result;
   }
 
-  provide(...providers: DependencyProviderReactive[]) {
+  provideReactive(...providers: DependencyProviderReactive[]) {
     for (const provider of providers) {
       provider.setContainer(this);
     }

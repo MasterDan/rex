@@ -8,6 +8,7 @@ import {
   map,
   of,
   switchMap,
+  tap,
 } from 'rxjs';
 import { Directive } from '../directive';
 import {
@@ -39,10 +40,15 @@ export class TemplateStringDirective extends Directive {
             strToRepl != null && typeof strToRepl === 'string',
         ),
         switchMap((strToRepl) => {
+          console.log('template string', strToRepl);
           const keys = getKeysToInsert(strToRepl);
+          console.log('keys', keys);
           const resolved = keys.map((key) =>
             this.resolveReactive<Ref<string>>(key).pipe(
               switchMap((v) => v),
+              tap((v) => {
+                console.log('value for key', v);
+              }),
               map((v) => (v == null ? '' : v)),
               map((value) => ({
                 key,
@@ -56,6 +62,7 @@ export class TemplateStringDirective extends Directive {
           });
         }),
         map((arg) => {
+          console.log('arg', arg);
           const acc: Record<string, string> = {};
           for (const pair of arg.pairs) {
             acc[pair.key] = pair.value;

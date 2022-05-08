@@ -1,4 +1,11 @@
-import { BehaviorSubject, filter, map, Observable, switchMap } from 'rxjs';
+import {
+  BehaviorSubject,
+  filter,
+  map,
+  Observable,
+  switchMap,
+  take,
+} from 'rxjs';
 import { DiContainer } from './diContainer';
 
 export class DependencyResolver {
@@ -16,6 +23,7 @@ export class DependencyResolver {
       filter((c): c is DiContainer => c != null),
       map((c) => c.resolve<T>(key)),
       filter((v): v is T => v != null),
+      take(1),
     );
   }
 

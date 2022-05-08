@@ -1,4 +1,5 @@
-import { filter, take } from 'rxjs';
+import { filter, map, take, withLatestFrom } from 'rxjs';
+import { documentKey } from '../di/constants';
 import { DependencyResolver } from '../di/dependencyResolver';
 import { DiContainer } from '../di/diContainer';
 import { Ref } from '../scope/ref';
@@ -27,12 +28,17 @@ export class Component extends DependencyResolver {
         di.provideReactive(new Scope(state));
         this.render.setContainer(di);
       });
-    throw new Error('Not Implemented');
   }
 
   mount(selector: string) {
-    console.log(selector);
-
-    throw new Error('Not Implemented');
+    this.resolve<Document>(documentKey)
+      .pipe(
+        map((doc) => doc.querySelector(selector)),
+        filter((el): el is Element => el != null),
+        withLatestFrom(this.render.text$),
+      )
+      .subscribe(([element, html]) => {
+        element.innerHTML = html;
+      });
   }
 }

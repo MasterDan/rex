@@ -3,11 +3,12 @@ import { JSDOM } from 'jsdom';
 import { documentKey } from '../di/constants';
 
 export class JsDomPlugin extends RexPlugin {
+  dom: JSDOM;
   constructor(private html: string) {
     super();
+    this.dom = new JSDOM(this.html);
   }
   install(): void {
-    const dom = new JSDOM(this.html);
-    this.register(dom.window.document, documentKey);
+    this.register(this.dom.window.document, documentKey);
   }
 }

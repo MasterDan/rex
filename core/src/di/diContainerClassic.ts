@@ -1,4 +1,5 @@
 import { Ctor } from '../tools/types/ctor';
+import { DependencyProviderClassic } from './dependencyProviderClassic';
 import { DependencyResolverClassic } from './dependencyResolverClassic';
 
 export class DiContainerClassic {
@@ -39,6 +40,13 @@ export class DiContainerClassic {
     }
     return result;
   }
+
+  provide(...providers: DependencyProviderClassic[]) {
+    for (const provider of providers) {
+      provider.setContainer(this);
+    }
+  }
+
   isKeyFree(key: string): boolean {
     return this.dictionary[Symbol.for(key)] == null;
   }

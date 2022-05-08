@@ -81,7 +81,7 @@ export class RexNode extends DependencyResolver {
     ]).pipe(
       switchMap(([text, dirs]) => {
         if (dirs.length === 0) {
-          return of(text);
+          return new BehaviorSubject(text);
         } else {
           let nodes: RexNode | RexNode[] | null = null;
           for (const dir of dirs) {

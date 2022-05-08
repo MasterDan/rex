@@ -3,11 +3,11 @@ import { RexNode } from 'core/src/vdom/rexNode';
 import {
   combineLatest,
   filter,
-  first,
   forkJoin,
   map,
   of,
   switchMap,
+  take,
   tap,
 } from 'rxjs';
 import { Directive } from '../directive';
@@ -56,7 +56,7 @@ export class TemplateStringDirective extends Directive {
           );
           return forkJoin({
             template: of(strToRepl),
-            pairs: combineLatest(resolved).pipe(first()),
+            pairs: combineLatest(resolved).pipe(take(1)),
           });
         }),
         map((arg) => {

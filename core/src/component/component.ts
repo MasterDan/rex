@@ -36,7 +36,6 @@ export class Component extends DependencyResolver {
         map((doc) => doc.querySelector(selector)),
         filter((el): el is Element => el != null),
         withLatestFrom(this.render.text$),
-        take(1),
       )
       .subscribe(([element, html]) => {
         element.innerHTML = html;

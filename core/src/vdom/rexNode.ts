@@ -1,11 +1,11 @@
 import {
   BehaviorSubject,
   combineLatest,
-  first,
   map,
   Observable,
   of,
   switchMap,
+  take,
 } from 'rxjs';
 import { directiveDetectorKey } from '../di/constants';
 import { DependencyResolver } from '../di/dependencyResolver';
@@ -109,7 +109,7 @@ export class RexNode extends DependencyResolver {
           }
         }
       }),
-      first(),
+      take(1),
     );
   }
 

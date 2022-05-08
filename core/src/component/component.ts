@@ -10,7 +10,7 @@ export interface IComponentConstructorArgs {
   setup(): Record<string, Ref>;
 }
 
-export abstract class Component extends DependencyResolver {
+export class Component extends DependencyResolver {
   render = new RexNode('');
   constructor(arg: IComponentConstructorArgs) {
     super();
@@ -27,6 +27,12 @@ export abstract class Component extends DependencyResolver {
         di.provideReactive(new Scope(state));
         this.render.setContainer(di);
       });
+    throw new Error('Not Implemented');
+  }
+
+  mount(selector: string) {
+    console.log(selector);
+
     throw new Error('Not Implemented');
   }
 }

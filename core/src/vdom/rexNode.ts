@@ -81,18 +81,18 @@ export class RexNode extends DependencyResolver {
     ]).pipe(
       switchMap(([text, dirs]) => {
         if (dirs.length === 0) {
-          return new BehaviorSubject(text);
+          return of(text);
         } else {
           let nodes: RexNode | RexNode[] | null = null;
-          for (const dir of dirs) {
+          for (const directive of dirs) {
             if (nodes == null) {
-              nodes = dir.__apply(this);
+              nodes = directive.__apply(this);
             } else if (nodes instanceof RexNode) {
-              nodes = dir.__apply(nodes);
+              nodes = directive.__apply(nodes);
             } else {
               nodes = nodes
                 .map((node) => {
-                  const transformed = dir.__apply(node);
+                  const transformed = directive.__apply(node);
                   if (transformed instanceof RexNode) {
                     return [transformed];
                   } else return transformed;

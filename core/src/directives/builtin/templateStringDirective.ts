@@ -23,6 +23,8 @@ export class TemplateStringDirective extends Directive {
   }
 
   override init(node: RexNode): RexNode | RexNode[] {
+    console.log('initializing for child', this.childIndex);
+
     node.children$
       .pipe(
         map((val) => {
@@ -71,6 +73,7 @@ export class TemplateStringDirective extends Directive {
           valueToModify[this.childIndex] = templateResult;
           node.children$.next(valueToModify);
         } else {
+          console.log('parseText initialized', templateResult);
           node.children$.next(templateResult);
         }
       });

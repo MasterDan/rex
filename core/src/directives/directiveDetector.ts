@@ -4,11 +4,6 @@ import { getKeysToInsert } from './stringParser/stringParser';
 import { TemplateStringDirective } from './builtin/templateStringDirective';
 
 export class DirectiveDetector extends DependencyResolver {
-  constructor(node: RexNode) {
-    super();
-    this.findStringTemplates(node);
-  }
-
   findStringTemplates(node: RexNode): void {
     if (
       node.children$.value == null ||

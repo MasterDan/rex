@@ -9,16 +9,14 @@ describe('application tests', () => {
     const rootComponent = new Component({
       render: new RexNode('div', null, 'Hello, {{ word }}'),
       setup() {
+        const word = new Ref('Danny');
         return {
-          word: new Ref('Danny'),
+          word,
         };
       },
     });
     const jsDom = new JsDomPlugin('<div id="rexApp" ></div>');
     new RexApp(rootComponent).extend(jsDom).mount('#rexApp');
-    const text =
-      jsDom.dom.window.document.querySelector('#rexApp')?.textContent;
     console.log(jsDom.dom.window.document.body.innerHTML);
-    console.log('inner Text Is', text);
   });
 });

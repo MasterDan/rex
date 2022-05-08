@@ -1,7 +1,9 @@
 import { Component } from '../component/component';
 import { directiveDetectorKey, rootComponentKey } from '../di/constants';
 import { DiContainer } from '../di/diContainer';
+import { TemplateStringDirective } from '../directives/builtin/templateStringDirective';
 import { DirectiveDetector } from '../directives/directiveDetector';
+import { DirectiveProvider } from '../directives/directiveProvider';
 import { RexPlugin } from '../plugins/plugin';
 
 export function createApp(): RexApp {
@@ -13,6 +15,7 @@ export class RexApp {
   constructor(root: Component) {
     this.di.register(root, rootComponentKey);
     this.di.register(DirectiveDetector, directiveDetectorKey);
+    this.di.provide(new DirectiveProvider(TemplateStringDirective));
   }
 
   extend(...plugins: RexPlugin[]): RexApp {

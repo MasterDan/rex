@@ -16,12 +16,10 @@ import {
   parseTemplateString,
 } from '../stringParser/stringParser';
 
+export const templateStringDirName = '__template_String__';
 export class TemplateStringDirective extends Directive {
-  name = '__template_String__';
-
-  constructor(private childIndex: number | null = null) {
-    super();
-  }
+  name = templateStringDirName;
+  childIndex: number | null = null;
 
   override init(node: RexNode): RexNode | RexNode[] {
     console.log('initializing for child', this.childIndex);

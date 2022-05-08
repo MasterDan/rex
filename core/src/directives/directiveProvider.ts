@@ -1,5 +1,4 @@
 import { filter, take } from 'rxjs';
-import { directivesKey } from '../di/constants';
 import { DependencyProviderClassic } from '../di/dependencyProviderClassic';
 import { DiContainerClassic } from '../di/diContainerClassic';
 import { Ctor } from '../tools/types/ctor';
@@ -14,16 +13,14 @@ export class DirectiveProvider extends DependencyProviderClassic {
         take(1),
       )
       .subscribe((di) => {
-        const dictionary =
-          di.resolve<Record<string, Ctor<Directive>>>(directivesKey) ?? {};
         for (const dirCtor of directives) {
           const dir = new dirCtor();
-          if (dictionary[dir.name] != null) {
+          const resolvedDir = di.resolve<Directive>(dir.name);
+          if (resolvedDir != null) {
             throw new Error(`Directive with name ${dir.name} already exists!`);
           }
-          dictionary[dir.name] = dirCtor;
+          this.register(dirCtor, dir.name);
         }
-        this.register(dictionary, directivesKey);
         return;
       });
   }

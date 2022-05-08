@@ -5,10 +5,8 @@ import {
   TemplateStringDirective,
   templateStringDirName,
 } from './builtin/templateStringDirective';
-import { directivesKey } from '../di/constants';
 import { Directive } from './directive';
-import { filter, map, Observable, take } from 'rxjs';
-import { Ctor } from '../tools/types/ctor';
+import { filter, Observable, take } from 'rxjs';
 
 export class DirectiveDetector extends DependencyResolver {
   findStringTemplates(node: RexNode): void {
@@ -46,10 +44,8 @@ export class DirectiveDetector extends DependencyResolver {
   }
 
   private resolveDirective<T extends Directive>(name: string): Observable<T> {
-    return this.resolve<Record<string, Ctor<Directive>>>(directivesKey).pipe(
-      map((dirs) => dirs[name]),
-      filter((ctor) => ctor != null),
-      map((ctor) => new ctor() as T),
+    return this.resolve<Directive>(name).pipe(
+      filter((dir): dir is T => dir != null),
       take(1),
     );
   }

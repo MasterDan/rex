@@ -12,7 +12,7 @@ export abstract class DependencyProviderClassic {
     this.container$.next(container);
   }
 
-  register<T>(item: T, key: string | symbol) {
+  protected register<T>(item: T, key: string | symbol) {
     return this.container$
       .pipe(
         filter((c): c is DiContainerClassic => c != null),

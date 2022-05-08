@@ -12,7 +12,7 @@ export abstract class DependencyProviderReactive {
     this.container$.next(container);
   }
 
-  registerReactive<T>(item: T, key: string) {
+  protected registerReactive<T>(item: T, key: string) {
     return this.container$
       .pipe(
         filter((c): c is DiContainerReactive => c != null),

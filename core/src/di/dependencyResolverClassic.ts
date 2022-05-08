@@ -12,7 +12,7 @@ export abstract class DependencyResolverClassic {
     this.container$.next(container);
   }
 
-  resolve<T>(key: symbol | string): Observable<T | undefined> {
+  protected resolve<T>(key: symbol | string): Observable<T | undefined> {
     return this.container$.pipe(
       filter((c): c is DiContainerClassic => c != null),
       map((c) => c.resolve<T>(key)),

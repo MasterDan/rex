@@ -18,6 +18,7 @@ describe('application tests', () => {
     new RexApp(rootComponent).extend(jsDom).mount('#rexApp');
     const text =
       jsDom.dom.window.document.querySelector('#rexApp')?.textContent;
+    console.log(jsDom.dom.window.document.body.innerHTML);
     console.log('inner Text Is', text);
   });
 });

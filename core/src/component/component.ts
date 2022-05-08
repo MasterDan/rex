@@ -38,6 +38,7 @@ export class Component extends DependencyResolver {
         withLatestFrom(this.render.text$),
       )
       .subscribe(([element, html]) => {
+        console.log('mounting', html);
         element.innerHTML = html;
       });
   }

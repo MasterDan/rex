@@ -24,7 +24,7 @@ export class RexNode extends DependencyResolver {
   directives$ = new BehaviorMutable<Directive[]>([]);
 
   constructor(
-    tag: string,
+    tag = '',
     attributes: Record<string, string> | null = null,
     children: RexNodeChildren = null,
   ) {

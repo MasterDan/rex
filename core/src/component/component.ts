@@ -6,14 +6,18 @@ import { Scope } from '../scope/scope';
 import { RexNode } from '../vdom/rexNode';
 
 export interface IComponentConstructorArgs {
-  template: RexNode;
+  render: RexNode | null;
   setup(): Record<string, Ref>;
 }
 
 export abstract class Component extends DependencyResolver {
+  render = new RexNode('');
   constructor(arg: IComponentConstructorArgs) {
     super();
     const state = arg.setup();
+    if (arg.render != null) {
+      this.render = arg.render;
+    }
     this.container$
       .pipe(
         filter((v): v is DiContainer => v != null),
@@ -21,6 +25,7 @@ export abstract class Component extends DependencyResolver {
       )
       .subscribe((di) => {
         di.provideReactive(new Scope(state));
+        this.render.setContainer(di);
       });
     throw new Error('Not Implemented');
   }

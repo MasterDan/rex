@@ -16,6 +16,7 @@ export abstract class Directive<T = string> extends DependencyResolverReactive {
   constructor(key: string | null = null) {
     super();
     this.valueKey$ = new BehaviorSubject<string | null>(key);
+    // resolving and unwrapping value
     this.valueKey$
       .pipe(
         filter((s): s is string => s != null),

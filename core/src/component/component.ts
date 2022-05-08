@@ -3,8 +3,10 @@ import { DependencyResolver } from '../di/dependencyResolver';
 import { DiContainer } from '../di/diContainer';
 import { Ref } from '../scope/ref';
 import { Scope } from '../scope/scope';
+import { RexNode } from '../vdom/rexNode';
 
 export interface IComponentConstructorArgs {
+  template: RexNode;
   setup(): Record<string, Ref>;
 }
 

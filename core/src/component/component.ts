@@ -1,4 +1,4 @@
-import { filter, map, take, tap, withLatestFrom } from 'rxjs';
+import { filter, map, take, withLatestFrom } from 'rxjs';
 import { documentKey } from '../di/constants';
 import { DependencyResolver } from '../di/dependencyResolver';
 import { DiContainer } from '../di/diContainer';
@@ -34,14 +34,11 @@ export class Component extends DependencyResolver {
     this.resolve<Document>(documentKey)
       .pipe(
         map((doc) => doc.querySelector(selector)),
-        tap((el) => {
-          console.log('element is', el);
-        }),
         filter((el): el is Element => el != null),
         withLatestFrom(this.render.text$),
+        take(1),
       )
       .subscribe(([element, html]) => {
-        console.log('mounting', html);
         element.innerHTML = html;
       });
   }

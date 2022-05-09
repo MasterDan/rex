@@ -75,16 +75,14 @@ export class RexNode extends DependencyResolver {
           : `<${tag} ${attrs} >${content}</${tag}>`;
       }),
     );
-    return combineLatest([
-      selfText$,
-      this.directives$.pipe(map((dirs) => dirs.filter((d) => !d._initialized))),
-    ]).pipe(
+    return combineLatest([selfText$, this.directives$]).pipe(
       switchMap(([text, dirs]) => {
         if (dirs.length === 0) {
           return of(text);
         } else {
           let nodes: RexNode | RexNode[] | null = null;
-          for (const directive of dirs) {
+          for (const key in dirs.filter((d) => !d._initialized)) {
+            const directive: Directive = dirs[key];
             if (nodes == null) {
               nodes = directive.__apply(this);
             } else if (nodes instanceof RexNode) {
@@ -100,7 +98,9 @@ export class RexNode extends DependencyResolver {
                 .reduce((a, c) => a.concat(c));
             }
           }
-          if (nodes instanceof RexNode) {
+          if (nodes == null) {
+            return of(text);
+          } else if (nodes instanceof RexNode) {
             return nodes.text$;
           } else {
             return combineLatest(nodes?.map((n) => n.text$) ?? []).pipe(

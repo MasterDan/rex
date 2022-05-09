@@ -8,7 +8,6 @@ import {
   of,
   switchMap,
   take,
-  tap,
 } from 'rxjs';
 import { Directive } from '../directive';
 import {
@@ -22,8 +21,6 @@ export class TemplateStringDirective extends Directive {
   childIndex: number | null = null;
 
   override init(node: RexNode): RexNode | RexNode[] {
-    console.log('initializing for child', this.childIndex);
-
     node.children$
       .pipe(
         map((val) => {
@@ -38,14 +35,9 @@ export class TemplateStringDirective extends Directive {
             strToRepl != null && typeof strToRepl === 'string',
         ),
         switchMap((strToRepl) => {
-          console.log('template string', strToRepl);
           const keys = getKeysToInsert(strToRepl);
-          console.log('keys', keys);
           const resolved = keys.map((key) =>
             this.resolveReactive<Ref<string>>(key).pipe(
-              tap((v) => {
-                console.log('value for key', key, 'is', v);
-              }),
               switchMap((v) => v),
               map((v) => (v == null ? '' : v)),
               map((value) => ({
@@ -60,7 +52,6 @@ export class TemplateStringDirective extends Directive {
           });
         }),
         map((arg) => {
-          console.log('arg', arg);
           const acc: Record<string, string> = {};
           for (const pair of arg.pairs) {
             acc[pair.key] = pair.value;
@@ -78,7 +69,6 @@ export class TemplateStringDirective extends Directive {
           valueToModify[this.childIndex] = templateResult;
           node.children$.next(valueToModify);
         } else {
-          console.log('parseText initialized', templateResult);
           node.children$.next(templateResult);
         }
       });

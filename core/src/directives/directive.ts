@@ -37,8 +37,7 @@ export abstract class Directive<T = string> extends DependencyResolverReactive {
   }
 
   __apply(node: RexNode): RexNode | RexNode[] {
-    const result = this.init(node);
     this._initialized = true;
-    return result;
+    return this.init(node);
   }
 }

@@ -65,9 +65,11 @@ export class TemplateStringDirective extends Directive {
       .subscribe((arg) => {
         const templateResult = parseTemplateString(arg.template, arg.state);
         if (this.childIndex != null) {
-          const valueToModify = node.children$.value as string[];
-          valueToModify[this.childIndex] = templateResult;
-          node.children$.next(valueToModify);
+          node.children$.mutate((array) => {
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            (array as string[])[this.childIndex!] = templateResult;
+            return array;
+          });
         } else {
           node.children$.next(templateResult);
         }

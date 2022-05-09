@@ -21,4 +21,26 @@ describe('application tests', () => {
       '<div id="rexApp"><div>Hello, Danny</div></div>',
     );
   });
+  test('Div with array of children', () => {
+    const rootComponent = new Component({
+      render: new RexNode('div', null, [
+        '{{ foo }}',
+        new RexNode('span', null, '-'),
+        '{{ bar }}',
+      ]),
+      setup() {
+        const foo = new Ref('fizz');
+        const bar = new Ref('buzz');
+        return {
+          foo,
+          bar,
+        };
+      },
+    });
+    const jsDom = new JsDomPlugin('<div id="rexApp" ></div>');
+    new RexApp(rootComponent).extend(jsDom).mount('#rexApp');
+    expect(jsDom.dom.window.document.body.innerHTML).toBe(
+      '<div id="rexApp"><div>fizz<span>-</span>buzz</div></div>',
+    );
+  });
 });

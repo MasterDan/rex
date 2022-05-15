@@ -20,11 +20,16 @@ export type RexNodeChildren = RexNode | string | Array<string | RexNode> | null;
 
 export class RexNode extends DependencyResolver {
   tag$: BehaviorSubject<string>;
+
   attributes$: BehaviorMutable<Record<string, string> | null>;
+
   children$: BehaviorMutable<RexNodeChildren>;
+
   _updatable = new BehaviorSubject<boolean>(false);
 
   directives$ = new BehaviorMutable<Directive[]>([]);
+
+  parentNode$ = new BehaviorSubject<RexNode | null>(null);
 
   constructor(
     tag = '',
@@ -37,7 +42,17 @@ export class RexNode extends DependencyResolver {
       attributes,
     );
     this.children$ = new BehaviorMutable<RexNodeChildren>(children);
-
+    this.children$.subscribe((children) => {
+      if (children instanceof RexNode) {
+        children.parentNode$.next(this);
+      } else if (Array.isArray(children)) {
+        children
+          .filter((child): child is RexNode => child instanceof RexNode)
+          .forEach((child) => {
+            child.parentNode$.next(this);
+          });
+      }
+    });
     combineLatest([this.container$, this.children$])
       .pipe(
         filter((arr): arr is [DiContainer, RexNodeChildren] => {

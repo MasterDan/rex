@@ -11,6 +11,8 @@ import { Ref } from '../scope/ref';
 export abstract class Directive<T = string> extends DependencyResolverReactive {
   abstract name: string;
   shorthand: string | null = null;
+
+  _sourceNode$ = new BehaviorSubject<RexNode | null>(null);
   valueKey$: BehaviorSubject<string | null>;
   value$ = new BehaviorSubject<T | null>(null);
   _initialized = false;
@@ -37,6 +39,7 @@ export abstract class Directive<T = string> extends DependencyResolverReactive {
   }
 
   __apply(node: RexNode): RexNode | RexNode[] {
+    this._sourceNode$.next(node);
     this._initialized = true;
     return this.init(node);
   }

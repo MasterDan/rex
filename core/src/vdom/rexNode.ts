@@ -22,6 +22,7 @@ export class RexNode extends DependencyResolver {
   tag$: BehaviorSubject<string>;
   attributes$: BehaviorSubject<Record<string, string> | null>;
   children$: BehaviorMutable<RexNodeChildren>;
+  _updatable = new BehaviorSubject<boolean>(false);
 
   directives$ = new BehaviorMutable<Directive[]>([]);
 

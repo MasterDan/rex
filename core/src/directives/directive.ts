@@ -1,7 +1,7 @@
-import { RexNode } from 'core/src/vdom/rexNode';
 import { BehaviorSubject, filter, switchMap } from 'rxjs';
 import { DependencyResolverReactive } from '../di/dependencyResolverReactive';
 import { Ref } from '../scope/ref';
+import { RexNode } from '../vdom/rexNode';
 /**
  * В общем виде директива - это штука, которая обновляет наше дерево
  * Мы не ищем вершины, требующие обновления явно. Всё нелбходимое уже должно быть

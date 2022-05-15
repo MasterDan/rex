@@ -1,6 +1,7 @@
 import {
   BehaviorSubject,
   combineLatest,
+  filter,
   map,
   Observable,
   of,
@@ -9,6 +10,7 @@ import {
 } from 'rxjs';
 import { directiveDetectorKey } from '../di/constants';
 import { DependencyResolver } from '../di/dependencyResolver';
+import { DiContainer } from '../di/diContainer';
 import { Directive } from '../directives/directive';
 import { DirectiveDetector } from '../directives/directiveDetector';
 import { BehaviorMutable } from '../tools/rx/BehaviorMutable';
@@ -34,6 +36,25 @@ export class RexNode extends DependencyResolver {
       attributes,
     );
     this.children$ = new BehaviorMutable<RexNodeChildren>(children);
+
+    combineLatest([this.container$, this.children$])
+      .pipe(
+        filter((arr): arr is [DiContainer, RexNodeChildren] => {
+          const [di] = arr;
+          return di != null;
+        }),
+      )
+      .subscribe(([di, children]) => {
+        if (children instanceof RexNode) {
+          children.setContainer(di);
+        } else if (Array.isArray(children)) {
+          children
+            .filter((child): child is RexNode => child instanceof RexNode)
+            .forEach((child) => {
+              child.setContainer(di);
+            });
+        }
+      });
 
     this.resolve<DirectiveDetector>(directiveDetectorKey).subscribe(
       (detector) => {

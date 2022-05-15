@@ -20,7 +20,7 @@ export type RexNodeChildren = RexNode | string | Array<string | RexNode> | null;
 
 export class RexNode extends DependencyResolver {
   tag$: BehaviorSubject<string>;
-  attributes$: BehaviorSubject<Record<string, string> | null>;
+  attributes$: BehaviorMutable<Record<string, string> | null>;
   children$: BehaviorMutable<RexNodeChildren>;
   _updatable = new BehaviorSubject<boolean>(false);
 
@@ -33,7 +33,7 @@ export class RexNode extends DependencyResolver {
   ) {
     super();
     this.tag$ = new BehaviorSubject<string>(tag);
-    this.attributes$ = new BehaviorSubject<Record<string, string> | null>(
+    this.attributes$ = new BehaviorMutable<Record<string, string> | null>(
       attributes,
     );
     this.children$ = new BehaviorMutable<RexNodeChildren>(children);

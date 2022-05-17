@@ -41,7 +41,9 @@ export class RexNode extends DependencyResolver {
     this.attributes$ = new BehaviorMutable<Record<string, string> | null>(
       attributes,
     );
-    this.children$ = new BehaviorMutable<RexNodeChildren>(children);
+    this.children$ = new BehaviorMutable<RexNodeChildren>(
+      this.simplifyArray(this.simplifyChildren(children)),
+    );
     this.children$.subscribe((children) => {
       if (children instanceof RexNode) {
         children.parentNode$.next(this);
@@ -77,6 +79,47 @@ export class RexNode extends DependencyResolver {
         detector.findStringTemplates(this);
       },
     );
+  }
+
+  private simplifyChildren(children: RexNodeChildren): RexNodeChildren {
+    if (children == null || !Array.isArray(children) || children.length < 2) {
+      return children;
+    }
+
+    const childrenToReturn: RexNodeChildren = [];
+    let touchedString = false;
+    let childToPush = null;
+    for (const child of children) {
+      if (typeof child === 'string') {
+        if (!touchedString) {
+          touchedString = true;
+          childToPush = child;
+        } else {
+          (childToPush as string) += child;
+        }
+      } else {
+        if (childToPush != null) {
+          childrenToReturn.push(childToPush);
+          childToPush = null;
+          touchedString = false;
+        }
+        childrenToReturn.push(child);
+      }
+    }
+    if (childToPush != null) {
+      childrenToReturn.push(childToPush);
+    }
+    return childrenToReturn;
+  }
+
+  private simplifyArray(children: RexNodeChildren): RexNodeChildren {
+    if (children == null) {
+      return children;
+    } else if (Array.isArray(children) && children.length === 1) {
+      return children[0];
+    } else {
+      return children;
+    }
   }
 
   get text$(): Observable<string> {

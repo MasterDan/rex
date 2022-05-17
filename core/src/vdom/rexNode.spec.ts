@@ -38,4 +38,27 @@ describe('rexNode', () => {
     rexNode.text$.subscribe(sub);
     expect(sub).toBeCalled();
   });
+  test('test string concat', () => {
+    const rexNode = new RexNode('div', { class: 'foo-bar' }, [
+      'lorem ipsum',
+      ' dolor',
+    ]);
+    expect(rexNode.children$.value).toEqual('lorem ipsum dolor');
+  });
+  test('more complex string concat', () => {
+    const rexNode = new RexNode('div', { class: 'foo-bar' }, [
+      'lorem ipsum',
+      ' dolor',
+      new RexNode('div'),
+      'lorem ipsum ',
+      'dolor',
+    ]);
+    expect((rexNode.children$.value as string[]).length).toEqual(3);
+    expect((rexNode.children$.value as string[])[0]).toEqual(
+      'lorem ipsum dolor',
+    );
+    expect((rexNode.children$.value as string[])[2]).toEqual(
+      'lorem ipsum dolor',
+    );
+  });
 });

@@ -1,6 +1,7 @@
 import {
   BehaviorSubject,
   combineLatest,
+  distinctUntilChanged,
   filter,
   map,
   of,
@@ -15,17 +16,22 @@ import type { Directive } from '../directives/directive';
 import type { DirectiveDetector } from '../directives/directiveDetector';
 import { BehaviorMutable } from '../tools/rx/BehaviorMutable';
 import { isNullOrWhiteSpace } from '../tools/stringTools';
+import { newId } from '../tools/idGeneratorSimple';
 
 export type RexNodeChildren = RexNode | string | Array<string | RexNode> | null;
+
+const updatableAttibute = 'rex-node-updatable';
 
 export class RexNode extends DependencyResolver {
   tag$: BehaviorSubject<string>;
 
-  attributes$: BehaviorMutable<Record<string, string> | null>;
+  attributes$: BehaviorMutable<Record<string, string | null> | null>;
 
   children$: BehaviorMutable<RexNodeChildren>;
 
-  _updatable = new BehaviorSubject<boolean>(false);
+  _updatable$ = new BehaviorSubject<boolean>(false);
+
+  _id$ = new BehaviorSubject<string | null>(null);
 
   directives$ = new BehaviorMutable<Directive[]>([]);
 
@@ -33,17 +39,38 @@ export class RexNode extends DependencyResolver {
 
   constructor(
     tag = '',
-    attributes: Record<string, string> | null = null,
+    attributes: Record<string, string | null> | null = null,
     children: RexNodeChildren = null,
   ) {
     super();
     this.tag$ = new BehaviorSubject<string>(tag);
-    this.attributes$ = new BehaviorMutable<Record<string, string> | null>(
-      attributes,
-    );
+    this.attributes$ = new BehaviorMutable<Record<
+      string,
+      string | null
+    > | null>(attributes);
     this.children$ = new BehaviorMutable<RexNodeChildren>(
       this.simplifyArray(this.simplifyChildren(children)),
     );
+    /* mark yourself unique attribute to easier detect later */
+    this._updatable$
+      .pipe(
+        filter((val) => val == true),
+        distinctUntilChanged(),
+      )
+      .subscribe(() => {
+        this.attributes$.mutate((oldval) => {
+          this._id$.next(newId());
+          if (oldval != null) {
+            oldval[updatableAttibute] = this._id$.value;
+            return oldval;
+          } else {
+            const attributes = {} as Record<string, string | null>;
+            attributes[updatableAttibute] = this._id$.value;
+            return attributes;
+          }
+        });
+      });
+
     /* Set current node as parent to children */
     this.children$.subscribe((children) => {
       if (children instanceof RexNode) {
@@ -133,7 +160,7 @@ export class RexNode extends DependencyResolver {
           return '';
         }
         return Object.keys(attrs)
-          .map((key) => `${key}="${attrs[key]}"`)
+          .map((key) => (attrs[key] != null ? `${key}="${attrs[key]}"` : key))
           .join(' ');
       }),
     );

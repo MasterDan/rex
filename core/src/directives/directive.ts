@@ -43,10 +43,10 @@ export abstract class Directive<T = string> extends DependencyResolverReactive {
     this._initialized = true;
     const nodesToReturn = this.init(node);
     if (node instanceof RexNode) {
-      node._updatable.next(true);
+      node._updatable$.next(true);
     } else {
       for (const current of node as RexNode[]) {
-        current._updatable.next(true);
+        current._updatable$.next(true);
       }
     }
     return nodesToReturn;

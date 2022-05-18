@@ -1,12 +1,6 @@
-import {
-  BehaviorSubject,
-  filter,
-  map,
-  Observable,
-  switchMap,
-  take,
-} from 'rxjs';
-import { DiContainer } from './diContainer';
+import { BehaviorSubject, filter, map, switchMap, take } from 'rxjs';
+import type { Observable } from 'rxjs';
+import type { DiContainer } from './diContainer';
 
 export class DependencyResolver {
   protected container$ = new BehaviorSubject<DiContainer | null>(null);

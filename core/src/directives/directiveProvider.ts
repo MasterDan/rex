@@ -1,7 +1,7 @@
 import { filter, take } from 'rxjs';
 import { DependencyProviderClassic } from '../di/dependencyProviderClassic';
 import { DiContainerClassic } from '../di/diContainerClassic';
-import { Ctor } from '../tools/types/ctor';
+import type { Ctor } from '../tools/types/ctor';
 import { Directive } from './directive';
 
 export class DirectiveProvider extends DependencyProviderClassic {

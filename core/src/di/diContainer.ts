@@ -1,5 +1,5 @@
 import { BehaviorSubject } from 'rxjs';
-import { Ctor } from '../tools/types/ctor';
+import type { Ctor } from '../tools/types/ctor';
 import { DependencyProviderClassic } from './dependencyProviderClassic';
 import { DependencyProviderReactive } from './dependencyProviderReactive';
 import { DependencyResolver } from './dependencyResolver';
@@ -56,7 +56,10 @@ export class DiContainer {
     this.diClassic.provide(...providers);
   }
 
-  createScope = {
+  createScope: {
+    classic: () => DiContainer;
+    reactive: () => DiContainer;
+  } = {
     classic: () => {
       this.diClassic = new DiContainerWrapperClassic(this.diClassic);
       return this;

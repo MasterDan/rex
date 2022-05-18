@@ -1,4 +1,4 @@
-import { Ctor } from '../tools/types/ctor';
+import type { Ctor } from '../tools/types/ctor';
 import { DependencyProviderClassic } from './dependencyProviderClassic';
 import { DependencyResolverClassic } from './dependencyResolverClassic';
 

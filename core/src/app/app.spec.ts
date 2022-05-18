@@ -18,7 +18,7 @@ describe('application tests', () => {
     const jsDom = new JsDomPlugin('<div id="rexApp" ></div>');
     new RexApp(rootComponent).extend(jsDom).mount('#rexApp');
     expect(jsDom.dom.window.document.body.innerHTML).toBe(
-      '<div id="rexApp"><div>Hello, Danny</div></div>',
+      /<div id="rexApp"><div rex-node-updatable=".*">Hello, Danny<\/div><\/div>/gm,
     );
   });
   test('Div with array of children', () => {
@@ -39,8 +39,8 @@ describe('application tests', () => {
     });
     const jsDom = new JsDomPlugin('<div id="rexApp" ></div>');
     new RexApp(rootComponent).extend(jsDom).mount('#rexApp');
-    expect(jsDom.dom.window.document.body.innerHTML).toBe(
-      '<div id="rexApp"><div>fizz<span>-</span>buzz</div></div>',
+    expect(jsDom.dom.window.document.body.innerHTML).toMatch(
+      /<div id="rexApp"><div rex-node-updatable=".*">fizz<span>-<\/span>buzz<\/div><\/div>/gm,
     );
   });
 });

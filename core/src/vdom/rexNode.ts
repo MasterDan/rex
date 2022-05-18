@@ -59,7 +59,7 @@ export class RexNode extends DependencyResolver {
       )
       .subscribe(() => {
         this.attributes$.mutate((oldval) => {
-          this._id$.next(newId());
+          this._id$.next(newId('x'));
           if (oldval != null) {
             oldval[updatableAttibute] = this._id$.value;
             return oldval;

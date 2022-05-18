@@ -3,16 +3,16 @@ import {
   combineLatest,
   filter,
   map,
-  Observable,
   of,
   switchMap,
   take,
 } from 'rxjs';
+import type { Observable } from 'rxjs';
 import { directiveDetectorKey } from '../di/constants';
 import { DependencyResolver } from '../di/dependencyResolver';
-import { DiContainer } from '../di/diContainer';
-import { Directive } from '../directives/directive';
-import { DirectiveDetector } from '../directives/directiveDetector';
+import type { DiContainer } from '../di/diContainer';
+import type { Directive } from '../directives/directive';
+import type { DirectiveDetector } from '../directives/directiveDetector';
 import { BehaviorMutable } from '../tools/rx/BehaviorMutable';
 import { isNullOrWhiteSpace } from '../tools/stringTools';
 

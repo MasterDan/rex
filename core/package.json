@@ -6,6 +6,9 @@
   "main": "dist/main.js",
   "module": "dist/module.js",
   "types": "dist/types.d.ts",
+  "targets": {
+    "types": false
+  },
   "scripts": {
     "watch": "parcel watch",
     "build": "parcel build",
@@ -15,9 +18,9 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@babel/core": "^7.17.9",
-    "@babel/preset-env": "^7.16.11",
-    "@babel/preset-typescript": "^7.16.7",
+    "@babel/core": "7.17.12",
+    "@babel/preset-env": "7.17.12",
+    "@babel/preset-typescript": "7.17.12",
     "@parcel/packager-ts": "^2.5.0",
     "@parcel/transformer-typescript-types": "^2.5.0",
     "@types/jest": "^27.4.1",

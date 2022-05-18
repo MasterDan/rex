@@ -44,6 +44,7 @@ export class RexNode extends DependencyResolver {
     this.children$ = new BehaviorMutable<RexNodeChildren>(
       this.simplifyArray(this.simplifyChildren(children)),
     );
+    /* Set current node as parent to children */
     this.children$.subscribe((children) => {
       if (children instanceof RexNode) {
         children.parentNode$.next(this);
@@ -55,6 +56,7 @@ export class RexNode extends DependencyResolver {
           });
       }
     });
+    /* Providing di container to all children */
     combineLatest([this.container$, this.children$])
       .pipe(
         filter((arr): arr is [DiContainer, RexNodeChildren] => {
@@ -80,7 +82,7 @@ export class RexNode extends DependencyResolver {
       },
     );
   }
-
+  /** Concat multiple strings into one  */
   private simplifyChildren(children: RexNodeChildren): RexNodeChildren {
     if (children == null || !Array.isArray(children) || children.length < 2) {
       return children;
@@ -112,6 +114,7 @@ export class RexNode extends DependencyResolver {
     return childrenToReturn;
   }
 
+  /** Replace array of one item with it's content */
   private simplifyArray(children: RexNodeChildren): RexNodeChildren {
     if (children == null) {
       return children;
@@ -122,6 +125,7 @@ export class RexNode extends DependencyResolver {
     }
   }
 
+  /** returns html text of current node */
   get text$(): Observable<string> {
     const attrtext$ = this.attributes$.pipe(
       map((attrs) => {
@@ -133,6 +137,7 @@ export class RexNode extends DependencyResolver {
           .join(' ');
       }),
     );
+    /* draws content as it is */
     const content$ = this.children$.pipe(
       switchMap((children) => {
         if (children == null) {
@@ -148,6 +153,7 @@ export class RexNode extends DependencyResolver {
         }
       }),
     );
+    /* Text of current node without directive transformations */
     const selfText$ = combineLatest([this.tag$, attrtext$, content$]).pipe(
       map(([tag, attrs, content]) => {
         return isNullOrWhiteSpace(tag)
@@ -155,6 +161,8 @@ export class RexNode extends DependencyResolver {
           : `<${tag} ${attrs} >${content}</${tag}>`;
       }),
     );
+    /* Applying directives if they exists. 
+    They will transform current node into one or many nodes. */
     return combineLatest([selfText$, this.directives$]).pipe(
       switchMap(([text, dirs]) => {
         const noninitDirectives = dirs.filter((d) => !d._initialized);

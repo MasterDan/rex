@@ -4,9 +4,11 @@ import { DiContainer } from '../di/diContainer';
 import { TemplateStringDirective } from '../directives/builtin/templateStringDirective';
 import { DirectiveDetector } from '../directives/directiveDetector';
 import { DirectiveProvider } from '../directives/directiveProvider';
+import { DomPlugin } from '../plugins/domPlugin';
 import { RexPlugin } from '../plugins/plugin';
 
-export function createApp(): RexApp {
+export function createApp(root: Component): RexApp {
+  return new RexApp(root).extend(new DomPlugin());
   throw new Error('Not Implemented');
 }
 

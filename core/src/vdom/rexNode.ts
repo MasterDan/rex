@@ -7,7 +7,6 @@ import {
   of,
   switchMap,
   take,
-  withLatestFrom,
 } from 'rxjs';
 import type { Observable } from 'rxjs';
 import { directiveDetectorKey } from '../di/constants';
@@ -70,16 +69,11 @@ export class RexNode extends DependencyResolver {
             return attributes;
           }
         });
-      });
-
-    this._id$
-      .pipe(
-        filter((id) => id != null),
-        withLatestFrom(this.text$),
-      )
-      .subscribe(([id, text]) => {
-        console.log('id ', id);
-        console.log('fullNode ', text);
+        this.text$.subscribe((text) => {
+          console.log('id ', this._id$.value);
+          console.log('fullNode ', text);
+          console.log('attrs ', this.attributes$.value);
+        });
       });
 
     /* Set current node as parent to children */

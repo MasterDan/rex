@@ -19,7 +19,6 @@
     "parcel": "^2.5.0"
   },
   "dependencies": {
-    "library": "file:../core"
+    "rexar": "file:../core"
   }
 }
-

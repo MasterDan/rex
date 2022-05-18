@@ -23,6 +23,15 @@
       "detail": "parcel"
     },
     {
+      "type": "npm",
+      "script": "test",
+      "path": "core",
+      "group": "test",
+      "problemMatcher": [],
+      "label": "npm: test - core",
+      "detail": "jest"
+    },
+    {
       "label": "terminate: all",
       "command": "echo ${input:terminate}",
       "type": "shell",

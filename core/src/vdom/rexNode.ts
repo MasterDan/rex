@@ -109,7 +109,7 @@ export class RexNode extends DependencyResolver {
             });
         }
       });
-
+    /* searching for directives in node */
     this.resolve<DirectiveDetector>(directiveDetectorKey).subscribe(
       (detector) => {
         detector.findStringTemplates(this);

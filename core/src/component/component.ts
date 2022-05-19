@@ -1,4 +1,4 @@
-import { filter, map, take, withLatestFrom } from 'rxjs';
+import { filter, forkJoin, map, take } from 'rxjs';
 import { documentKey } from '../di/constants';
 import { DependencyResolver } from '../di/dependencyResolver';
 import { DiContainer } from '../di/diContainer';
@@ -31,14 +31,20 @@ export class Component extends DependencyResolver {
   }
 
   mount(selector: string) {
-    this.resolve<Document>(documentKey)
-      .pipe(
-        map((doc) => doc.querySelector(selector)),
-        filter((el): el is Element => el != null),
-        withLatestFrom(this.render.text$),
-      )
-      .subscribe(([element, html]) => {
-        element.innerHTML = html;
-      });
+    const element$ = this.resolve<Document>(documentKey).pipe(
+      map((doc) => doc.querySelector(selector)),
+      filter((el): el is Element => el != null),
+      take(1),
+    );
+    console.log('root node attributes', this.render.attributes$.value);
+    console.log('directives', this.render.directives$.value);
+    console.log('updatable', this.render._updatable$.value);
+    forkJoin({
+      element: element$,
+      htmlText: this.render.text$,
+    }).subscribe(({ element, htmlText }) => {
+      console.log('finaly draw', htmlText);
+      element.innerHTML = htmlText;
+    });
   }
 }

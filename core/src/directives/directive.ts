@@ -39,6 +39,11 @@ export abstract class Directive<T = string> extends DependencyResolverReactive {
   }
 
   __apply(node: RexNode): RexNode | RexNode[] {
+    if (this._initialized) {
+      throw new Error(
+        'Attempt to initialize already initialized directive. Something went wrong.',
+      );
+    }
     this._sourceNode$.next(node);
     this._initialized = true;
     const nodesToReturn = this.init(node);

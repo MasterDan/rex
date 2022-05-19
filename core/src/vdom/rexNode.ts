@@ -17,6 +17,7 @@ import type { DirectiveDetector } from '../directives/directiveDetector';
 import { BehaviorMutable } from '../tools/rx/BehaviorMutable';
 import { isNullOrWhiteSpace } from '../tools/stringTools';
 import { newId } from '../tools/idGeneratorSimple';
+import { pipeIt } from '../tools/pipe';
 
 export type RexNodeChildren = RexNode | string | Array<string | RexNode> | null;
 
@@ -48,9 +49,10 @@ export class RexNode extends DependencyResolver {
       string,
       string | null
     > | null>(attributes);
-    this.children$ = new BehaviorMutable<RexNodeChildren>(
-      this.simplifyArray(this.simplifyChildren(children)),
-    );
+    this.children$ = pipeIt(this.simplifyChildren)
+      .then(this.simplifyArray)
+      .then((result) => new BehaviorMutable<RexNodeChildren>(result))
+      .run(children);
     /* mark yourself unique attribute to easier detect later */
     this._updatable$
       .pipe(

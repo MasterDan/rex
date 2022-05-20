@@ -9,7 +9,6 @@ import { RexPlugin } from '../plugins/plugin';
 
 export function createApp(root: Component): RexApp {
   return new RexApp(root).extend(new DomPlugin());
-  throw new Error('Not Implemented');
 }
 
 export class RexApp {

@@ -192,7 +192,7 @@ export class RexNode extends DependencyResolver {
         map(([tag, attrs, content]) => {
           return isNullOrWhiteSpace(tag)
             ? content
-            : `<${tag} ${attrs} >${content}</${tag}>`;
+            : `<${tag} ${attrs}>${content}</${tag}>`;
         }),
         take(1),
       );

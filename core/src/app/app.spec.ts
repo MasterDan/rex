@@ -17,7 +17,7 @@ describe('application tests', () => {
     });
     const jsDom = new JsDomPlugin('<div id="rexApp" ></div>');
     new RexApp(rootComponent).extend(jsDom).mount('#rexApp');
-    expect(jsDom.dom.window.document.body.innerHTML).toBe(
+    expect(jsDom.dom.window.document.body.innerHTML).toMatch(
       /<div id="rexApp"><div rex-node-updatable=".*">Hello, Danny<\/div><\/div>/gm,
     );
   });

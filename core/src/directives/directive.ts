@@ -34,9 +34,7 @@ export abstract class Directive<T = string> extends DependencyResolverReactive {
       .subscribe((val) => this.value$.next(val));
   }
 
-  init(node: RexNode): RexNode | RexNode[] {
-    return node;
-  }
+  abstract init(node: RexNode): RexNode | RexNode[];
 
   __apply(node: RexNode): RexNode | RexNode[] {
     if (this._initialized) {
@@ -45,7 +43,6 @@ export abstract class Directive<T = string> extends DependencyResolverReactive {
       );
     }
     this._sourceNode$.next(node);
-    this._initialized = true;
     const nodesToReturn = this.init(node);
     if (node instanceof RexNode) {
       node._updatable$.next(true);
@@ -54,6 +51,7 @@ export abstract class Directive<T = string> extends DependencyResolverReactive {
         current._updatable$.next(true);
       }
     }
+    this._initialized = true;
     return nodesToReturn;
   }
 }

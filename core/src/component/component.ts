@@ -36,14 +36,10 @@ export class Component extends DependencyResolver {
       filter((el): el is Element => el != null),
       take(1),
     );
-    console.log('root node attributes', this.render.attributes$.value);
-    console.log('directives', this.render.directives$.value);
-    console.log('updatable', this.render._updatable$.value);
     forkJoin({
       element: element$,
       htmlText: this.render.text$,
     }).subscribe(({ element, htmlText }) => {
-      console.log('finaly draw', htmlText);
       element.innerHTML = htmlText;
     });
   }

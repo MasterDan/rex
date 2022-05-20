@@ -43,4 +43,25 @@ describe('application tests', () => {
       /<div id="rexApp"><div rex-node-updatable=".*">fizz<span>-<\/span>buzz<\/div><\/div>/gm,
     );
   });
+  test('Div with span with template', () => {
+    const rootComponent = new Component({
+      render: new RexNode('div', null, [
+        '{{ foo }}',
+        new RexNode('span', null, '{{ bar }}'),
+      ]),
+      setup() {
+        const foo = new Ref('fizz');
+        const bar = new Ref('buzz');
+        return {
+          foo,
+          bar,
+        };
+      },
+    });
+    const jsDom = new JsDomPlugin('<div id="rexApp" ></div>');
+    new RexApp(rootComponent).extend(jsDom).mount('#rexApp');
+    expect(jsDom.dom.window.document.body.innerHTML).toMatch(
+      /<div id="rexApp"><div rex-node-updatable=".*">fizz<span rex-node-updatable=".*">buzz<\/span><\/div><\/div>/gm,
+    );
+  });
 });

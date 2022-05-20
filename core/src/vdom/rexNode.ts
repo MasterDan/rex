@@ -160,7 +160,7 @@ export class RexNode extends DependencyResolver {
       (d) => d.__initialized === false,
     );
     if (noninitDirectives.length === 0) {
-      // Current node doesn't nedd transformation therefore we can render it
+      /* Current node doesn't nedd transformation therefore we can render it */
       const attrtext$ = this.attributes$.pipe(
         map((attrs) => {
           if (attrs == null) {
@@ -198,7 +198,7 @@ export class RexNode extends DependencyResolver {
       );
       return selfText$;
     } else {
-      // Current node needs transformation before drawing
+      /* Current node needs transformation before drawing */
       let nodes: RexNode | RexNode[] | null = null;
       /* Applying directives. 
       They will transform current node into one or many nodes. */

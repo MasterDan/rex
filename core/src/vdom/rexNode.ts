@@ -49,8 +49,8 @@ export class RexNode extends DependencyResolver {
       string,
       string | null
     > | null>(attributes);
-    this.children$ = pipeIt(this.simplifyChildren)
-      .then(this.simplifyArray)
+    this.children$ = pipeIt(this.__simplifyChildren__)
+      .then(this.__simplifyArray__)
       .then((result) => new BehaviorMutable<RexNodeChildren>(result))
       .run(children);
     /* mark yourself unique attribute to easier detect later */
@@ -112,7 +112,7 @@ export class RexNode extends DependencyResolver {
     );
   }
   /** Concat multiple strings into one  */
-  private simplifyChildren(children: RexNodeChildren): RexNodeChildren {
+  private __simplifyChildren__(children: RexNodeChildren): RexNodeChildren {
     if (children == null || !Array.isArray(children) || children.length < 2) {
       return children;
     }
@@ -144,7 +144,7 @@ export class RexNode extends DependencyResolver {
   }
 
   /** Replace array of one item with it's content */
-  private simplifyArray(children: RexNodeChildren): RexNodeChildren {
+  private __simplifyArray__(children: RexNodeChildren): RexNodeChildren {
     if (children == null) {
       return children;
     } else if (Array.isArray(children) && children.length === 1) {
@@ -229,7 +229,7 @@ export class RexNode extends DependencyResolver {
     }
   }
 
-  _addDirective(dir: Directive) {
+  __addDirective(dir: Directive) {
     this.directives$.mutate((val) => {
       val.push(dir);
       return val;

@@ -157,7 +157,7 @@ export class RexNode extends DependencyResolver {
   /** returns html text of current node */
   get text$(): Observable<string> {
     const noninitDirectives = this.directives$.value.filter(
-      (d) => d._initialized === false,
+      (d) => d.__initialized === false,
     );
     if (noninitDirectives.length === 0) {
       // Current node doesn't nedd transformation therefore we can render it

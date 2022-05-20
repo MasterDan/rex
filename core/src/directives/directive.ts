@@ -10,39 +10,35 @@ import { RexNode } from '../vdom/rexNode';
  */
 export abstract class Directive<T = string> extends DependencyResolverReactive {
   abstract name: string;
-  shorthand: string | null = null;
+  protected shorthand: string | null = null;
 
-  _sourceNode$ = new BehaviorSubject<RexNode | null>(null);
-  valueKey$: BehaviorSubject<string | null>;
-  value$ = new BehaviorSubject<T | null>(null);
-  _initialized = false;
-
-  protected get value(): T | null {
-    return this.value$.value;
-  }
+  __sourceNode$ = new BehaviorSubject<RexNode | null>(null);
+  __valueKey$: BehaviorSubject<string | null>;
+  __value$ = new BehaviorSubject<T | null>(null);
+  __initialized = false;
 
   constructor(key: string | null = null) {
     super();
-    this.valueKey$ = new BehaviorSubject<string | null>(key);
+    this.__valueKey$ = new BehaviorSubject<string | null>(key);
     // resolving and unwrapping value
-    this.valueKey$
+    this.__valueKey$
       .pipe(
         filter((s): s is string => s != null),
         switchMap((key) => this.resolveReactive<Ref<T>>(key)),
         switchMap((ref) => ref),
       )
-      .subscribe((val) => this.value$.next(val));
+      .subscribe((val) => this.__value$.next(val));
   }
 
   abstract init(node: RexNode): RexNode | RexNode[];
 
   __apply(node: RexNode): RexNode | RexNode[] {
-    if (this._initialized) {
+    if (this.__initialized) {
       throw new Error(
         `Attempt to initialize already initialized directive ${this.name}. Something went wrong.`,
       );
     }
-    this._sourceNode$.next(node);
+    this.__sourceNode$.next(node);
     const nodesToReturn = this.init(node);
     if (node instanceof RexNode) {
       node._updatable$.next(true);
@@ -51,7 +47,7 @@ export abstract class Directive<T = string> extends DependencyResolverReactive {
         current._updatable$.next(true);
       }
     }
-    this._initialized = true;
+    this.__initialized = true;
     return nodesToReturn;
   }
 }

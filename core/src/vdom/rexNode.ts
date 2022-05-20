@@ -156,8 +156,6 @@ export class RexNode extends DependencyResolver {
 
   /** returns html text of current node */
   get text$(): Observable<string> {
-    /* Applying directives if they exists. 
-    They will transform current node into one or many nodes. */
     const noninitDirectives = this.directives$.value.filter(
       (d) => d._initialized === false,
     );
@@ -200,8 +198,10 @@ export class RexNode extends DependencyResolver {
       );
       return selfText$;
     } else {
-      // Current node needs transformation before it can be drawn
+      // Current node needs transformation before drawing
       let nodes: RexNode | RexNode[] | null = null;
+      /* Applying directives. 
+      They will transform current node into one or many nodes. */
       for (const key in noninitDirectives) {
         const directive: Directive = this.directives$.value[key];
         if (nodes == null) {

@@ -21,7 +21,9 @@ import { pipeIt } from '../tools/pipe';
 
 export type RexNodeChildren = RexNode | string | Array<string | RexNode> | null;
 
-const updatableAttibute = 'rex-node-updatable';
+export const updatableAttibute = 'rex-node-updatable';
+
+export const rexNodeIdPrefix = 'x';
 
 export interface IRexNodeOptions {
   skipDirectivesResolve: boolean;
@@ -65,7 +67,7 @@ export class RexNode extends DependencyResolver {
       .subscribe(() => {
         this.attributes$.mutate((oldval) => {
           if (this._id$.value == null) {
-            this._id$.next(newId('x'));
+            this._id$.next(newId(rexNodeIdPrefix));
           }
           if (oldval != null) {
             oldval[updatableAttibute] = this._id$.value;

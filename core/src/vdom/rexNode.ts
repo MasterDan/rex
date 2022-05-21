@@ -31,16 +31,13 @@ export class RexNode extends DependencyResolver {
   tag$: BehaviorSubject<string>;
 
   attributes$: BehaviorMutable<Record<string, string | null> | null>;
-
   children$: BehaviorMutable<RexNodeChildren>;
-
-  _updatable$ = new BehaviorSubject<boolean>(false);
-
-  _id$ = new BehaviorSubject<string | null>(null);
-
   directives$ = new BehaviorMutable<Directive[]>([]);
 
-  parentNode$ = new BehaviorSubject<RexNode | null>(null);
+  _updatable$ = new BehaviorSubject<boolean>(false);
+  _id$ = new BehaviorSubject<string | null>(null);
+
+  _parentNode$ = new BehaviorSubject<RexNode | null>(null);
 
   constructor(
     tag = '',
@@ -83,12 +80,12 @@ export class RexNode extends DependencyResolver {
     /* Set current node as parent to children */
     this.children$.subscribe((children) => {
       if (children instanceof RexNode) {
-        children.parentNode$.next(this);
+        children._parentNode$.next(this);
       } else if (Array.isArray(children)) {
         children
           .filter((child): child is RexNode => child instanceof RexNode)
           .forEach((child) => {
-            child.parentNode$.next(this);
+            child._parentNode$.next(this);
           });
       }
     });

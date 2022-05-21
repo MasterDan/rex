@@ -1,14 +1,6 @@
 import { Ref } from 'core/src/scope/ref';
 import { RexNode } from 'core/src/vdom/rexNode';
-import {
-  combineLatest,
-  filter,
-  forkJoin,
-  map,
-  Observable,
-  switchMap,
-  take,
-} from 'rxjs';
+import { combineLatest, filter, map, Observable, switchMap, take } from 'rxjs';
 import { Directive } from '../directive';
 import {
   getKeysToInsert,
@@ -58,35 +50,35 @@ export class TemplateStringDirective extends Directive {
     }),
   );
 
+  templateStringParsed$: Observable<string> = combineLatest([
+    this.templateString$,
+    this.resolvedKeyValuePairs$,
+  ]).pipe(
+    map(([template, pairs]) => {
+      const acc: Record<string, string> = {};
+      for (const pair of pairs) {
+        acc[pair.key] = pair.value;
+      }
+      return {
+        template,
+        state: acc,
+      };
+    }),
+    map((arg) => parseTemplateString(arg.template, arg.state)),
+  );
+
   override init(node: RexNode): RexNode | RexNode[] {
-    forkJoin({
-      template: this.templateString$.pipe(take(1)),
-      pairs: this.resolvedKeyValuePairs$.pipe(take(1)),
-    })
-      .pipe(
-        map((arg) => {
-          const acc: Record<string, string> = {};
-          for (const pair of arg.pairs) {
-            acc[pair.key] = pair.value;
-          }
-          return {
-            template: arg.template,
-            state: acc,
-          };
-        }),
-      )
-      .subscribe((arg) => {
-        const templateResult = parseTemplateString(arg.template, arg.state);
-        if (this.childIndex != null) {
-          node.children$.mutate((array) => {
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            (array as string[])[this.childIndex!] = templateResult;
-            return array;
-          });
-        } else {
-          node.children$.next(templateResult);
-        }
-      });
+    this.templateStringParsed$.pipe(take(1)).subscribe((templateResult) => {
+      if (this.childIndex != null) {
+        node.children$.mutate((array) => {
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          (array as string[])[this.childIndex!] = templateResult;
+          return array;
+        });
+      } else {
+        node.children$.next(templateResult);
+      }
+    });
     return node;
   }
 }

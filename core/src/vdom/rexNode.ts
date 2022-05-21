@@ -54,6 +54,7 @@ export class RexNode extends DependencyResolver {
       string,
       string | null
     > | null>(attributes);
+    /* setting children with little transormations */
     this.children$ = pipeIt(this.__simplifyChildren__)
       .then(this.__simplifyArray__)
       .then((result) => new BehaviorMutable<RexNodeChildren>(result))

@@ -5,7 +5,7 @@ import {
   filter,
   forkJoin,
   map,
-  of,
+  Observable,
   switchMap,
   take,
 } from 'rxjs';
@@ -20,37 +20,50 @@ export class TemplateStringDirective extends Directive {
   name = templateStringDirName;
   childIndex: number | null = null;
 
-  override init(node: RexNode): RexNode | RexNode[] {
-    node.children$
-      .pipe(
-        map((val) => {
-          if (this.childIndex == null && typeof val === 'string') {
-            return val;
-          } else if (this.childIndex != null && Array.isArray(val)) {
-            return val[this.childIndex] ?? null;
-          }
-        }),
-        filter(
-          (strToRepl): strToRepl is string =>
-            strToRepl != null && typeof strToRepl === 'string',
+  templateString$: Observable<string> = this.__sourceNode$.pipe(
+    filter((n): n is RexNode => n != null),
+    switchMap((n) => n.children$),
+    map((val) => {
+      if (this.childIndex == null && typeof val === 'string') {
+        return val;
+      } else if (this.childIndex != null && Array.isArray(val)) {
+        return val[this.childIndex] ?? null;
+      }
+    }),
+    filter(
+      (strToRepl): strToRepl is string =>
+        strToRepl != null && typeof strToRepl === 'string',
+    ),
+  );
+
+  resolvedKeyValuePairs$: Observable<
+    {
+      key: string;
+      value: string;
+    }[]
+  > = this.templateString$.pipe(
+    switchMap((strToRepl) => {
+      const keys = getKeysToInsert(strToRepl);
+      const resolvedPairs = keys.map((key) =>
+        this.resolveReactive<Ref<string>>(key).pipe(
+          switchMap((v) => v),
+          map((v) => (v == null ? '' : v)),
+          map((value) => ({
+            key,
+            value,
+          })),
         ),
-        switchMap((strToRepl) => {
-          const keys = getKeysToInsert(strToRepl);
-          const resolved = keys.map((key) =>
-            this.resolveReactive<Ref<string>>(key).pipe(
-              switchMap((v) => v),
-              map((v) => (v == null ? '' : v)),
-              map((value) => ({
-                key,
-                value,
-              })),
-            ),
-          );
-          return forkJoin({
-            template: of(strToRepl),
-            pairs: combineLatest(resolved).pipe(take(1)),
-          });
-        }),
+      );
+      return combineLatest(resolvedPairs);
+    }),
+  );
+
+  override init(node: RexNode): RexNode | RexNode[] {
+    forkJoin({
+      template: this.templateString$.pipe(take(1)),
+      pairs: this.resolvedKeyValuePairs$.pipe(take(1)),
+    })
+      .pipe(
         map((arg) => {
           const acc: Record<string, string> = {};
           for (const pair of arg.pairs) {

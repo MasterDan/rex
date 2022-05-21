@@ -1,4 +1,4 @@
-import { filter, forkJoin, map, take } from 'rxjs';
+import { BehaviorSubject, filter, forkJoin, map, take } from 'rxjs';
 import { documentKey } from '../di/constants';
 import { DependencyResolver } from '../di/dependencyResolver';
 import { DiContainer } from '../di/diContainer';
@@ -30,6 +30,8 @@ export class Component extends DependencyResolver {
       });
   }
 
+  _mounted$ = new BehaviorSubject<boolean>(false);
+
   mount(selector: string) {
     const element$ = this.resolve<Document>(documentKey).pipe(
       map((doc) => doc.querySelector(selector)),
@@ -41,6 +43,8 @@ export class Component extends DependencyResolver {
       htmlText: this.render.text$,
     }).subscribe(({ element, htmlText }) => {
       element.innerHTML = htmlText;
+      this.render._mounted$.next(true);
+      this._mounted$.next(true);
     });
   }
 }

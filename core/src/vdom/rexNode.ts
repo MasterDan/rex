@@ -36,6 +36,7 @@ export class RexNode extends DependencyResolver {
 
   _updatable$ = new BehaviorSubject<boolean>(false);
   _id$ = new BehaviorSubject<string | null>(null);
+  _mounted$ = new BehaviorSubject<boolean>(false);
 
   _parentNode$ = new BehaviorSubject<RexNode | null>(null);
 
@@ -89,6 +90,24 @@ export class RexNode extends DependencyResolver {
           });
       }
     });
+    /* Providing mounted state to children */
+    this._mounted$
+      .pipe(
+        filter((val) => val),
+        switchMap(() => this.children$),
+      )
+      .subscribe(() => {
+        if (children instanceof RexNode) {
+          children._mounted$.next(true);
+        } else if (Array.isArray(children)) {
+          children
+            .filter((child): child is RexNode => child instanceof RexNode)
+            .forEach((child) => {
+              child._mounted$.next(true);
+            });
+        }
+      });
+
     /* Providing di container to all children */
     combineLatest([this.container$, this.children$])
       .pipe(

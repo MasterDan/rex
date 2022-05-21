@@ -23,7 +23,7 @@ export type RexNodeChildren = RexNode | string | Array<string | RexNode> | null;
 
 export const updatableAttibute = 'rex-node-updatable';
 
-export const rexNodeIdPrefix = 'x';
+export const rexNodeIdPrefix = '__rex-node__';
 
 export interface IRexNodeOptions {
   skipDirectivesResolve: boolean;

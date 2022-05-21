@@ -13,6 +13,7 @@ export abstract class Directive<T = string> extends DependencyResolverReactive {
   protected shorthand: string | null = null;
 
   __sourceNode$ = new BehaviorSubject<RexNode | null>(null);
+  __transformedNode$ = new BehaviorSubject<RexNode | RexNode[] | null>(null);
   __valueKey$: BehaviorSubject<string | null>;
   __value$ = new BehaviorSubject<T | null>(null);
   __initialized = false;
@@ -39,15 +40,16 @@ export abstract class Directive<T = string> extends DependencyResolverReactive {
       );
     }
     this.__sourceNode$.next(node);
-    const nodesToReturn = this.init(node);
-    if (node instanceof RexNode) {
-      node._updatable$.next(true);
+    const transformed = this.init(node.clone({ skipDirectivesResolve: true }));
+    if (transformed instanceof RexNode) {
+      transformed._updatable$.next(true);
     } else {
-      for (const current of node as RexNode[]) {
+      for (const current of transformed as RexNode[]) {
         current._updatable$.next(true);
       }
     }
+    this.__transformedNode$.next(transformed);
     this.__initialized = true;
-    return nodesToReturn;
+    return transformed;
   }
 }

@@ -23,6 +23,10 @@ export type RexNodeChildren = RexNode | string | Array<string | RexNode> | null;
 
 const updatableAttibute = 'rex-node-updatable';
 
+export interface IRexNodeOptions {
+  skipDirectivesResolve: boolean;
+}
+
 export class RexNode extends DependencyResolver {
   tag$: BehaviorSubject<string>;
 
@@ -42,6 +46,7 @@ export class RexNode extends DependencyResolver {
     tag = '',
     attributes: Record<string, string | null> | null = null,
     children: RexNodeChildren = null,
+    options: IRexNodeOptions | null = null,
   ) {
     super();
     this.tag$ = new BehaviorSubject<string>(tag);
@@ -104,12 +109,14 @@ export class RexNode extends DependencyResolver {
             });
         }
       });
-    /* searching for directives in node */
-    this.resolve<DirectiveDetector>(directiveDetectorKey).subscribe(
-      (detector) => {
-        detector.findStringTemplates(this);
-      },
-    );
+    if (options == null || !options.skipDirectivesResolve) {
+      /* searching for directives in node */
+      this.resolve<DirectiveDetector>(directiveDetectorKey).subscribe(
+        (detector) => {
+          detector.findStringTemplates(this);
+        },
+      );
+    }
   }
   /** Concat multiple strings into one  */
   private __simplifyChildren__(children: RexNodeChildren): RexNodeChildren {
@@ -227,6 +234,24 @@ export class RexNode extends DependencyResolver {
         );
       }
     }
+  }
+
+  clone(options: IRexNodeOptions | null = null): RexNode {
+    const clonedNode = new RexNode(
+      this.tag$.value,
+      this.attributes$.value,
+      this.children$.value,
+      options,
+    );
+    this.container$
+      .pipe(
+        filter((di): di is DiContainer => di != null),
+        take(1),
+      )
+      .subscribe((di) => {
+        clonedNode.setContainer(di);
+      });
+    return clonedNode;
   }
 
   __addDirective(dir: Directive) {

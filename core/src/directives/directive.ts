@@ -53,11 +53,15 @@ export abstract class Directive<T = string> extends DependencyResolver {
         switchMap((ref) => ref),
       )
       .subscribe((val) => this.__value$.next(val));
+    this.__transformedElements$.subscribe((text) => {
+      console.log('html updated', text);
+    });
     // triggering update
     combineLatest([
       this.__transformedElements$,
       this.__value$.pipe(filter((val): val is T => val != null)),
     ]).subscribe(([elems, value]) => {
+      console.log('update triggered');
       this.update(value, elems);
     });
   }

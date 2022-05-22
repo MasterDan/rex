@@ -8,6 +8,9 @@ const root = new Component({
   ),
   setup() {
     const word = new Ref('Danny');
+    setTimeout(() => {
+      word.next('World');
+    }, 5000);
     return {
       word,
     };

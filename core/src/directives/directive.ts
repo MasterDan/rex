@@ -1,54 +1,98 @@
-import { BehaviorSubject, filter, switchMap } from 'rxjs';
-import { DependencyResolverReactive } from '../di/dependencyResolverReactive';
+import {
+  BehaviorSubject,
+  combineLatest,
+  filter,
+  map,
+  Observable,
+  switchMap,
+} from 'rxjs';
+import { htmlElementsKey } from '../di/constants';
+import { DependencyResolver } from '../di/dependencyResolver';
+import { DiContainerReactive } from '../di/diContainerReactive';
 import { Ref } from '../scope/ref';
 import { RexNode } from '../vdom/rexNode';
 /**
- * В общем виде директива - это штука, которая обновляет наше дерево
- * Мы не ищем вершины, требующие обновления явно. Всё нелбходимое уже должно быть
- * в директиве.
- *
+  Directive is a thing that transforms our tree and detects changes
  */
-export abstract class Directive<T = string> extends DependencyResolverReactive {
+export abstract class Directive<T = string> extends DependencyResolver {
   abstract name: string;
-  shorthand: string | null = null;
+  protected shorthand: string | null = null;
 
-  _sourceNode$ = new BehaviorSubject<RexNode | null>(null);
-  valueKey$: BehaviorSubject<string | null>;
-  value$ = new BehaviorSubject<T | null>(null);
-  _initialized = false;
+  __sourceNode$ = new BehaviorSubject<RexNode | null>(null);
+  __transformedNode$ = new BehaviorSubject<RexNode | RexNode[] | null>(null);
+  __valueKey$: BehaviorSubject<string | null>;
+  __value$ = new BehaviorSubject<T | null>(null);
+  __initialized = false;
 
-  protected get value(): T | null {
-    return this.value$.value;
-  }
+  __transformedElements$: Observable<HTMLElement[]> =
+    this.__transformedNode$.pipe(
+      filter((val): val is RexNode | RexNode[] => val != null),
+      map((tn) => {
+        if (tn instanceof RexNode) {
+          return [tn];
+        }
+      }),
+      filter((nodes): nodes is RexNode[] => nodes != undefined),
+      switchMap((nodes) => {
+        return combineLatest(
+          nodes.map((node) =>
+            node._id$.pipe(
+              filter((id): id is string => id != null),
+              switchMap((id) =>
+                this.resolve<DiContainerReactive>(htmlElementsKey).pipe(
+                  switchMap((htmlDi) =>
+                    htmlDi.resolveReactive<HTMLElement>(id),
+                  ),
+                  filter((el): el is HTMLElement => el != null),
+                ),
+              ),
+            ),
+          ),
+        );
+      }),
+    );
 
   constructor(key: string | null = null) {
     super();
-    this.valueKey$ = new BehaviorSubject<string | null>(key);
+    this.__valueKey$ = new BehaviorSubject<string | null>(key);
     // resolving and unwrapping value
-    this.valueKey$
+    this.__valueKey$
       .pipe(
         filter((s): s is string => s != null),
         switchMap((key) => this.resolveReactive<Ref<T>>(key)),
         switchMap((ref) => ref),
       )
-      .subscribe((val) => this.value$.next(val));
+      .subscribe((val) => this.__value$.next(val));
+    // triggering update
+    combineLatest([
+      this.__transformedElements$,
+      this.__value$.pipe(filter((val): val is T => val != null)),
+    ]).subscribe(([elems, value]) => {
+      this.update(value, elems);
+    });
   }
 
-  init(node: RexNode): RexNode | RexNode[] {
-    return node;
-  }
+  abstract init(node: RexNode): RexNode | RexNode[];
+
+  abstract update(value: T, elems: HTMLElement[]): HTMLElement[];
 
   __apply(node: RexNode): RexNode | RexNode[] {
-    this._sourceNode$.next(node);
-    this._initialized = true;
-    const nodesToReturn = this.init(node);
-    if (node instanceof RexNode) {
-      node._updatable.next(true);
+    if (this.__initialized) {
+      throw new Error(
+        `Attempt to initialize already initialized directive ${this.name}.`,
+      );
+    }
+    this.__sourceNode$.next(node);
+    const transformed = this.init(node.clone({ skipDirectivesResolve: true }));
+    if (transformed instanceof RexNode) {
+      transformed._updatable$.next(true);
     } else {
-      for (const current of node as RexNode[]) {
-        current._updatable.next(true);
+      for (const current of transformed as RexNode[]) {
+        current._updatable$.next(true);
       }
     }
-    return nodesToReturn;
+    this.__transformedNode$.next(transformed);
+    this.__initialized = true;
+    return transformed;
   }
 }

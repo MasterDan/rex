@@ -16,7 +16,8 @@
   "license": "ISC",
   "devDependencies": {
     "@parcel/transformer-sass": "^2.5.0",
-    "parcel": "^2.5.0"
+    "parcel": "^2.5.0",
+    "parcel-plugin-nuke-dist": "^1.0.1"
   },
   "dependencies": {
     "rexar": "file:../core"

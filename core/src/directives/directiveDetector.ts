@@ -21,7 +21,7 @@ export class DirectiveDetector extends DependencyResolver {
         this.resolveDirective<TemplateStringDirective>(
           templateStringDirName,
         ).subscribe((dir) => {
-          node._addDirective(dir);
+          node.__addDirective(dir);
         });
       }
     } else if (Array.isArray(node.children$.value)) {
@@ -36,7 +36,7 @@ export class DirectiveDetector extends DependencyResolver {
             templateStringDirName,
           ).subscribe((dir) => {
             dir.childIndex = +key;
-            node._addDirective(dir);
+            node.__addDirective(dir);
           });
         }
       }

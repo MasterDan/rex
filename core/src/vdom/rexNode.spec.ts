@@ -7,7 +7,7 @@ describe('rexNode', () => {
       ' dolor',
     ]);
     const sub = jest.fn((value: string) => {
-      expect(value).toBe('<div class="foo-bar" >lorem ipsum dolor</div>');
+      expect(value).toBe('<div class="foo-bar">lorem ipsum dolor</div>');
     });
     rexNode.text$.subscribe(sub);
     expect(sub).toBeCalled();
@@ -19,7 +19,7 @@ describe('rexNode', () => {
     ]);
     const sub = jest.fn((value: string) => {
       expect(value).toBe(
-        '<div class="foo-bar" ><div class="foo-baz" ></div><div class="foo-baz" ></div></div>',
+        '<div class="foo-bar"><div class="foo-baz"></div><div class="foo-baz"></div></div>',
       );
     });
     rexNode.text$.subscribe(sub);
@@ -32,7 +32,7 @@ describe('rexNode', () => {
     ]);
     const sub = jest.fn((value: string) => {
       expect(value).toBe(
-        '<div class="foo-baz" ></div><div class="foo-baz" ></div>',
+        '<div class="foo-baz"></div><div class="foo-baz"></div>',
       );
     });
     rexNode.text$.subscribe(sub);

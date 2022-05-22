@@ -26,6 +26,8 @@ describe('application tests', () => {
     );
   });
   test('Div with array of children', () => {
+    const foo = new Ref('fizz');
+    const bar = new Ref('buzz');
     const rootComponent = new Component({
       render: new RexNode('div', null, [
         '{{ foo }}',
@@ -33,8 +35,6 @@ describe('application tests', () => {
         '{{ bar }}',
       ]),
       setup() {
-        const foo = new Ref('fizz');
-        const bar = new Ref('buzz');
         return {
           foo,
           bar,
@@ -46,16 +46,21 @@ describe('application tests', () => {
     expect(jsDom.dom.window.document.body.innerHTML).toMatch(
       /<div id="rexApp"><div --rex--anchor=".*">fizz<span>-<\/span>buzz<\/div><\/div>/gm,
     );
+    foo.next('foo');
+    bar.next('bar');
+    expect(jsDom.dom.window.document.body.innerHTML).toMatch(
+      /<div id="rexApp"><div --rex--anchor=".*">foo<span>-<\/span>bar<\/div><\/div>/gm,
+    );
   });
   test('Div with span with template', () => {
+    const foo = new Ref('fizz');
+    const bar = new Ref('buzz');
     const rootComponent = new Component({
       render: new RexNode('div', null, [
         '{{ foo }}',
         new RexNode('span', null, '{{ bar }}'),
       ]),
       setup() {
-        const foo = new Ref('fizz');
-        const bar = new Ref('buzz');
         return {
           foo,
           bar,
@@ -66,6 +71,11 @@ describe('application tests', () => {
     new RexApp(rootComponent).extend(jsDom).mount('#rexApp');
     expect(jsDom.dom.window.document.body.innerHTML).toMatch(
       /<div id="rexApp"><div --rex--anchor=".*">fizz<span --rex--anchor=".*">buzz<\/span><\/div><\/div>/gm,
+    );
+    foo.next('foo');
+    bar.next('bar');
+    expect(jsDom.dom.window.document.body.innerHTML).toMatch(
+      /<div id="rexApp"><div --rex--anchor=".*">foo<span --rex--anchor=".*">bar<\/span><\/div><\/div>/gm,
     );
   });
 });

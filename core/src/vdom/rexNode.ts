@@ -21,7 +21,7 @@ import { pipeIt } from '../tools/pipe';
 
 export type RexNodeChildren = RexNode | string | Array<string | RexNode> | null;
 
-export const anchorAttribute = '__rex-anchor__';
+export const anchorAttribute = '--rex--anchor';
 
 export const anchorPrefix = 'anchor--';
 

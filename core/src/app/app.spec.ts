@@ -18,7 +18,7 @@ describe('application tests', () => {
     const jsDom = new JsDomPlugin('<div id="rexApp" ></div>');
     new RexApp(rootComponent).extend(jsDom).mount('#rexApp');
     expect(jsDom.dom.window.document.body.innerHTML).toMatch(
-      /<div id="rexApp"><div rex-node-updatable=".*">Hello, Danny<\/div><\/div>/gm,
+      /<div id="rexApp"><div --rex--anchor=".*">Hello, Danny<\/div><\/div>/gm,
     );
   });
   test('Div with array of children', () => {
@@ -40,7 +40,7 @@ describe('application tests', () => {
     const jsDom = new JsDomPlugin('<div id="rexApp" ></div>');
     new RexApp(rootComponent).extend(jsDom).mount('#rexApp');
     expect(jsDom.dom.window.document.body.innerHTML).toMatch(
-      /<div id="rexApp"><div rex-node-updatable=".*">fizz<span>-<\/span>buzz<\/div><\/div>/gm,
+      /<div id="rexApp"><div --rex--anchor=".*">fizz<span>-<\/span>buzz<\/div><\/div>/gm,
     );
   });
   test('Div with span with template', () => {
@@ -61,7 +61,7 @@ describe('application tests', () => {
     const jsDom = new JsDomPlugin('<div id="rexApp" ></div>');
     new RexApp(rootComponent).extend(jsDom).mount('#rexApp');
     expect(jsDom.dom.window.document.body.innerHTML).toMatch(
-      /<div id="rexApp"><div rex-node-updatable=".*">fizz<span rex-node-updatable=".*">buzz<\/span><\/div><\/div>/gm,
+      /<div id="rexApp"><div --rex--anchor=".*">fizz<span --rex--anchor=".*">buzz<\/span><\/div><\/div>/gm,
     );
   });
 });

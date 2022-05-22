@@ -12,7 +12,7 @@ import { DependencyResolver } from '../di/dependencyResolver';
 import { DiContainer } from '../di/diContainer';
 import { Ref } from '../scope/ref';
 import { Scope } from '../scope/scope';
-import { RexNode, updatableAttibute } from '../vdom/rexNode';
+import { RexNode, anchorAttribute } from '../vdom/rexNode';
 
 export interface IComponentConstructorArgs {
   render: RexNode | null;
@@ -37,6 +37,7 @@ export class Component extends DependencyResolver {
         di.provideReactive(new Scope(state));
         this.render.setContainer(di);
       });
+    /* Search all anchor elements */
     this._mounted$
       .pipe(
         filter((v) => v),
@@ -46,9 +47,9 @@ export class Component extends DependencyResolver {
       )
       .subscribe(([doc, di]) => {
         doc
-          .querySelectorAll(`${this.__selector} [${updatableAttibute}]`)
+          .querySelectorAll(`${this.__selector} [${anchorAttribute}]`)
           .forEach((el) => {
-            const attrVal = el.getAttribute(updatableAttibute);
+            const attrVal = el.getAttribute(anchorAttribute);
             if (attrVal != null) {
               di.register(el, attrVal);
             }

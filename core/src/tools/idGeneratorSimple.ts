@@ -8,5 +8,5 @@ export function newId(prefix = ''): string {
   }
   lastId += 1;
   ids[ids.length - 1] = lastId;
-  return prefix + '-' + ids.join('-');
+  return prefix + ids.join('-');
 }

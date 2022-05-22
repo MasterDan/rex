@@ -21,9 +21,9 @@ import { pipeIt } from '../tools/pipe';
 
 export type RexNodeChildren = RexNode | string | Array<string | RexNode> | null;
 
-export const updatableAttibute = 'rex-node-updatable';
+export const anchorAttribute = '__rex-anchor__';
 
-export const rexNodeIdPrefix = '__rex-node-';
+export const anchorPrefix = 'anchor--';
 
 export interface IRexNodeOptions {
   skipDirectivesResolve: boolean;
@@ -33,11 +33,15 @@ export class RexNode extends DependencyResolver {
   tag$: BehaviorSubject<string>;
 
   attributes$: BehaviorMutable<Record<string, string | null> | null>;
+
   children$: BehaviorMutable<RexNodeChildren>;
+
   directives$ = new BehaviorMutable<Directive[]>([]);
 
   _updatable$ = new BehaviorSubject<boolean>(false);
+
   _id$ = new BehaviorSubject<string | null>(null);
+
   _mounted$ = new BehaviorSubject<boolean>(false);
 
   _parentNode$ = new BehaviorSubject<RexNode | null>(null);
@@ -68,14 +72,14 @@ export class RexNode extends DependencyResolver {
       .subscribe(() => {
         this.attributes$.mutate((oldval) => {
           if (this._id$.value == null) {
-            this._id$.next(newId(rexNodeIdPrefix));
+            this._id$.next(newId(anchorPrefix));
           }
           if (oldval != null) {
-            oldval[updatableAttibute] = this._id$.value;
+            oldval[anchorAttribute] = this._id$.value;
             return oldval;
           } else {
             const attributes = {} as Record<string, string | null>;
-            attributes[updatableAttibute] = this._id$.value;
+            attributes[anchorAttribute] = this._id$.value;
             return attributes;
           }
         });

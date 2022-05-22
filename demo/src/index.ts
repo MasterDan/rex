@@ -10,7 +10,7 @@ const root = new Component({
     const word = new Ref('Danny');
     setTimeout(() => {
       word.next('World');
-    }, 5000);
+    }, 2000);
     return {
       word,
     };

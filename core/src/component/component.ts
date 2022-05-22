@@ -10,6 +10,7 @@ import {
 import { documentKey } from '../di/constants';
 import { DependencyResolver } from '../di/dependencyResolver';
 import { DiContainer } from '../di/diContainer';
+import { HtmlElementProvider } from '../di/providers/htmlElementProvider';
 import { Ref } from '../scope/ref';
 import { Scope } from '../scope/scope';
 import { RexNode, anchorAttribute } from '../vdom/rexNode';
@@ -46,14 +47,17 @@ export class Component extends DependencyResolver {
         filter((arr): arr is [Document, DiContainer] => arr[1] != null),
       )
       .subscribe(([doc, di]) => {
-        doc
-          .querySelectorAll(`${this.__selector} [${anchorAttribute}]`)
-          .forEach((el) => {
-            const attrVal = el.getAttribute(anchorAttribute);
-            if (attrVal != null) {
-              di.register(el, attrVal);
-            }
-          });
+        const elems = doc.querySelectorAll(
+          `${this.__selector} [${anchorAttribute}]`,
+        );
+        const elemsRecord: Record<string, HTMLElement> = {};
+        for (const el of elems) {
+          const attrVal = el.getAttribute(anchorAttribute);
+          if (attrVal != null) {
+            elemsRecord[attrVal] = el as HTMLElement;
+          }
+        }
+        di.provide(new HtmlElementProvider(elemsRecord));
       });
   }
 

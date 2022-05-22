@@ -1,6 +1,11 @@
 import { Component } from '../component/component';
-import { directiveDetectorKey, rootComponentKey } from '../di/constants';
+import {
+  directiveDetectorKey,
+  htmlElementsKey,
+  rootComponentKey,
+} from '../di/constants';
 import { DiContainer } from '../di/diContainer';
+import { DiContainerReactive } from '../di/diContainerReactive';
 import { TemplateStringDirective } from '../directives/builtin/templateStringDirective';
 import { DirectiveDetector } from '../directives/directiveDetector';
 import { DirectiveProvider } from '../directives/directiveProvider';
@@ -17,6 +22,7 @@ export class RexApp {
     this.di.register(root, rootComponentKey);
     this.di.register(DirectiveDetector, directiveDetectorKey);
     this.di.provide(new DirectiveProvider(TemplateStringDirective));
+    this.di.register(new DiContainerReactive(), htmlElementsKey);
   }
 
   extend(...plugins: RexPlugin[]): RexApp {

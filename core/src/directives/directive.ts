@@ -6,14 +6,13 @@ import {
   Observable,
   switchMap,
 } from 'rxjs';
+import { htmlElementsKey } from '../di/constants';
 import { DependencyResolver } from '../di/dependencyResolver';
+import { DiContainerReactive } from '../di/diContainerReactive';
 import { Ref } from '../scope/ref';
 import { RexNode } from '../vdom/rexNode';
 /**
- * В общем виде директива - это штука, которая обновляет наше дерево
- * Мы не ищем вершины, требующие обновления явно. Всё нелбходимое уже должно быть
- * в директиве.
- *
+  Directive is a thing that transforms our tree and detects changes
  */
 export abstract class Directive<T = string> extends DependencyResolver {
   abstract name: string;
@@ -34,11 +33,22 @@ export abstract class Directive<T = string> extends DependencyResolver {
         }
       }),
       filter((nodes): nodes is RexNode[] => nodes != undefined),
-      map((nodes) =>
-        nodes.map((n) => n._id$.value).filter((id): id is string => id != null),
-      ),
-      switchMap((ids) => {
-        return combineLatest(ids.map((id) => this.resolve<HTMLElement>(id)));
+      switchMap((nodes) => {
+        return combineLatest(
+          nodes.map((node) =>
+            node._id$.pipe(
+              filter((id): id is string => id != null),
+              switchMap((id) =>
+                this.resolve<DiContainerReactive>(htmlElementsKey).pipe(
+                  switchMap((htmlDi) =>
+                    htmlDi.resolveReactive<HTMLElement>(id),
+                  ),
+                  filter((el): el is HTMLElement => el != null),
+                ),
+              ),
+            ),
+          ),
+        );
       }),
     );
 
@@ -53,15 +63,11 @@ export abstract class Directive<T = string> extends DependencyResolver {
         switchMap((ref) => ref),
       )
       .subscribe((val) => this.__value$.next(val));
-    this.__transformedElements$.subscribe((text) => {
-      console.log('html updated', text);
-    });
     // triggering update
     combineLatest([
       this.__transformedElements$,
       this.__value$.pipe(filter((val): val is T => val != null)),
     ]).subscribe(([elems, value]) => {
-      console.log('update triggered');
       this.update(value, elems);
     });
   }

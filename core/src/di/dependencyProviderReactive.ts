@@ -22,4 +22,10 @@ export abstract class DependencyProviderReactive {
         di.registerReactive<T>(item, key);
       });
   }
+
+  protected onContainerSet(fn: (di: DiContainerReactive) => void) {
+    this.container$
+      .pipe(filter((c): c is DiContainerReactive => c != null))
+      .subscribe(fn);
+  }
 }

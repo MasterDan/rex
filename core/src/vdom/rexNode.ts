@@ -59,10 +59,11 @@ export class RexNode extends DependencyResolver {
       string | null
     > | null>(attributes);
     /* setting children with little transormations */
-    this.children$ = pipeIt(this.__simplifyChildren__)
+    this.children$ = pipeIt(() => children)
+      .then(this.__simplifyChildren__)
       .then(this.__simplifyArray__)
       .then((result) => new BehaviorMutable<RexNodeChildren>(result))
-      .run(children);
+      .run();
     /* mark yourself unique attribute to easier detect later */
     this._updatable$
       .pipe(

@@ -49,8 +49,9 @@ export class Component extends DependencyResolver {
             arr[1] != null && arr[2] != null,
         ),
         take(1),
+        map(([_, di, el]) => ({ di, el })),
       )
-      .subscribe(([_, di, el]) => {
+      .subscribe(({ di, el }) => {
         const elems = el.querySelectorAll(`[${anchorAttribute}]`);
         const elemsRecord: Record<string, HTMLElement> = {};
         for (const el of elems) {

@@ -3,7 +3,6 @@ import {
   filter,
   forkJoin,
   map,
-  switchMap,
   take,
   withLatestFrom,
 } from 'rxjs';
@@ -22,7 +21,9 @@ export interface IComponentConstructorArgs {
 
 export class Component extends DependencyResolver {
   render = new RexNode('');
-  __selector = '';
+  _el$ = new BehaviorSubject<HTMLElement | null>(null);
+  _mounted$ = new BehaviorSubject<boolean>(false);
+
   constructor(arg: IComponentConstructorArgs) {
     super();
     const state = arg.setup();
@@ -42,14 +43,15 @@ export class Component extends DependencyResolver {
     this._mounted$
       .pipe(
         filter((v) => v),
-        switchMap(() => this.resolve<Document>(documentKey)),
-        withLatestFrom(this.container$),
-        filter((arr): arr is [Document, DiContainer] => arr[1] != null),
+        withLatestFrom(this.container$, this._el$),
+        filter(
+          (arr): arr is [boolean, DiContainer, HTMLElement] =>
+            arr[1] != null && arr[2] != null,
+        ),
+        take(1),
       )
-      .subscribe(([doc, di]) => {
-        const elems = doc.querySelectorAll(
-          `${this.__selector} [${anchorAttribute}]`,
-        );
+      .subscribe(([_, di, el]) => {
+        const elems = el.querySelectorAll(`[${anchorAttribute}]`);
         const elemsRecord: Record<string, HTMLElement> = {};
         for (const el of elems) {
           const attrVal = el.getAttribute(anchorAttribute);
@@ -61,13 +63,10 @@ export class Component extends DependencyResolver {
       });
   }
 
-  _mounted$ = new BehaviorSubject<boolean>(false);
-
   mount(selector: string) {
-    this.__selector = selector;
     const element$ = this.resolve<Document>(documentKey).pipe(
       map((doc) => doc.querySelector(selector)),
-      filter((el): el is Element => el != null),
+      filter((el): el is HTMLElement => el != null),
       take(1),
     );
     forkJoin({
@@ -75,6 +74,7 @@ export class Component extends DependencyResolver {
       htmlText: this.render.text$,
     }).subscribe(({ element, htmlText }) => {
       element.innerHTML = htmlText;
+      this._el$.next(element);
       this.render._mounted$.next(true);
       this._mounted$.next(true);
     });

@@ -139,7 +139,7 @@ export class RexNode extends DependencyResolver {
       /* searching for directives in node */
       this.resolve<DirectiveDetector>(directiveDetectorKey).subscribe(
         (detector) => {
-          detector.findStringTemplates(this);
+          detector.scanNode(this);
         },
       );
     }
@@ -281,9 +281,9 @@ export class RexNode extends DependencyResolver {
     return clonedNode;
   }
 
-  __addDirective(dir: Directive) {
+  __addDirective(...dirs: Directive[]) {
     this.directives$.mutate((val) => {
-      val.push(dir);
+      val.push(...dirs);
       return val;
     });
   }

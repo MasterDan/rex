@@ -15,8 +15,11 @@ import { RexNode } from '../vdom/rexNode';
   Directive is a thing that transforms our tree and detects changes
  */
 export abstract class Directive<T = string> extends DependencyResolver {
+  abstract frame: RegExp;
   abstract name: string;
-  protected shorthand: string | null = null;
+
+  arg$ = new BehaviorSubject<string | null>(null);
+  modifiers$ = new BehaviorSubject<Record<string, boolean> | null>(null);
 
   __sourceNode$ = new BehaviorSubject<RexNode | null>(null);
   __transformedNode$ = new BehaviorSubject<RexNode | RexNode[] | null>(null);
@@ -70,6 +73,42 @@ export abstract class Directive<T = string> extends DependencyResolver {
     ]).subscribe(([elems, value]) => {
       this.update(value, elems);
     });
+  }
+
+  __detectSelfIn(node: RexNode): Directive[] | null {
+    const attrs = node.attributes$.value;
+    if (attrs == null) {
+      return null;
+    }
+    let notFoundSelf = true;
+    const foundedSelf: Directive[] = [];
+    for (const key of Object.keys(attrs)) {
+      const match = this.frame.exec(key);
+      if (match == null) {
+        continue;
+      } else {
+        this.resolve<Directive>(this.name).subscribe((directive) => {
+          notFoundSelf = false;
+          const arg = match[1];
+          if (arg != null) {
+            directive.arg$.next(arg);
+          }
+          foundedSelf.push(directive);
+          node.attributes$.mutate((val) => {
+            if (val != null) {
+              delete val[key];
+            }
+            return val;
+          });
+        });
+      }
+    }
+    if (notFoundSelf) {
+      return null;
+    } else {
+      return foundedSelf;
+    }
+    throw new Error('Not impleented');
   }
 
   abstract init(node: RexNode): RexNode | RexNode[];

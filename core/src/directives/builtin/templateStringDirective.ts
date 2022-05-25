@@ -9,6 +9,8 @@ import {
 
 export const templateStringDirName = '__template_String__';
 export class TemplateStringDirective extends Directive {
+  /** dont'need this for template strings */
+  frame = undefined as unknown as RegExp;
   name = templateStringDirName;
   childIndex: number | null = null;
 

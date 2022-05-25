@@ -135,8 +135,8 @@ export class RexNode extends DependencyResolver {
             });
         }
       });
+    /* searching for directives in node if not restricted in options */
     if (options == null || !options.skipDirectivesResolve) {
-      /* searching for directives in node */
       this.resolve<DirectiveDetector>(directiveDetectorKey).subscribe(
         (detector) => {
           detector.scanNode(this);

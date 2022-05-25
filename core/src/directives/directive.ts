@@ -108,7 +108,6 @@ export abstract class Directive<T = string> extends DependencyResolver {
     } else {
       return foundedSelf;
     }
-    throw new Error('Not impleented');
   }
 
   abstract init(node: RexNode): RexNode | RexNode[];

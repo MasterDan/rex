@@ -15,7 +15,7 @@ import { RexNode } from '../vdom/rexNode';
   Directive is a thing that transforms our tree and detects changes
  */
 export abstract class Directive<T = string> extends DependencyResolver {
-  abstract frame: RegExp;
+  protected frame: RegExp | null = null;
   abstract name: string;
 
   arg$ = new BehaviorSubject<string | null>(null);
@@ -83,7 +83,11 @@ export abstract class Directive<T = string> extends DependencyResolver {
     let notFoundSelf = true;
     const foundedSelf: Directive[] = [];
     for (const key of Object.keys(attrs)) {
-      const match = this.frame.exec(key);
+      const regExpByName = new RegExp(`rex-${this.name}:(\\w*)`);
+      const match =
+        this.frame != null
+          ? this.frame.exec(key) ?? regExpByName.exec(key)
+          : regExpByName.exec(key);
       if (match == null) {
         continue;
       } else {

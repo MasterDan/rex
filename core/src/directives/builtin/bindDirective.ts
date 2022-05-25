@@ -7,7 +7,7 @@ export class BindDirective extends Directive {
   init(node: RexNode): RexNode | RexNode[] {
     return node;
   }
-  update(value: string, elems: HTMLElement[]): HTMLElement[] {
+  update(_value: string, _elems: HTMLElement[]): HTMLElement[] {
     throw new Error('Method not implemented.');
   }
 }

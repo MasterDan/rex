@@ -8,8 +8,9 @@
   "source": "src/index.html",
   "browserslist": "> 0.5%, last 2 versions, not dead",
   "scripts": {
-    "start": "parcel",
-    "build": "parcel build"
+    "start": "npm run clean && parcel",
+    "build": "npm run clean && parcel build",
+    "clean": "rimraf dist"
   },
   "keywords": [],
   "author": "",
@@ -17,7 +18,8 @@
   "devDependencies": {
     "@parcel/transformer-sass": "^2.5.0",
     "parcel": "^2.5.0",
-    "parcel-plugin-nuke-dist": "^1.0.1"
+    "parcel-plugin-nuke-dist": "^1.0.1",
+    "rimraf": "^3.0.2"
   },
   "dependencies": {
     "rexar": "file:../core"

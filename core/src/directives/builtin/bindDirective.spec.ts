@@ -24,7 +24,7 @@ describe('bind attribute directive', () => {
     );
     word.next('World');
     expect(jsDom.dom.window.document.body.innerHTML).toMatch(
-      /<div id="rexApp"><div id="World" --rex--anchor=".*">Hello, World<\/div><\/div>/gm,
+      /<div id="rexApp"><div id="World" --rex--anchor=".*"><\/div><\/div>/gm,
     );
   });
 });

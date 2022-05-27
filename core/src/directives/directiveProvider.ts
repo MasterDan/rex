@@ -17,8 +17,8 @@ export class DirectiveProvider extends DependencyProviderClassic {
         }
         di.register(dirCtor, dir.name);
         existingKeys.push(dir.name);
-        di.register(existingKeys, registeredDirectiveNamesKey);
       }
+      di.register(existingKeys, registeredDirectiveNamesKey);
     });
   }
 }

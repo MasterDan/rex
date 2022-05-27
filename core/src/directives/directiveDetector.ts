@@ -62,8 +62,10 @@ export class DirectiveDetector extends DependencyResolver {
         map((dirs) =>
           dirs
             .map((dir) => dir.__detectSelfIn(node))
-            .filter((arg): arg is Directive[] => arg != null)
-            .reduce((a, b) => a.concat(b)),
+            .filter((arg): arg is Directive[] => arg != null),
+        ),
+        map((dirs) =>
+          dirs.length > 0 ? dirs.reduce((a, b) => a.concat(b)) : (dirs as []),
         ),
       )
       .subscribe((dirs) => {

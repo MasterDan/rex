@@ -4,7 +4,7 @@ import { Ref } from '../../scope/ref';
 import { RexNode } from '../../vdom/rexNode';
 import { RexApp } from '../../app/app';
 
-describe('application tests', () => {
+describe('template string directive', () => {
   test('Simple Component', () => {
     const word = new Ref('Danny');
     const rootComponent = new Component({

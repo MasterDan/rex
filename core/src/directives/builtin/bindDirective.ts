@@ -33,6 +33,6 @@ export class BindDirective extends Directive {
       return elements;
     }
     element.setAttribute(argument, value ?? '');
-    throw new Error('Method not implemented.');
+    return elements;
   }
 }

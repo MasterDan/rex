@@ -2,7 +2,7 @@ import { RexNode } from 'core/src/vdom/rexNode';
 import { Directive, IDirectiveBinding, IElems } from '../directive';
 
 export class BindDirective extends Directive {
-  frame = /(\w*):/;
+  frame = /(.*):$/;
   name = 'bind';
 
   init(

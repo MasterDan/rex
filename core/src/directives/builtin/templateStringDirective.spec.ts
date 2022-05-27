@@ -1,8 +1,8 @@
-import { Component } from '../component/component';
-import { JsDomPlugin } from '../plugins/jsDomPlugin';
-import { Ref } from '../scope/ref';
-import { RexNode } from '../vdom/rexNode';
-import { RexApp } from './app';
+import { Component } from '../../component/component';
+import { JsDomPlugin } from '../../plugins/jsDomPlugin';
+import { Ref } from '../../scope/ref';
+import { RexNode } from '../../vdom/rexNode';
+import { RexApp } from '../../app/app';
 
 describe('application tests', () => {
   test('Simple Component', () => {

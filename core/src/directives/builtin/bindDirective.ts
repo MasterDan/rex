@@ -33,6 +33,6 @@ export class BindDirective extends Directive {
       return elements;
     }
     element.setAttribute(argument, value ?? '');
-    return elements;
+    return [element];
   }
 }

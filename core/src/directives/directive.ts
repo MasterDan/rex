@@ -75,6 +75,9 @@ export abstract class Directive<T = string> extends DependencyResolver {
     });
   }
 
+  /** Detects if current directive (if not template string) exists in provideded node.
+   *  May be more, than once.
+   */
   __detectSelfIn(node: RexNode): Directive[] | null {
     const attrs = node.attributes$.value;
     if (attrs == null) {
@@ -82,25 +85,26 @@ export abstract class Directive<T = string> extends DependencyResolver {
     }
     let notFoundSelf = true;
     const foundedSelf: Directive[] = [];
-    for (const key of Object.keys(attrs)) {
-      const regExpByName = new RegExp(`rex-${this.name}:(\\w*)`);
+    for (const attributeName of Object.keys(attrs)) {
+      const fallbackRegExp = new RegExp(`rex-${this.name}:(\\w*)`);
       const match =
         this.frame != null
-          ? this.frame.exec(key) ?? regExpByName.exec(key)
-          : regExpByName.exec(key);
+          ? this.frame.exec(attributeName) ?? fallbackRegExp.exec(attributeName)
+          : fallbackRegExp.exec(attributeName);
       if (match == null) {
         continue;
       } else {
         this.resolve<Directive>(this.name).subscribe((directive) => {
           notFoundSelf = false;
-          const arg = match[1];
-          if (arg != null) {
-            directive.arg$.next(arg);
+          const argumentDetected = match[1];
+          if (argumentDetected != null) {
+            directive.arg$.next(argumentDetected);
           }
+          directive.__valueKey$.next(attrs[attributeName]);
           foundedSelf.push(directive);
           node.attributes$.mutate((val) => {
             if (val != null) {
-              delete val[key];
+              delete val[attributeName];
             }
             return val;
           });

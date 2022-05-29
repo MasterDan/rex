@@ -1,7 +1,7 @@
 import { Ref } from 'core/src/scope/ref';
 import { RexNode } from 'core/src/vdom/rexNode';
 import { combineLatest, filter, map, Observable, switchMap, take } from 'rxjs';
-import { Directive } from '../directive';
+import { Directive, IDirectiveBinding, IElems } from '../directive';
 import {
   getKeysToInsert,
   parseTemplateString,
@@ -92,12 +92,15 @@ export class TemplateStringDirective extends Directive {
     return node;
   }
 
-  override update(value: string, [el]: HTMLElement[]): HTMLElement[] {
+  override update(
+    { element }: IElems,
+    { value }: IDirectiveBinding,
+  ): HTMLElement[] {
     if (this.childIndex == null) {
-      el.innerHTML = value;
+      element.innerHTML = value ?? '';
     } else {
-      el.childNodes[this.childIndex].nodeValue = value;
+      element.childNodes[this.childIndex].nodeValue = value;
     }
-    return [el];
+    return [element];
   }
 }

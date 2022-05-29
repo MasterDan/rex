@@ -59,10 +59,11 @@ export class RexNode extends DependencyResolver {
       string | null
     > | null>(attributes);
     /* setting children with little transormations */
-    this.children$ = pipeIt(this.__simplifyChildren__)
+    this.children$ = pipeIt(() => children)
+      .then(this.__simplifyChildren__)
       .then(this.__simplifyArray__)
       .then((result) => new BehaviorMutable<RexNodeChildren>(result))
-      .run(children);
+      .run();
     /* mark yourself unique attribute to easier detect later */
     this._updatable$
       .pipe(
@@ -134,11 +135,11 @@ export class RexNode extends DependencyResolver {
             });
         }
       });
+    /* searching for directives in node if not restricted in options */
     if (options == null || !options.skipDirectivesResolve) {
-      /* searching for directives in node */
       this.resolve<DirectiveDetector>(directiveDetectorKey).subscribe(
         (detector) => {
-          detector.findStringTemplates(this);
+          detector.scanNode(this);
         },
       );
     }
@@ -280,9 +281,9 @@ export class RexNode extends DependencyResolver {
     return clonedNode;
   }
 
-  __addDirective(dir: Directive) {
+  __addDirective(...dirs: Directive[]) {
     this.directives$.mutate((val) => {
-      val.push(dir);
+      val.push(...dirs);
       return val;
     });
   }

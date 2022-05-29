@@ -22,4 +22,13 @@ export abstract class DependencyProviderClassic {
         di.register<T>(item, key);
       });
   }
+
+  protected onContainerSet(arg: (di: DiContainerClassic) => void) {
+    this.container$
+      .pipe(
+        filter((c): c is DiContainerClassic => c != null),
+        take(1),
+      )
+      .subscribe(arg);
+  }
 }

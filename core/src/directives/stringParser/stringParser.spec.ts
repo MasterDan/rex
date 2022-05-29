@@ -18,6 +18,13 @@ describe('string Parser', () => {
     expect(parsed2).toBe('Hello, world');
     expect(parsed3).toBe('Hello, world');
   });
+  test('parse multiple keys', () => {
+    const parsed = parseTemplateString('Hello, {{ word }} and {{ name }}', {
+      word: 'world',
+      name: 'Danny',
+    });
+    expect(parsed).toBe('Hello, world and Danny');
+  });
   test('parse empty', () => {
     expect(parseTemplateString('Foo')).toBe('Foo');
   });

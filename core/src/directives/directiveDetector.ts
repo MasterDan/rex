@@ -6,10 +6,16 @@ import {
   templateStringDirName,
 } from './builtin/templateStringDirective';
 import { Directive } from './directive';
-import { filter, Observable, take } from 'rxjs';
+import { combineLatest, map, Observable, switchMap, take } from 'rxjs';
+import { registeredDirectiveNamesKey } from '../di/constants';
 
 export class DirectiveDetector extends DependencyResolver {
-  findStringTemplates(node: RexNode): void {
+  scanNode(node: RexNode): void {
+    this.findStringTemplates(node);
+    this.findClassicDirectives(node);
+  }
+
+  private findStringTemplates(node: RexNode): void {
     if (
       node.children$.value == null ||
       node.children$.value instanceof RexNode
@@ -43,10 +49,31 @@ export class DirectiveDetector extends DependencyResolver {
     }
   }
 
+  private findClassicDirectives(node: RexNode): void {
+    this.resolve<string[]>(registeredDirectiveNamesKey)
+      .pipe(
+        switchMap((keys) =>
+          combineLatest(
+            keys
+              .filter((key) => key !== templateStringDirName)
+              .map((key) => this.resolveDirective(key)),
+          ).pipe(take(1)),
+        ),
+        map((dirs) =>
+          dirs
+            .map((dir) => dir.__detectSelfIn(node))
+            .filter((arg): arg is Directive[] => arg != null),
+        ),
+        map((dirs) =>
+          dirs.length > 0 ? dirs.reduce((a, b) => a.concat(b)) : (dirs as []),
+        ),
+      )
+      .subscribe((dirs) => {
+        node.__addDirective(...dirs);
+      });
+  }
+
   private resolveDirective<T extends Directive>(name: string): Observable<T> {
-    return this.resolve<Directive>(name).pipe(
-      filter((dir): dir is T => dir != null),
-      take(1),
-    );
+    return this.resolve<T>(name);
   }
 }

@@ -6,8 +6,10 @@ import {
   map,
   Observable,
   pairwise,
+  skip,
   startWith,
   switchMap,
+  take,
 } from 'rxjs';
 import { htmlElementsKey } from '../di/constants';
 import { DependencyResolver } from '../di/dependencyResolver';
@@ -71,8 +73,21 @@ export abstract class Directive<T = string> extends DependencyResolver {
         );
       }),
     );
+  /** Value changed and we have Element(s) to apply changes */
+  __readyToUpdate$ = combineLatest([
+    this.__transformedElements$.pipe(
+      map(
+        (els) =>
+          <IElems>{
+            element: els.length === 1 ? els[0] : null,
+            elements: els,
+          },
+      ),
+    ),
+    this.__value$,
+  ]);
 
-  get binding(): IDirectiveBinding<T> {
+  get __binding(): IDirectiveBinding<T> {
     return {
       argument: this.__argument$.value,
       modifiers: this.__modifiers$.value,
@@ -98,19 +113,12 @@ export abstract class Directive<T = string> extends DependencyResolver {
         this.__valueOld$.next(oldval);
       });
     // triggering update
-    combineLatest([
-      this.__transformedElements$.pipe(
-        map(
-          (els) =>
-            <IElems>{
-              element: els.length === 1 ? els[0] : null,
-              elements: els,
-            },
-        ),
-      ),
-      this.__value$,
-    ]).subscribe(([elems]) => {
-      this.update(elems, this.binding);
+    this.__readyToUpdate$.pipe(skip(1)).subscribe(([elems]) => {
+      this.update(elems, this.__binding);
+    });
+
+    this.__readyToUpdate$.pipe(take(1)).subscribe(([elems]) => {
+      this.mounted(elems, this.__binding);
     });
   }
 
@@ -162,6 +170,13 @@ export abstract class Directive<T = string> extends DependencyResolver {
     binding: IDirectiveBinding<T>,
   ): RexNode | RexNode[];
 
+  protected mounted(
+    elems: IElems,
+    binding: IDirectiveBinding<T>,
+  ): HTMLElement[] {
+    return this.update(elems, binding);
+  }
+
   abstract update(elems: IElems, binding: IDirectiveBinding<T>): HTMLElement[];
 
   __apply(node: RexNode): RexNode | RexNode[] {
@@ -174,7 +189,7 @@ export abstract class Directive<T = string> extends DependencyResolver {
     const transformed = this.init(
       /* Preventing endless loop of detecting directives in Node */
       node.clone({ skipDirectivesResolve: true }),
-      this.binding,
+      this.__binding,
     );
     if (transformed instanceof RexNode) {
       transformed._updatable$.next(true);

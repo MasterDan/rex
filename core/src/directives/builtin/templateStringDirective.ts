@@ -93,9 +93,12 @@ export class TemplateStringDirective extends Directive {
   }
 
   override update(
-    { element }: IElems,
+    { element, elements }: IElems,
     { value }: IDirectiveBinding,
   ): HTMLElement[] {
+    if (element == null) {
+      return elements;
+    }
     if (this.childIndex == null) {
       element.innerHTML = value ?? '';
     } else {

@@ -172,6 +172,7 @@ export abstract class Directive<T = string> extends DependencyResolver {
     }
     this.__sourceNode$.next(node);
     const transformed = this.init(
+      /* Preventing endless loop of detecting directives in Node */
       node.clone({ skipDirectivesResolve: true }),
       this.binding,
     );

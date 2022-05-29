@@ -125,10 +125,10 @@ export abstract class Directive<T = string> extends DependencyResolver {
     let notFoundSelf = true;
     const foundedSelf: Directive[] = [];
     for (const attributeName of Object.keys(attrs)) {
-      const fallbackRegExp = new RegExp(`rex-${this.name}:(\\w*)`);
+      const fallbackRegExp = new RegExp(`rex-${this.name}:([\\w-]*)`);
       const match =
         this.frame != null
-          ? this.frame.exec(attributeName) ?? fallbackRegExp.exec(attributeName)
+          ? this.frame.exec(attributeName)
           : fallbackRegExp.exec(attributeName);
       if (match == null) {
         continue;

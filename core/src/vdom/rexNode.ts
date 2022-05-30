@@ -19,7 +19,7 @@ import { isNullOrWhiteSpace } from '../tools/stringTools';
 import { newId } from '../tools/idGeneratorSimple';
 import { pipeIt } from '../tools/pipe';
 
-export type RexNodeChildren = RexNode | string | Array<string | RexNode> | null;
+export type RexNodeChildren = Array<string | RexNode> | null;
 
 export const anchorAttribute = '--rex--anchor';
 
@@ -49,7 +49,7 @@ export class RexNode extends DependencyResolver {
   constructor(
     tag = '',
     attributes: Record<string, string | null> | null = null,
-    children: RexNodeChildren = null,
+    children: RexNodeChildren | RexNode | string = null,
     options: IRexNodeOptions | null = null,
   ) {
     super();
@@ -59,9 +59,10 @@ export class RexNode extends DependencyResolver {
       string | null
     > | null>(attributes);
     /* setting children with little transormations */
-    this.children$ = pipeIt(() => children)
+    this.children$ = pipeIt(() =>
+      children == null || Array.isArray(children) ? children : [children],
+    )
       .then(this.__simplifyChildren__)
-      .then(this.__simplifyArray__)
       .then((result) => new BehaviorMutable<RexNodeChildren>(result))
       .run();
     /* mark yourself unique attribute to easier detect later */
@@ -174,17 +175,6 @@ export class RexNode extends DependencyResolver {
       childrenToReturn.push(childToPush);
     }
     return childrenToReturn;
-  }
-
-  /** Replace array of one item with it's content */
-  private __simplifyArray__(children: RexNodeChildren): RexNodeChildren {
-    if (children == null) {
-      return children;
-    } else if (Array.isArray(children) && children.length === 1) {
-      return children[0];
-    } else {
-      return children;
-    }
   }
 
   /** returns html text of current node */

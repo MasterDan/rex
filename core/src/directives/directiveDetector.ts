@@ -21,15 +21,6 @@ export class DirectiveDetector extends DependencyResolver {
       node.children$.value instanceof RexNode
     ) {
       return;
-    } else if (typeof node.children$.value === 'string') {
-      const keys = getKeysToInsert(node.children$.value);
-      if (keys.length > 0) {
-        this.resolveDirective<TemplateStringDirective>(
-          templateStringDirName,
-        ).subscribe((dir) => {
-          node.__addDirective(dir);
-        });
-      }
     } else if (Array.isArray(node.children$.value)) {
       for (const key in node.children$.value) {
         const current = node.children$.value[key];

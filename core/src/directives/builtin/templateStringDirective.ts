@@ -10,7 +10,7 @@ import {
 export const templateStringDirName = '__template_String__';
 export class TemplateStringDirective extends Directive {
   name = templateStringDirName;
-  childIndex: number | null = null;
+  childIndex = 0;
 
   templateString$: Observable<string> = this.__sourceNode$.pipe(
     filter((n): n is RexNode => n != null),
@@ -79,15 +79,10 @@ export class TemplateStringDirective extends Directive {
         take(1),
       )
       .subscribe((templateResult) => {
-        if (this.childIndex != null) {
-          node.children$.mutate((array) => {
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            (array as string[])[this.childIndex!] = templateResult;
-            return array;
-          });
-        } else {
-          node.children$.next(templateResult);
-        }
+        node.children$.mutate((array) => {
+          (array as string[])[this.childIndex] = templateResult;
+          return array;
+        });
       });
     return node;
   }

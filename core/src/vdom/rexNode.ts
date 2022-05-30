@@ -199,10 +199,6 @@ export class RexNode extends DependencyResolver {
         switchMap((children) => {
           if (children == null) {
             return of('');
-          } else if (typeof children === 'string') {
-            return of(children);
-          } else if (children instanceof RexNode) {
-            return children.text$;
           } else {
             return combineLatest(
               children.map((c) => (typeof c === 'string' ? of(c) : c.text$)),

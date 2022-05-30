@@ -193,10 +193,7 @@ export abstract class Directive<T = string> extends DependencyResolver {
     );
   }
 
-  abstract init(
-    node: RexNode,
-    binding: IDirectiveBinding<T>,
-  ): RexNode | RexNode[];
+  abstract init(node: RexNode, binding: IDirectiveBinding<T>): RexNode[];
 
   protected mounted(
     elems: IElems,
@@ -207,7 +204,7 @@ export abstract class Directive<T = string> extends DependencyResolver {
 
   abstract update(elems: IElems, binding: IDirectiveBinding<T>): HTMLElement[];
 
-  __apply(node: RexNode): RexNode | RexNode[] {
+  __apply(node: RexNode): RexNode[] {
     if (this.__initialized) {
       throw new Error(
         `Attempt to initialize already initialized directive ${this.name}.`,

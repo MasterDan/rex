@@ -43,7 +43,8 @@ describe('rexNode', () => {
       'lorem ipsum',
       ' dolor',
     ]);
-    expect(rexNode.children$.value).toEqual('lorem ipsum dolor');
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    expect(rexNode.children$.value![0]).toEqual('lorem ipsum dolor');
   });
   test('more complex string concat', () => {
     const rexNode = new RexNode('div', { class: 'foo-bar' }, [

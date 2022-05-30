@@ -218,33 +218,29 @@ export class RexNode extends DependencyResolver {
       return selfText$;
     } else {
       /* Current node needs transformation before drawing */
-      let nodes: RexNode | RexNode[] | null = null;
+      let nodes: RexNode[] | null = null;
       /* Applying directives. 
       They will transform current node into one or many nodes. */
       for (const key in noninitDirectives) {
         const directive: Directive = this.directives$.value[key];
         if (nodes == null) {
           nodes = directive.__apply(this);
-        } else if (nodes instanceof RexNode) {
-          nodes = directive.__apply(nodes);
         } else {
           nodes = nodes
             .map((node) => {
               const transformed = directive.__apply(node);
               if (transformed instanceof RexNode) {
                 return [transformed];
-              } else return transformed;
+              } else {
+                return transformed;
+              }
             })
             .reduce((a, c) => a.concat(c));
         }
       }
-      if (nodes instanceof RexNode) {
-        return nodes.text$;
-      } else {
-        return combineLatest(nodes?.map((n) => n.text$) ?? []).pipe(
-          map((arr) => arr.join('')),
-        );
-      }
+      return combineLatest(nodes?.map((n) => n.text$) ?? []).pipe(
+        map((arr) => arr.join('')),
+      );
     }
   }
 

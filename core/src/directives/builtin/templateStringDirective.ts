@@ -72,7 +72,7 @@ export class TemplateStringDirective extends Directive {
     this.templateStringParsed$.subscribe((val) => this.__value$.next(val));
   }
 
-  override init(node: RexNode): RexNode | RexNode[] {
+  override init(node: RexNode): RexNode[] {
     this.__value$
       .pipe(
         filter((val): val is string => val != null),
@@ -84,7 +84,7 @@ export class TemplateStringDirective extends Directive {
           return array;
         });
       });
-    return node;
+    return [node];
   }
 
   override update(

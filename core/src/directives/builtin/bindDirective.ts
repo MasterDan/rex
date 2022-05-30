@@ -8,9 +8,9 @@ export class BindDirective extends Directive {
   init(
     node: RexNode,
     { argument, value }: IDirectiveBinding<string>,
-  ): RexNode | RexNode[] {
+  ): RexNode[] {
     if (argument == null) {
-      return node;
+      return [node];
     }
     node.attributes$.mutate((attrs) => {
       if (attrs == null) {
@@ -22,7 +22,7 @@ export class BindDirective extends Directive {
         return attrs;
       }
     });
-    return node;
+    return [node];
   }
 
   update(

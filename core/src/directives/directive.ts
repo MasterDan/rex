@@ -216,39 +216,24 @@ export abstract class Directive<T = string> extends DependencyResolver {
       node.clone({ skipDirectivesResolve: true }),
       this.__binding,
     );
-    if (transformed instanceof RexNode) {
-      if (isNullOrWhiteSpace(transformed.tag$.value)) {
-        this.__sourceNode$
-          .pipe(
-            filter((n): n is RexNode => n != null),
-            switchMap((n) => n._parentNode$),
-            filter((n): n is RexNode => n != null),
-            take(1),
-          )
-          .subscribe((n) => {
-            n._updatable$.next(true);
-          });
-      } else {
-        transformed._updatable$.next(true);
-      }
+
+    if (transformed.length === 0) {
+      this.__sourceNode$
+        .pipe(
+          filter((n): n is RexNode => n != null),
+          switchMap((n) => n._parentNode$),
+          filter((n): n is RexNode => n != null),
+          take(1),
+        )
+        .subscribe((n) => {
+          n._updatable$.next(true);
+        });
     } else {
-      if ((transformed as RexNode[]).length === 0) {
-        this.__sourceNode$
-          .pipe(
-            filter((n): n is RexNode => n != null),
-            switchMap((n) => n._parentNode$),
-            filter((n): n is RexNode => n != null),
-            take(1),
-          )
-          .subscribe((n) => {
-            n._updatable$.next(true);
-          });
-      } else {
-        for (const current of transformed as RexNode[]) {
-          current._updatable$.next(true);
-        }
+      for (const current of transformed) {
+        current._updatable$.next(true);
       }
     }
+
     this.__transformedNode$.next(transformed);
     this.__initialized = true;
     return transformed;

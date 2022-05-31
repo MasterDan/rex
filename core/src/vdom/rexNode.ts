@@ -18,6 +18,7 @@ import { BehaviorMutable } from '../tools/rx/BehaviorMutable';
 import { isNullOrWhiteSpace } from '../tools/stringTools';
 import { newId } from '../tools/idGeneratorSimple';
 import { pipeIt } from '../tools/pipe';
+import { DirectivePipeline } from '../directives/directivePipeline';
 
 export type RexNodeChildren = Array<string | RexNode> | null;
 
@@ -40,7 +41,7 @@ export class RexNode extends DependencyResolver {
 
   children$: BehaviorMutable<RexNodeChildren>;
 
-  directives$ = new BehaviorMutable<Directive[]>([]);
+  directives = new DirectivePipeline().setNode(this);
 
   _updatable$ = new BehaviorSubject<boolean>(false);
 
@@ -49,6 +50,12 @@ export class RexNode extends DependencyResolver {
   _mounted$ = new BehaviorSubject<boolean>(false);
 
   _parentNode$ = new BehaviorSubject<RexNode | null>(null);
+
+  get _selfOrTransformed$(): Observable<RexNode[]> {
+    return this.directives.isEmpty
+      ? of([this])
+      : this.directives.transformedNode$;
+  }
 
   constructor(
     tag = '',
@@ -181,71 +188,52 @@ export class RexNode extends DependencyResolver {
     return childrenToReturn;
   }
 
+  __renderAsText(node: RexNode): Observable<string> {
+    /* Current node doesn't nedd transformation therefore we can render it */
+    const attrtext$ = node.attributes$.pipe(
+      map((attrs) => {
+        if (attrs == null) {
+          return '';
+        }
+        return Object.keys(attrs)
+          .map((key) => (attrs[key] != null ? `${key}="${attrs[key]}"` : key))
+          .join(' ');
+      }),
+    );
+    /* draws content as it is */
+    const content$ = node.children$.pipe(
+      switchMap((children) => {
+        if (children == null) {
+          return of('');
+        } else {
+          return combineLatest(
+            children.map((c) => (typeof c === 'string' ? of(c) : c.text$)),
+          ).pipe(map((arr) => arr.join('')));
+        }
+      }),
+    );
+    /* Text of current node without directive transformations */
+    const selfText$ = combineLatest([this.tag$, attrtext$, content$]).pipe(
+      map(([tag, attrs, content]) => {
+        return isNullOrWhiteSpace(tag)
+          ? content
+          : `<${tag} ${attrs}>${content}</${tag}>`;
+      }),
+      take(1),
+    );
+    return selfText$;
+  }
+
   /** returns html text of current node */
   get text$(): Observable<string> {
-    const noninitDirectives = this.directives$.value.filter(
-      (d) => d.__initialized === false,
+    return this._selfOrTransformed$.pipe(
+      switchMap((nodes) => {
+        return combineLatest(nodes.map((node) => this.__renderAsText(node)));
+      }),
+      map((strings) => {
+        return strings.join('');
+      }),
     );
-    if (noninitDirectives.length === 0) {
-      /* Current node doesn't nedd transformation therefore we can render it */
-      const attrtext$ = this.attributes$.pipe(
-        map((attrs) => {
-          if (attrs == null) {
-            return '';
-          }
-          return Object.keys(attrs)
-            .map((key) => (attrs[key] != null ? `${key}="${attrs[key]}"` : key))
-            .join(' ');
-        }),
-      );
-      /* draws content as it is */
-      const content$ = this.children$.pipe(
-        switchMap((children) => {
-          if (children == null) {
-            return of('');
-          } else {
-            return combineLatest(
-              children.map((c) => (typeof c === 'string' ? of(c) : c.text$)),
-            ).pipe(map((arr) => arr.join('')));
-          }
-        }),
-      );
-      /* Text of current node without directive transformations */
-      const selfText$ = combineLatest([this.tag$, attrtext$, content$]).pipe(
-        map(([tag, attrs, content]) => {
-          return isNullOrWhiteSpace(tag)
-            ? content
-            : `<${tag} ${attrs}>${content}</${tag}>`;
-        }),
-        take(1),
-      );
-      return selfText$;
-    } else {
-      /* Current node needs transformation before drawing */
-      let nodes: RexNode[] | null = null;
-      /* Applying directives. 
-      They will transform current node into one or many nodes. */
-      for (const key in noninitDirectives) {
-        const directive: Directive = this.directives$.value[key];
-        if (nodes == null) {
-          nodes = directive.__apply(this);
-        } else {
-          nodes = nodes
-            .map((node) => {
-              const transformed = directive.__apply(node);
-              if (transformed instanceof RexNode) {
-                return [transformed];
-              } else {
-                return transformed;
-              }
-            })
-            .reduce((a, c) => a.concat(c));
-        }
-      }
-      return combineLatest(nodes?.map((n) => n.text$) ?? []).pipe(
-        map((arr) => arr.join('')),
-      );
-    }
   }
 
   clone(options: IRexNodeOptions | null = null): RexNode {
@@ -268,9 +256,6 @@ export class RexNode extends DependencyResolver {
   }
 
   __addDirective(...dirs: Directive[]) {
-    this.directives$.mutate((val) => {
-      val.push(...dirs);
-      return val;
-    });
+    this.directives.pushDirectives(...dirs);
   }
 }

@@ -221,23 +221,23 @@ export abstract class Directive<T = string> extends DependencyResolver {
       node.clone({ skipDirectivesResolve: true }),
       this.__binding,
     );
-
-    if (transformed.length === 0) {
-      this.__sourceNode$
-        .pipe(
-          filter((n): n is RexNode => n != null),
-          switchMap((n) => n._parentNode$),
-          filter((n): n is RexNode => n != null),
-          take(1),
-        )
-        .subscribe((n) => {
-          n._updatable$.next(true);
-        });
-    } else {
-      for (const current of transformed) {
-        current._updatable$.next(true);
-      }
-    }
+    // @todo move this to pipeline
+    // if (transformed.length === 0) {
+    //   this.__sourceNode$
+    //     .pipe(
+    //       filter((n): n is RexNode => n != null),
+    //       switchMap((n) => n._parentNode$),
+    //       filter((n): n is RexNode => n != null),
+    //       take(1),
+    //     )
+    //     .subscribe((n) => {
+    //       n._updatable$.next(true);
+    //     });
+    // } else {
+    //   for (const current of transformed) {
+    //     current._updatable$.next(true);
+    //   }
+    // }
 
     this.__transformedNode$.next(transformed);
     this.__initialized = true;

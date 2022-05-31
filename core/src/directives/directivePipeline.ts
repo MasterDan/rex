@@ -19,11 +19,11 @@ export class DirectivePipeline {
 
   constructor() {
     this.validState$.subscribe(([directives, initialNode]) => {
-      let transformationStep = directives[0].__apply(initialNode);
+      let transformationStep = directives[0].__applySafe(initialNode);
       for (let i = 1; i < directives.length; i++) {
         const currentDir = directives[i];
         const transformedNodes = transformationStep.map((node) => {
-          const transformed = currentDir.__apply(node);
+          const transformed = currentDir.__applySafe(node);
           return transformed;
         });
         transformationStep =

@@ -42,7 +42,7 @@ export abstract class Directive<T = string> extends DependencyResolver {
   __modifiers$ = new BehaviorSubject<Record<string, boolean> | null>(null);
 
   __sourceNode$ = new BehaviorSubject<RexNode | null>(null);
-  __transformedNode$ = new BehaviorSubject<RexNode | RexNode[] | null>(null);
+  __transformedNode$ = new BehaviorSubject<RexNode[] | null>(null);
   __valueKey$: BehaviorSubject<string | null>;
   __value$ = new BehaviorSubject<T | null>(null);
   __valueOld$ = new BehaviorSubject<T | null>(null);
@@ -203,6 +203,14 @@ export abstract class Directive<T = string> extends DependencyResolver {
   }
 
   abstract update(elems: IElems, binding: IDirectiveBinding<T>): HTMLElement[];
+
+  __applySafe(node: RexNode): RexNode[] {
+    if (this.__initialized && this.__transformedNode$.value != null) {
+      return this.__transformedNode$.value;
+    } else {
+      return this.__apply(node);
+    }
+  }
 
   __apply(node: RexNode): RexNode[] {
     if (this.__initialized) {

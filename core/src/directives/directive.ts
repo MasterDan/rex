@@ -5,6 +5,7 @@ import {
   filter,
   map,
   Observable,
+  of,
   pairwise,
   skip,
   startWith,
@@ -103,7 +104,9 @@ export abstract class Directive<T = string> extends DependencyResolver {
     this.__sourceNode$
       .pipe(
         filter((n): n is RexNode => n != null),
-        switchMap((n) => this.__findHtml(n._parentNode$)),
+        switchMap((node) => node._parentNode$),
+        filter((n): n is RexNode => n != null),
+        switchMap((n) => this.__findHtml(of([n]))),
       )
       .subscribe(([el]) => this.__parentElement$.next(el));
 
@@ -161,16 +164,10 @@ export abstract class Directive<T = string> extends DependencyResolver {
   }
 
   __findHtml(
-    nodeSubject: Observable<RexNode | RexNode[] | null>,
+    nodeSubject: Observable<RexNode[] | null>,
   ): Observable<HTMLElement[]> {
     return nodeSubject.pipe(
-      filter((val): val is RexNode | RexNode[] => val != null),
-      map((tn) => {
-        if (tn instanceof RexNode) {
-          return [tn];
-        }
-      }),
-      filter((nodes): nodes is RexNode[] => nodes != undefined),
+      filter((val): val is RexNode[] => val != null),
       switchMap((nodes) => {
         return combineLatest(
           nodes

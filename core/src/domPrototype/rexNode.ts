@@ -227,9 +227,9 @@ export class RexNode extends DependencyResolver {
   /** returns html text of current node */
   get text$(): Observable<string> {
     return this._selfOrTransformed$.pipe(
-      switchMap((nodes) => {
-        return combineLatest(nodes.map((node) => this.__renderAsText(node)));
-      }),
+      switchMap((nodes) =>
+        combineLatest(nodes.map((node) => this.__renderAsText(node))),
+      ),
       map((strings) => {
         return strings.join('');
       }),

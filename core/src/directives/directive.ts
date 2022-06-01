@@ -209,6 +209,7 @@ export abstract class Directive<T = string> extends DependencyResolver {
     }
   }
 
+  /** @todo move comment zone to pipeline */
   __apply(node: RexNode): RexNode[] {
     if (this.__initialized) {
       throw new Error(
@@ -221,7 +222,7 @@ export abstract class Directive<T = string> extends DependencyResolver {
       node.clone({ skipDirectivesResolve: true }),
       this.__binding,
     );
-    // @todo move this to pipeline
+    //
     // if (transformed.length === 0) {
     //   this.__sourceNode$
     //     .pipe(

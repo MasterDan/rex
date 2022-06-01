@@ -1,7 +1,7 @@
 import { Component } from '../component/component';
 import { JsDomPlugin } from '../plugins/jsDomPlugin';
 import { Ref } from '../scope/ref';
-import { RexNode } from '../vdom/rexNode';
+import { RexNode } from '../domPrototype/rexNode';
 import { RexApp } from './app';
 
 describe('application', () => {

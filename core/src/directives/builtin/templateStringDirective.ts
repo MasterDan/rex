@@ -1,5 +1,5 @@
 import { Ref } from 'core/src/scope/ref';
-import { RexNode } from 'core/src/vdom/rexNode';
+import { RexNode } from '../../domPrototype/rexNode';
 import { combineLatest, filter, map, Observable, switchMap, take } from 'rxjs';
 import { Directive, IDirectiveBinding, IElems } from '../directive';
 import {

@@ -17,7 +17,7 @@ import { DependencyResolver } from '../di/dependencyResolver';
 import { DiContainerReactive } from '../di/diContainerReactive';
 import { Ref } from '../scope/ref';
 import { isNullOrWhiteSpace } from '../tools/stringTools';
-import { RexNode } from '../vdom/rexNode';
+import { RexNode } from '../domPrototype/rexNode';
 
 export interface IDirectiveBinding<T = string> {
   argument: string | null;

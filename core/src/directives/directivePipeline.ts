@@ -1,6 +1,6 @@
 import { BehaviorSubject, combineLatest, filter, Observable, take } from 'rxjs';
 import { BehaviorMutable } from '../tools/rx/BehaviorMutable';
-import { RexNode } from '../vdom/rexNode';
+import { RexNode } from '../domPrototype/rexNode';
 import { Directive } from './directive';
 
 export class DirectivePipeline {

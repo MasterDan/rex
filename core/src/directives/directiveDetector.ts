@@ -1,5 +1,5 @@
 import { DependencyResolver } from '../di/dependencyResolver';
-import { RexNode } from '../vdom/rexNode';
+import { RexNode } from '../domPrototype/rexNode';
 import { getKeysToInsert } from './stringParser/stringParser';
 import {
   TemplateStringDirective,

@@ -1,4 +1,4 @@
-import { RexNode } from 'core/src/vdom/rexNode';
+import { RexNode } from '../../domPrototype/rexNode';
 import { Directive, IDirectiveBinding, IElems } from '../directive';
 
 export class BindDirective extends Directive {

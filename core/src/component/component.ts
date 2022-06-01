@@ -12,7 +12,7 @@ import { DiContainer } from '../di/diContainer';
 import { HtmlElementProvider } from '../di/providers/htmlElementProvider';
 import { Ref } from '../scope/ref';
 import { Scope } from '../scope/scope';
-import { RexNode, anchorAttribute } from '../vdom/rexNode';
+import { RexNode, anchorAttribute } from '../domPrototype/rexNode';
 
 export interface IComponentConstructorArgs {
   render: RexNode | null;

@@ -9,7 +9,7 @@ import {
   take,
 } from 'rxjs';
 import type { Observable } from 'rxjs';
-import { directiveDetectorKey } from '../di/constants';
+import { directiveDetectorKey, documentKey } from '../di/constants';
 import { DependencyResolver } from '../di/dependencyResolver';
 import type { DiContainer } from '../di/diContainer';
 import type { Directive } from '../directives/directive';
@@ -236,6 +236,58 @@ export class RexNode extends DependencyResolver {
     );
   }
 
+  insertInto(fragment: DocumentFragment | HTMLElement) {
+    combineLatest([
+      this.resolve<Document>(documentKey),
+      this._selfOrTransformed$,
+    ]).subscribe(([doc, nodes]) => {
+      for (const node of nodes) {
+        if (isNullOrWhiteSpace(node.tag$.value)) {
+          if (node.children$.value != null) {
+            for (const child of node.children$.value) {
+              if (typeof child === 'string') {
+                fragment.append(child);
+              } else {
+                child.insertInto(fragment);
+              }
+            }
+          }
+        } else {
+          const el = doc.createElement(node.tag$.value);
+          if (node.attributes$.value != null) {
+            for (const key of Object.keys(node.attributes$.value)) {
+              el.setAttribute(key, node.attributes$.value[key] ?? '');
+            }
+          }
+          if (node.children$.value != null) {
+            for (const child of node.children$.value) {
+              if (typeof child === 'string') {
+                el.append(child);
+              } else {
+                child.insertInto(el);
+              }
+            }
+          }
+          fragment.appendChild(el);
+        }
+      }
+    });
+  }
+
+  render(): Observable<DocumentFragment> {
+    const fragment$ = this.resolve<Document>(documentKey).pipe(
+      map((doc) => doc.createDocumentFragment()),
+    );
+    combineLatest([fragment$, this._selfOrTransformed$]).subscribe(
+      ([fragment, nodes]) => {
+        for (const node of nodes) {
+          node.insertInto(fragment);
+        }
+      },
+    );
+    return fragment$;
+  }
+
   clone(options: IRexNodeOptions | null = null): RexNode {
     const clonedNode = new RexNode(
       this.tag$.value,
@@ -258,8 +310,7 @@ export class RexNode extends DependencyResolver {
   compare(other: RexNode): boolean {
     return (
       this.tag$.value === other.tag$.value &&
-      this.children$.value?.length === other.children$.value?.length &&
-      this.attributes$.value?.length === other.attributes$.value?.length
+      this.children$.value?.length === other.children$.value?.length
     );
   }
 

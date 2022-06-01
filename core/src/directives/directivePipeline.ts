@@ -1,4 +1,12 @@
-import { BehaviorSubject, combineLatest, filter, Observable, take } from 'rxjs';
+import {
+  BehaviorSubject,
+  combineLatest,
+  filter,
+  map,
+  Observable,
+  switchMap,
+  take,
+} from 'rxjs';
 import { BehaviorMutable } from '../tools/rx/BehaviorMutable';
 import { RexNode } from '../domPrototype/rexNode';
 import { Directive } from './directive';
@@ -16,6 +24,13 @@ export class DirectivePipeline {
     }),
   );
   private _transformedNodes$ = new BehaviorSubject<RexNode[] | null>(null);
+  private _isTheSameElement$: Observable<boolean> = this.directives$.pipe(
+    filter((val): val is Directive[] => val != null),
+    switchMap((dirs) =>
+      combineLatest(dirs.map((dir) => dir.__isTheSameElement$)),
+    ),
+    map((bools) => bools.every((b) => b === true)),
+  );
 
   constructor() {
     this.validState$.subscribe(([directives, initialNode]) => {
@@ -33,6 +48,16 @@ export class DirectivePipeline {
       }
       this._transformedNodes$.next(transformationStep);
     });
+    combineLatest([this._transformedNodes$, this._isTheSameElement$])
+      .pipe(
+        filter((args): args is [RexNode[], boolean] => {
+          const [nodes, isSame] = args;
+          return isSame && nodes != null;
+        }),
+      )
+      .subscribe(([[node]]) => {
+        node._updatable$.next(true);
+      });
   }
 
   get isEmpty(): boolean {

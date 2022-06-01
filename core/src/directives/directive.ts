@@ -52,6 +52,17 @@ export abstract class Directive<T = string> extends DependencyResolver {
   __transformedElements$ = new BehaviorSubject<HTMLElement[] | null>(null);
   __parentElement$ = new BehaviorSubject<HTMLElement | null>(null);
 
+  __isTheSameElement$ = combineLatest([
+    this.__sourceNode$,
+    this.__transformedNode$,
+  ]).pipe(
+    filter((arr): arr is [RexNode, RexNode[]] => {
+      const [was, now] = arr;
+      return was != null && now != null;
+    }),
+    map(([was, now]) => now.length === 1 && was.compare(now[0])),
+  );
+
   /** Value changed and we have Element(s) to apply changes */
   __readyToUpdate$: Observable<[IElems, T | null]> = combineLatest([
     this.__transformedElements$,

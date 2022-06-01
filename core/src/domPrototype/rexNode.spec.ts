@@ -86,7 +86,7 @@ describe('rexNode', () => {
       if (root) {
         root.appendChild(fragment);
         expect(jsd.window.document.body.innerHTML).toBe(
-          '<div id="rexApp" ><div class="foo-bar"><div class="foo-baz"></div><div class="foo-baz"></div></div></div>',
+          '<div id="rexApp"><div class="foo-bar"><div class="foo-baz"></div><div class="foo-baz"></div></div></div>',
         );
       }
     });

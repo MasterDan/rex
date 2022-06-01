@@ -236,7 +236,7 @@ export class RexNode extends DependencyResolver {
     );
   }
 
-  insertInto(fragment: DocumentFragment | HTMLElement) {
+  insertInto(appendHere: DocumentFragment | HTMLElement) {
     combineLatest([
       this.resolve<Document>(documentKey),
       this._selfOrTransformed$,
@@ -246,9 +246,9 @@ export class RexNode extends DependencyResolver {
           if (node.children$.value != null) {
             for (const child of node.children$.value) {
               if (typeof child === 'string') {
-                fragment.append(child);
+                appendHere.append(child);
               } else {
-                child.insertInto(fragment);
+                child.insertInto(appendHere);
               }
             }
           }
@@ -268,7 +268,7 @@ export class RexNode extends DependencyResolver {
               }
             }
           }
-          fragment.appendChild(el);
+          appendHere.appendChild(el);
         }
       }
     });
@@ -278,14 +278,14 @@ export class RexNode extends DependencyResolver {
     const fragment$ = this.resolve<Document>(documentKey).pipe(
       map((doc) => doc.createDocumentFragment()),
     );
-    combineLatest([fragment$, this._selfOrTransformed$]).subscribe(
-      ([fragment, nodes]) => {
+    return combineLatest([fragment$, this._selfOrTransformed$]).pipe(
+      map(([fragment, nodes]) => {
         for (const node of nodes) {
           node.insertInto(fragment);
         }
-      },
+        return fragment;
+      }),
     );
-    return fragment$;
   }
 
   clone(options: IRexNodeOptions | null = null): RexNode {

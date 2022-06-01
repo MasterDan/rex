@@ -62,4 +62,9 @@ describe('rexNode', () => {
       'lorem ipsum dolor',
     );
   });
+  test('compare two nodes', () => {
+    const rexNode = new RexNode('div', { class: 'foo-bar' }, ['lorem ipsum']);
+    const cloned = rexNode.clone();
+    expect(cloned.compare(rexNode)).toBe(true);
+  });
 });

@@ -255,6 +255,14 @@ export class RexNode extends DependencyResolver {
     return clonedNode;
   }
 
+  compare(other: RexNode): boolean {
+    return (
+      this.tag$.value === other.tag$.value &&
+      this.children$.value?.length === other.children$.value?.length &&
+      this.attributes$.value?.length === other.attributes$.value?.length
+    );
+  }
+
   __addDirective(...dirs: Directive[]) {
     this.directives.pushDirectives(...dirs);
   }

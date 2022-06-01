@@ -6,7 +6,7 @@ import { Directive } from './directive';
 export class DirectivePipeline {
   private directives$ = new BehaviorMutable<Directive[] | null>(null);
   private initialNode$ = new BehaviorSubject<RexNode | null>(null);
-  private validState$ = combineLatest([
+  private validState$: Observable<[Directive[], RexNode]> = combineLatest([
     this.directives$,
     this.initialNode$,
   ]).pipe(

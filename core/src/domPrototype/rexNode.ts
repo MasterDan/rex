@@ -29,11 +29,7 @@ export const anchorPrefix = 'anchor--';
 export interface IRexNodeOptions {
   skipDirectivesResolve: boolean;
 }
-/**
- * @todo make pipeline of directives
- * @todo call pipeline before render
- * @todo option to render DocumentFragment https://davidwalsh.name/documentfragment
- */
+
 export class RexNode extends DependencyResolver {
   tag$: BehaviorSubject<string>;
 

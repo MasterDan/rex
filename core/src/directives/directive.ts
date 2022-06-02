@@ -94,7 +94,7 @@ export abstract class Directive<T = string> extends DependencyResolver {
   constructor(key: string | null = null) {
     super();
     this.__valueKey$ = new BehaviorSubject<string | null>(key);
-    // resolving and unwrapping value
+    /* When key is set - getting value of that key */
     this.__valueKey$
       .pipe(
         filter((s): s is string => s != null),
@@ -121,11 +121,11 @@ export abstract class Directive<T = string> extends DependencyResolver {
       )
       .subscribe(([el]) => this.__parentElement$.next(el));
 
-    // triggering update
+    /* triggering update */
     this.__readyToUpdate$.pipe(skip(1)).subscribe(([elems]) => {
       this.update(elems, this.__binding);
     });
-    // first update is mounted
+    /* first update is mounted */
     this.__readyToUpdate$.pipe(take(1)).subscribe(([elems]) => {
       this.mounted(elems, this.__binding);
     });

@@ -39,7 +39,7 @@ export class RexApp {
   mount(selector: string): RexApp {
     const component = this.di.resolve<Component>(rootComponentKey);
     if (component != null) {
-      component.mountAsText(selector);
+      component.mountUsingFragment(selector);
     }
     return this;
   }

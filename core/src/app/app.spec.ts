@@ -26,12 +26,12 @@ describe('application', () => {
     const jsDom = new JsDomPlugin('<div id="rexApp" ></div>');
     new RexApp(rootComponent).extend(jsDom).mount('#rexApp');
     expect(jsDom.dom.window.document.body.innerHTML).toMatch(
-      /<div id="rexApp"><div --rex--anchor=".*" id="Mi">Hello, Danny<\/div><\/div>/gm,
+      /<div id="rexApp"><div __rex__anchor=".*" id="Mi">Hello, Danny<\/div><\/div>/gm,
     );
     word.next('World');
     id.next('foo');
     expect(jsDom.dom.window.document.body.innerHTML).toMatch(
-      /<div id="rexApp"><div --rex--anchor=".*" id="foo">Hello, World<\/div><\/div>/gm,
+      /<div id="rexApp"><div __rex__anchor=".*" id="foo">Hello, World<\/div><\/div>/gm,
     );
   });
 });

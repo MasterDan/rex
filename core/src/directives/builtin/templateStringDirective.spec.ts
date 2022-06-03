@@ -18,11 +18,11 @@ describe('template string directive', () => {
     const jsDom = new JsDomPlugin('<div id="rexApp" ></div>');
     new RexApp(rootComponent).extend(jsDom).mount('#rexApp');
     expect(jsDom.dom.window.document.body.innerHTML).toMatch(
-      /<div id="rexApp"><div --rex--anchor=".*">Hello, Danny<\/div><\/div>/gm,
+      /<div id="rexApp"><div __rex__anchor=".*">Hello, Danny<\/div><\/div>/gm,
     );
     word.next('World');
     expect(jsDom.dom.window.document.body.innerHTML).toMatch(
-      /<div id="rexApp"><div --rex--anchor=".*">Hello, World<\/div><\/div>/gm,
+      /<div id="rexApp"><div __rex__anchor=".*">Hello, World<\/div><\/div>/gm,
     );
   });
   test('Div with array of children', () => {
@@ -44,12 +44,12 @@ describe('template string directive', () => {
     const jsDom = new JsDomPlugin('<div id="rexApp" ></div>');
     new RexApp(rootComponent).extend(jsDom).mount('#rexApp');
     expect(jsDom.dom.window.document.body.innerHTML).toMatch(
-      /<div id="rexApp"><div --rex--anchor=".*">fizz<span>-<\/span>buzz<\/div><\/div>/gm,
+      /<div id="rexApp"><div __rex__anchor=".*">fizz<span>-<\/span>buzz<\/div><\/div>/gm,
     );
     foo.next('foo');
     bar.next('bar');
     expect(jsDom.dom.window.document.body.innerHTML).toMatch(
-      /<div id="rexApp"><div --rex--anchor=".*">foo<span>-<\/span>bar<\/div><\/div>/gm,
+      /<div id="rexApp"><div __rex__anchor=".*">foo<span>-<\/span>bar<\/div><\/div>/gm,
     );
   });
   test('Div with span with template', () => {
@@ -70,12 +70,12 @@ describe('template string directive', () => {
     const jsDom = new JsDomPlugin('<div id="rexApp" ></div>');
     new RexApp(rootComponent).extend(jsDom).mount('#rexApp');
     expect(jsDom.dom.window.document.body.innerHTML).toMatch(
-      /<div id="rexApp"><div --rex--anchor=".*">fizz<span --rex--anchor=".*">buzz<\/span><\/div><\/div>/gm,
+      /<div id="rexApp"><div __rex__anchor=".*">fizz<span __rex__anchor=".*">buzz<\/span><\/div><\/div>/gm,
     );
     foo.next('foo');
     bar.next('bar');
     expect(jsDom.dom.window.document.body.innerHTML).toMatch(
-      /<div id="rexApp"><div --rex--anchor=".*">foo<span --rex--anchor=".*">bar<\/span><\/div><\/div>/gm,
+      /<div id="rexApp"><div __rex__anchor=".*">foo<span __rex__anchor=".*">bar<\/span><\/div><\/div>/gm,
     );
   });
 });

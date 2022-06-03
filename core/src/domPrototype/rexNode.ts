@@ -23,7 +23,7 @@ import { HtmlElementProvider } from '../di/providers/htmlElementProvider';
 
 export type RexNodeChildren = Array<string | RexNode> | null;
 
-export const anchorAttribute = '--rex--anchor';
+export const anchorAttribute = '__rex__anchor';
 
 export const anchorPrefix = 'anchor--';
 
@@ -230,60 +230,67 @@ export class RexNode extends DependencyResolver {
     combineLatest([
       this.resolve<Document>(documentKey),
       this._selfOrTransformed$,
-    ]).subscribe(([doc, nodes]) => {
-      for (const node of nodes) {
-        if (isNullOrWhiteSpace(node.tag$.value)) {
-          if (node.children$.value != null) {
-            for (const child of node.children$.value) {
-              if (typeof child === 'string') {
-                appendHere.append(child);
-              } else {
-                child.insertInto(appendHere);
+    ])
+      .pipe(take(1))
+      .subscribe(([doc, nodes]) => {
+        for (const node of nodes) {
+          if (isNullOrWhiteSpace(node.tag$.value)) {
+            if (node.children$.value != null) {
+              for (const child of node.children$.value) {
+                if (typeof child === 'string') {
+                  appendHere.append(child);
+                } else {
+                  child.insertInto(appendHere);
+                }
               }
             }
-          }
-        } else {
-          const el = doc.createElement(node.tag$.value);
-          if (node.attributes$.value != null) {
-            for (const key of Object.keys(node.attributes$.value)) {
-              console.log(
-                'setting attribute',
-                key,
-                node.attributes$.value[key],
-              );
-              el.setAttribute(key, node.attributes$.value[key] ?? '');
-            }
-          }
-          if (node.children$.value != null) {
-            for (const child of node.children$.value) {
-              if (typeof child === 'string') {
-                console.log('adding child', child);
-                el.append(child);
-              } else {
-                console.log('adding child', child.toString());
-                child.insertInto(el);
+          } else {
+            const el = doc.createElement(node.tag$.value);
+            if (node.attributes$.value != null) {
+              for (const key of Object.keys(node.attributes$.value)) {
+                console.log(
+                  'setting attribute',
+                  key,
+                  node.attributes$.value[key],
+                );
+                try {
+                  el.setAttribute(key, node.attributes$.value[key] ?? '');
+                } catch (error) {
+                  console.log('error', (error as DOMException).message);
+                }
               }
             }
+            console.log('all attributes set');
+            if (node.children$.value != null) {
+              for (const child of node.children$.value) {
+                if (typeof child === 'string') {
+                  console.log('adding child', child);
+                  el.append(child);
+                } else {
+                  console.log('adding child', child.toString());
+                  child.insertInto(el);
+                }
+              }
+            }
+            /* providing self in Di before mount */
+            combineLatest([this.container$, this._id$])
+              .pipe(
+                filter((args): args is [DiContainer, string] =>
+                  args.every((e) => e != null),
+                ),
+                take(1),
+              )
+              .subscribe(([di, id]) => {
+                const provideArg: Record<string, HTMLElement> = {};
+                provideArg[id] = el;
+                console.log('providing element', el);
+                di.provide(new HtmlElementProvider(provideArg));
+              });
+            console.log('appending element', el);
+            appendHere.appendChild(el);
           }
-          /* providing self in Di before mount */
-          combineLatest([this.container$, this._id$])
-            .pipe(
-              filter((args): args is [DiContainer, string] =>
-                args.every((e) => e != null),
-              ),
-              take(1),
-            )
-            .subscribe(([di, id]) => {
-              const provideArg: Record<string, HTMLElement> = {};
-              provideArg[id] = el;
-              console.log('providing element', el);
-              di.provide(new HtmlElementProvider(provideArg));
-            });
-          console.log('appending element', el);
-          appendHere.appendChild(el);
         }
-      }
-    });
+      });
   }
 
   render(): Observable<DocumentFragment> {

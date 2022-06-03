@@ -248,26 +248,22 @@ export class RexNode extends DependencyResolver {
             const el = doc.createElement(node.tag$.value);
             if (node.attributes$.value != null) {
               for (const key of Object.keys(node.attributes$.value)) {
-                console.log(
-                  'setting attribute',
-                  key,
-                  node.attributes$.value[key],
-                );
-                try {
-                  el.setAttribute(key, node.attributes$.value[key] ?? '');
-                } catch (error) {
-                  console.log('error', (error as DOMException).message);
-                }
+                // console.log(
+                //   'setting attribute',
+                //   key,
+                //   node.attributes$.value[key],
+                // );
+                el.setAttribute(key, node.attributes$.value[key] ?? '');
               }
             }
-            console.log('all attributes set');
+            // console.log('all attributes set');
             if (node.children$.value != null) {
               for (const child of node.children$.value) {
                 if (typeof child === 'string') {
-                  console.log('adding child', child);
+                  // console.log('adding child', child);
                   el.append(child);
                 } else {
-                  console.log('adding child', child.toString());
+                  // console.log('adding child', child.toString());
                   child.insertInto(el);
                 }
               }
@@ -283,10 +279,10 @@ export class RexNode extends DependencyResolver {
               .subscribe(([di, id]) => {
                 const provideArg: Record<string, HTMLElement> = {};
                 provideArg[id] = el;
-                console.log('providing element', el);
+                // console.log('providing element', el);
                 di.provide(new HtmlElementProvider(provideArg));
               });
-            console.log('appending element', el);
+            // console.log('appending element', el);
             appendHere.appendChild(el);
           }
         }

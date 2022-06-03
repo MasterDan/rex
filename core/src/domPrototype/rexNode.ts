@@ -3,7 +3,6 @@ import {
   combineLatest,
   distinctUntilChanged,
   filter,
-  from,
   map,
   of,
   switchMap,
@@ -90,23 +89,17 @@ export class RexNode extends DependencyResolver {
     });
 
     /* Set current node as parent to children */
-    this._selfOrTransformed$
-      .pipe(
-        switchMap((nodes) => {
-          return from(nodes.map((node) => node.children$));
-        }),
-      )
-      .subscribe((children) => {
-        if (children instanceof RexNode) {
-          children._parentNode$.next(this);
-        } else if (Array.isArray(children)) {
-          children
-            .filter((child): child is RexNode => child instanceof RexNode)
-            .forEach((child) => {
-              child._parentNode$.next(this);
-            });
-        }
-      });
+    this.children$.subscribe((children) => {
+      if (children instanceof RexNode) {
+        children._parentNode$.next(this);
+      } else if (Array.isArray(children)) {
+        children
+          .filter((child): child is RexNode => child instanceof RexNode)
+          .forEach((child) => {
+            child._parentNode$.next(this);
+          });
+      }
+    });
     /* Providing mounted state to children */
     this._mounted$
       .pipe(

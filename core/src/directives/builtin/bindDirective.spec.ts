@@ -8,7 +8,7 @@ describe('bind attribute directive', () => {
   test('bind id', () => {
     const word = new Ref('Danny');
     const rootComponent = new Component({
-      render: new RexNode('div', {
+      nodes: new RexNode('div', {
         'id:': 'word',
       }),
       setup() {

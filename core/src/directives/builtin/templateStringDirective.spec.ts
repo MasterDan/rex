@@ -8,7 +8,7 @@ describe('template string directive', () => {
   test('Simple Component', () => {
     const word = new Ref('Danny');
     const rootComponent = new Component({
-      render: new RexNode('div', null, 'Hello, {{ word }}'),
+      nodes: new RexNode('div', null, 'Hello, {{ word }}'),
       setup() {
         return {
           word,
@@ -29,7 +29,7 @@ describe('template string directive', () => {
     const foo = new Ref('fizz');
     const bar = new Ref('buzz');
     const rootComponent = new Component({
-      render: new RexNode('div', null, [
+      nodes: new RexNode('div', null, [
         '{{ foo }}',
         new RexNode('span', null, '-'),
         '{{ bar }}',
@@ -56,7 +56,7 @@ describe('template string directive', () => {
     const foo = new Ref('fizz');
     const bar = new Ref('buzz');
     const rootComponent = new Component({
-      render: new RexNode('div', null, [
+      nodes: new RexNode('div', null, [
         '{{ foo }}',
         new RexNode('span', null, '{{ bar }}'),
       ]),

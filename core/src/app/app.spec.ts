@@ -9,7 +9,7 @@ describe('application', () => {
     const word = new Ref('Danny');
     const id = new Ref('Mi');
     const rootComponent = new Component({
-      render: new RexNode(
+      nodes: new RexNode(
         'div',
         {
           'id:': 'id',

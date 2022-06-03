@@ -15,20 +15,20 @@ import { Scope } from '../scope/scope';
 import { RexNode, anchorAttribute } from '../domPrototype/rexNode';
 
 export interface IComponentConstructorArgs {
-  render: RexNode | null;
+  nodes: RexNode | null;
   setup(): Record<string, Ref>;
 }
 
 export class Component extends DependencyResolver {
-  render = new RexNode('');
+  nodes = new RexNode('');
   _el$ = new BehaviorSubject<HTMLElement | null>(null);
   _mounted$ = new BehaviorSubject<boolean>(false);
 
   constructor(arg: IComponentConstructorArgs) {
     super();
     const state = arg.setup();
-    if (arg.render != null) {
-      this.render = arg.render;
+    if (arg.nodes != null) {
+      this.nodes = arg.nodes;
     }
     this.container$
       .pipe(
@@ -37,7 +37,7 @@ export class Component extends DependencyResolver {
       )
       .subscribe((di) => {
         di.provideReactive(new Scope(state));
-        this.render.setContainer(di);
+        this.nodes.setContainer(di);
       });
     /* Search all anchor elements */
   }
@@ -75,11 +75,11 @@ export class Component extends DependencyResolver {
 
     forkJoin({
       element: element$,
-      htmlText: this.render.text$,
+      htmlText: this.nodes.text$,
     }).subscribe(({ element, htmlText }) => {
       element.innerHTML = htmlText;
       this._el$.next(element);
-      this.render._mounted$.next(true);
+      this.nodes._mounted$.next(true);
       this._mounted$.next(true);
     });
   }
@@ -92,11 +92,11 @@ export class Component extends DependencyResolver {
     );
     forkJoin({
       element: element$,
-      fragment: this.render.render(),
+      fragment: this.nodes.render(),
     }).subscribe(({ element, fragment }) => {
       element.appendChild(fragment);
       this._el$.next(element);
-      this.render._mounted$.next(true);
+      this.nodes._mounted$.next(true);
       this._mounted$.next(true);
     });
   }

@@ -19,6 +19,7 @@ import { isNullOrWhiteSpace } from '../tools/stringTools';
 import { newId } from '../tools/idGeneratorSimple';
 import { pipeIt } from '../tools/pipe';
 import { DirectivePipeline } from '../directives/directivePipeline';
+import { HtmlElementProvider } from '../di/providers/htmlElementProvider';
 
 export type RexNodeChildren = Array<string | RexNode> | null;
 
@@ -257,6 +258,19 @@ export class RexNode extends DependencyResolver {
               }
             }
           }
+          /* providing self in Di before mount */
+          combineLatest([this.container$, this._id$])
+            .pipe(
+              filter((args): args is [DiContainer, string] =>
+                args.every((e) => e != null),
+              ),
+              take(1),
+            )
+            .subscribe(([di, id]) => {
+              const provideArg: Record<string, HTMLElement> = {};
+              provideArg[id] = el;
+              di.provide(new HtmlElementProvider(provideArg));
+            });
           appendHere.appendChild(el);
         }
       }

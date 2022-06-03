@@ -40,6 +40,10 @@ export class Component extends DependencyResolver {
         this.render.setContainer(di);
       });
     /* Search all anchor elements */
+  }
+
+  mountAsText(selector: string) {
+    /* search anchor elements if mounted as text */
     this._mounted$
       .pipe(
         filter((v) => v),
@@ -62,9 +66,7 @@ export class Component extends DependencyResolver {
         }
         di.provide(new HtmlElementProvider(elemsRecord));
       });
-  }
 
-  mount(selector: string): void {
     const element$ = this.resolve<Document>(documentKey).pipe(
       map((doc) => doc.querySelector(selector)),
       filter((el): el is HTMLElement => el != null),
@@ -76,6 +78,23 @@ export class Component extends DependencyResolver {
       htmlText: this.render.text$,
     }).subscribe(({ element, htmlText }) => {
       element.innerHTML = htmlText;
+      this._el$.next(element);
+      this.render._mounted$.next(true);
+      this._mounted$.next(true);
+    });
+  }
+
+  mountUsingFragment(selector: string) {
+    const element$ = this.resolve<Document>(documentKey).pipe(
+      map((doc) => doc.querySelector(selector)),
+      filter((el): el is HTMLElement => el != null),
+      take(1),
+    );
+    forkJoin({
+      element: element$,
+      fragment: this.render.render(),
+    }).subscribe(({ element, fragment }) => {
+      element.appendChild(fragment);
       this._el$.next(element);
       this.render._mounted$.next(true);
       this._mounted$.next(true);

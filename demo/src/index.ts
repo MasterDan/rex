@@ -1,7 +1,7 @@
 import { Component, createApp, Ref, RexNode } from 'rexar';
 
 const root = new Component({
-  render: new RexNode(
+  nodes: new RexNode(
     'div',
     null,
     'Hello, {{ word }}. This is first rexar component',

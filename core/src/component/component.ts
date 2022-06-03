@@ -64,12 +64,13 @@ export class Component extends DependencyResolver {
       });
   }
 
-  mount(selector: string) {
+  mount(selector: string): void {
     const element$ = this.resolve<Document>(documentKey).pipe(
       map((doc) => doc.querySelector(selector)),
       filter((el): el is HTMLElement => el != null),
       take(1),
     );
+
     forkJoin({
       element: element$,
       htmlText: this.render.text$,

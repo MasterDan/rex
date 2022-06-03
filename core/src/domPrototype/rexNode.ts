@@ -76,27 +76,20 @@ export class RexNode extends DependencyResolver {
       .then(this.__simplifyChildren__)
       .then((result) => new BehaviorMutable<RexNodeChildren>(result))
       .run();
-    /* mark yourself unique attribute to easier detect later */
-    this._updatable$
-      .pipe(
-        filter((val) => val == true),
-        distinctUntilChanged(),
-      )
+    /* we need unique id if we're planning to update current node in runtime */
+    combineLatest([this._updatable$, this._id$.pipe(distinctUntilChanged())])
+      .pipe(filter(([needsUpdate, id]) => needsUpdate == true && id == null))
       .subscribe(() => {
-        this.attributes$.mutate((oldval) => {
-          if (this._id$.value == null) {
-            this._id$.next(newId(anchorPrefix));
-          }
-          if (oldval != null) {
-            oldval[anchorAttribute] = this._id$.value;
-            return oldval;
-          } else {
-            const attributes = {} as Record<string, string | null>;
-            attributes[anchorAttribute] = this._id$.value;
-            return attributes;
-          }
-        });
+        this._id$.next(newId(anchorPrefix));
       });
+    /* passing id to the attributes if we have */
+    this._id$.pipe(filter((id): id is string => id != null)).subscribe((id) => {
+      this.attributes$.mutate((oldval) => {
+        const attributes = oldval ?? {};
+        attributes[anchorAttribute] = id;
+        return attributes;
+      });
+    });
 
     /* Set current node as parent to children */
     this.children$.subscribe((children) => {
@@ -188,8 +181,8 @@ export class RexNode extends DependencyResolver {
     return childrenToReturn;
   }
 
+  /** Returns text of current non-transformed rex-node */
   __renderAsText(node: RexNode): Observable<string> {
-    /* Current node doesn't nedd transformation therefore we can render it */
     const attrtext$ = node.attributes$.pipe(
       map((attrs) => {
         if (attrs == null) {

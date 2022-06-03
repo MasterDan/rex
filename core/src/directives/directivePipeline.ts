@@ -14,6 +14,7 @@ import { Directive } from './directive';
 export class DirectivePipeline {
   private directives$ = new BehaviorMutable<Directive[] | null>(null);
   private initialNode$ = new BehaviorSubject<RexNode | null>(null);
+  /** if we have initalnode and at least one directive */
   private validState$: Observable<[Directive[], RexNode]> = combineLatest([
     this.directives$,
     this.initialNode$,
@@ -33,6 +34,7 @@ export class DirectivePipeline {
   );
 
   constructor() {
+    /* transformation */
     this.validState$.subscribe(([directives, initialNode]) => {
       let transformationStep = directives[0].__applySafe(initialNode);
       for (let i = 1; i < directives.length; i++) {
@@ -48,6 +50,7 @@ export class DirectivePipeline {
       }
       this._transformedNodes$.next(transformationStep);
     });
+    /* if we're just mutating single element - then make it updatable */
     combineLatest([this._transformedNodes$, this._isTheSameElement$])
       .pipe(
         filter((args): args is [RexNode[], boolean] => {

@@ -122,16 +122,14 @@ export class DirectivePipeline {
     ),
   );
   mounted$ = new BehaviorSubject<boolean>(false);
+
+  /** if values or elements changed */
+  private change$ = combineLatest([this._elementsAggregated$, this._values$]);
+
   /** first value update is mount */
-  private mount$ = combineLatest([
-    this._elementsAggregated$,
-    this._values$,
-  ]).pipe(take(1));
+  private mount$ = this.change$.pipe(take(1));
   /** second and other updates are actually updates */
-  private update$ = combineLatest([
-    this._elementsAggregated$,
-    this._values$,
-  ]).pipe(skip(1));
+  private update$ = this.change$.pipe(skip(1));
 
   constructor() {
     /* initial transformation rex-nodes before mount */

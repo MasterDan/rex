@@ -4,16 +4,12 @@ import {
   distinctUntilChanged,
   filter,
   map,
-  Observable,
   pairwise,
   startWith,
   switchMap,
 } from 'rxjs';
-import { htmlElementsKey } from '../di/constants';
 import { DependencyResolver } from '../di/dependencyResolver';
-import { DiContainerReactive } from '../di/diContainerReactive';
 import { Ref } from '../scope/ref';
-import { isNullOrWhiteSpace } from '../tools/stringTools';
 import { RexNode } from '../domPrototype/rexNode';
 
 export interface IDirectiveBinding<T = string> {
@@ -153,33 +149,6 @@ export abstract class Directive<T = string> extends DependencyResolver {
     } else {
       return foundedSelf;
     }
-  }
-
-  __findHtml(
-    nodeSubject: Observable<RexNode[] | null>,
-  ): Observable<HTMLElement[]> {
-    return nodeSubject.pipe(
-      filter((val): val is RexNode[] => val != null),
-      switchMap((nodes) => {
-        return combineLatest(
-          nodes
-            .filter((node) => !isNullOrWhiteSpace(node.tag$.value))
-            .map((node) =>
-              node._id$.pipe(
-                filter((id): id is string => id != null),
-                switchMap((id) =>
-                  this.resolve<DiContainerReactive>(htmlElementsKey).pipe(
-                    switchMap((htmlDi) =>
-                      htmlDi.resolveReactive<HTMLElement>(id),
-                    ),
-                    filter((el): el is HTMLElement => el != null),
-                  ),
-                ),
-              ),
-            ),
-        );
-      }),
-    );
   }
 
   abstract init(node: RexNode, binding: IDirectiveBinding<T>): RexNode[];

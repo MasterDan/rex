@@ -9,7 +9,11 @@ import {
   take,
 } from 'rxjs';
 import type { Observable } from 'rxjs';
-import { directiveDetectorKey, documentKey } from '../di/constants';
+import {
+  directiveDetectorKey,
+  documentKey,
+  htmlElementsKey,
+} from '../di/constants';
 import { DependencyResolver } from '../di/dependencyResolver';
 import type { DiContainer } from '../di/diContainer';
 import type { Directive } from '../directives/directive';
@@ -20,6 +24,7 @@ import { newId } from '../tools/idGeneratorSimple';
 import { pipeIt } from '../tools/pipe';
 import { DirectivePipeline } from '../directives/directivePipeline';
 import { HtmlElementProvider } from '../di/providers/htmlElementProvider';
+import { DiContainerReactive } from '../di/diContainerReactive';
 
 export type RexNodeChildren = Array<string | RexNode> | null;
 
@@ -53,6 +58,17 @@ export class RexNode extends DependencyResolver {
       ? of([this])
       : this.directives.transformedNode$;
   }
+
+  /** html elememt ( if current node is updatable ) */
+  _htmlElement$: Observable<HTMLElement> = this._id$.pipe(
+    filter((id): id is string => id != null),
+    switchMap((id) =>
+      this.resolve<DiContainerReactive>(htmlElementsKey).pipe(
+        switchMap((htmlDi) => htmlDi.resolveReactive<HTMLElement>(id)),
+        filter((el): el is HTMLElement => el != null),
+      ),
+    ),
+  );
 
   constructor(
     tag = '',

@@ -56,7 +56,7 @@ export class RexNode extends DependencyResolver {
   get _selfOrTransformed$(): Observable<RexNode[]> {
     return this.directives.isEmpty
       ? of([this])
-      : this.directives.transformedNode$;
+      : this.directives.transformedNodes$;
   }
 
   /** html elememt ( if current node is updatable ) */

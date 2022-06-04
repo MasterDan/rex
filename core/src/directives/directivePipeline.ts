@@ -25,6 +25,7 @@ export class DirectivePipeline {
     }),
   );
   private _transformedNodes$ = new BehaviorSubject<RexNode[] | null>(null);
+
   /** Should emit when after transformation we only mutated element
    * and not replaced it with something else
    */
@@ -35,12 +36,34 @@ export class DirectivePipeline {
     ),
     map((bools) => bools.every((b) => b === true)),
   );
+  /**
+   * Emits single rex node if we just changing single element
+   * otherwise not
+   */
+  private _transformedNode$: Observable<RexNode> = combineLatest([
+    this._transformedNodes$,
+    this._isTheSameElement$,
+  ]).pipe(
+    filter((args): args is [RexNode[], boolean] => {
+      const [nodes, isSame] = args;
+      return isSame && nodes != null && nodes.length === 1;
+    }),
+    map(([[node]]) => node),
+  );
+  /** emits htmlElement of _transformedNode$ */
+  private _transformedElement = this._transformedNode$.pipe(
+    switchMap((node) => node._htmlElement$),
+  );
   /** Parent of Initial rex node
    * In case if our element/node appears or disapperas
    */
   private _parentNode$ = this.validState$.pipe(
     switchMap(([_, initialNode]) => initialNode._parentNode$),
     filter((v): v is RexNode => v != null),
+  );
+  /** Html element of parent rex node */
+  private _parentElement$ = this._parentNode$.pipe(
+    switchMap((node) => node._htmlElement$),
   );
 
   constructor() {
@@ -67,14 +90,9 @@ export class DirectivePipeline {
         parent._updatable$.next(true);
       });
     /* if we're just mutating single element - then make it updatable */
-    combineLatest([this._transformedNodes$, this._isTheSameElement$])
-      .pipe(
-        filter((args): args is [RexNode[], boolean] => {
-          const [nodes, isSame] = args;
-          return isSame && nodes != null;
-        }),
-      )
-      .subscribe(([[node]]) => {
+    this._transformedNode$
+      .pipe(filter((node) => !node._updatable$.value))
+      .subscribe((node) => {
         node._updatable$.next(true);
       });
   }
@@ -98,7 +116,7 @@ export class DirectivePipeline {
     return this;
   }
 
-  get transformedNode$(): Observable<RexNode[]> {
+  get transformedNodes$(): Observable<RexNode[]> {
     return this._transformedNodes$.pipe(
       filter((n): n is RexNode[] => n != null),
       take(1),

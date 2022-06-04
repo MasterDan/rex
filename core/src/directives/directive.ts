@@ -37,7 +37,7 @@ export abstract class Directive<T = string> extends DependencyResolver {
 
   __sourceNode$ = new BehaviorSubject<RexNode | null>(null);
   __transformedNode$ = new BehaviorSubject<RexNode[] | null>(null);
-  valueKey$: BehaviorSubject<string | null>;
+  __valueKey$: BehaviorSubject<string | null>;
   __value$ = new BehaviorSubject<T | null>(null);
   __valueOld$ = new BehaviorSubject<T | null>(null);
   __initialized = false;
@@ -83,9 +83,9 @@ export abstract class Directive<T = string> extends DependencyResolver {
 
   constructor(key: string | null = null) {
     super();
-    this.valueKey$ = new BehaviorSubject<string | null>(key);
+    this.__valueKey$ = new BehaviorSubject<string | null>(key);
     /* When key is set - getting value of that key */
-    this.valueKey$
+    this.__valueKey$
       .pipe(
         filter((s): s is string => s != null),
         switchMap((key) => this.resolveReactive<Ref<T>>(key)),
@@ -133,7 +133,7 @@ export abstract class Directive<T = string> extends DependencyResolver {
           if (argumentDetected != null) {
             directive.__argument$.next(argumentDetected);
           }
-          directive.valueKey$.next(attrs[attributeName]);
+          directive.__valueKey$.next(attrs[attributeName]);
           foundedSelf.push(directive);
           node.attributes$.mutate((val) => {
             if (val != null) {

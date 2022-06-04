@@ -12,12 +12,12 @@ import { RexNode } from '../domPrototype/rexNode';
 import { Directive } from './directive';
 
 export class DirectivePipeline {
-  private directives$ = new BehaviorMutable<Directive[] | null>(null);
-  private initialNode$ = new BehaviorSubject<RexNode | null>(null);
+  private _directives$ = new BehaviorMutable<Directive[] | null>(null);
+  private _initialNode$ = new BehaviorSubject<RexNode | null>(null);
   /** if we have initalnode and at least one directive */
   private validState$: Observable<[Directive[], RexNode]> = combineLatest([
-    this.directives$,
-    this.initialNode$,
+    this._directives$,
+    this._initialNode$,
   ]).pipe(
     filter((arr): arr is [Directive[], RexNode] => {
       const [dirs, node] = arr;
@@ -25,16 +25,26 @@ export class DirectivePipeline {
     }),
   );
   private _transformedNodes$ = new BehaviorSubject<RexNode[] | null>(null);
-  private _isTheSameElement$: Observable<boolean> = this.directives$.pipe(
+  /** Should emit when after transformation we only mutated element
+   * and not replaced it with something else
+   */
+  private _isTheSameElement$: Observable<boolean> = this._directives$.pipe(
     filter((val): val is Directive[] => val != null),
     switchMap((dirs) =>
       combineLatest(dirs.map((dir) => dir.__isTheSameElement$)),
     ),
     map((bools) => bools.every((b) => b === true)),
   );
+  /** Parent of Initial rex node
+   * In case if our element/node appears or disapperas
+   */
+  private _parentNode$ = this.validState$.pipe(
+    switchMap(([_, initialNode]) => initialNode._parentNode$),
+    filter((v): v is RexNode => v != null),
+  );
 
   constructor() {
-    /* transformation */
+    /* initial transformation */
     this.validState$.subscribe(([directives, initialNode]) => {
       let transformationStep = directives[0].__applySafe(initialNode);
       for (let i = 1; i < directives.length; i++) {
@@ -51,11 +61,8 @@ export class DirectivePipeline {
       this._transformedNodes$.next(transformationStep);
     });
     /* always mark parent of initial transformation node as updatable */
-    this.validState$
-      .pipe(
-        switchMap(([_, initialNode]) => initialNode._parentNode$),
-        filter((v): v is RexNode => v != null),
-      )
+    this._parentNode$
+      .pipe(filter((node) => !node._updatable$.value))
       .subscribe((parent) => {
         parent._updatable$.next(true);
       });
@@ -73,17 +80,17 @@ export class DirectivePipeline {
   }
 
   get isEmpty(): boolean {
-    const dirs = this.directives$.value;
+    const dirs = this._directives$.value;
     return dirs == null || dirs.length === 0;
   }
 
   setNode(n: RexNode): DirectivePipeline {
-    this.initialNode$.next(n);
+    this._initialNode$.next(n);
     return this;
   }
 
   pushDirectives(...dirs: Directive[]): DirectivePipeline {
-    this.directives$.mutate((old) => {
+    this._directives$.mutate((old) => {
       const newDirs = old ?? [];
       newDirs.push(...dirs);
       return newDirs;

@@ -4,6 +4,7 @@ import {
   filter,
   map,
   Observable,
+  skip,
   switchMap,
   take,
 } from 'rxjs';
@@ -118,6 +119,17 @@ export class DirectivePipeline {
       combineLatest(directives.map((dir) => dir.__value$)),
     ),
   );
+
+  /** first value update is mount */
+  private mount$ = combineLatest([
+    this._elementsAggregated$,
+    this._values$,
+  ]).pipe(take(1));
+  /** second and other updates are actually updates */
+  private update$ = combineLatest([
+    this._elementsAggregated$,
+    this._values$,
+  ]).pipe(skip(1));
 
   constructor() {
     /* initial transformation */

@@ -4,6 +4,7 @@ import {
   filter,
   map,
   Observable,
+  of,
   switchMap,
   take,
 } from 'rxjs';
@@ -15,7 +16,7 @@ export class DirectivePipeline {
   private _directives$ = new BehaviorMutable<Directive[] | null>(null);
   private _initialNode$ = new BehaviorSubject<RexNode | null>(null);
   /** if we have initalnode and at least one directive */
-  private validState$: Observable<[Directive[], RexNode]> = combineLatest([
+  private _validState$: Observable<[Directive[], RexNode]> = combineLatest([
     this._directives$,
     this._initialNode$,
   ]).pipe(
@@ -51,13 +52,23 @@ export class DirectivePipeline {
     map(([[node]]) => node),
   );
   /** emits htmlElement of _transformedNode$ */
-  private _transformedElement = this._transformedNode$.pipe(
+  private _transformedElement$ = this._transformedNode$.pipe(
     switchMap((node) => node._htmlElement$),
+  );
+  /** emits htmlElement of _transformedNode$ or null if we not changing single element */
+  private _transforemenElementNullable$ = this._isTheSameElement$.pipe(
+    switchMap((isSame) => {
+      if (isSame) {
+        return this._transformedElement$;
+      } else {
+        return of(null);
+      }
+    }),
   );
   /** Parent of Initial rex node
    * In case if our element/node appears or disapperas
    */
-  private _parentNode$ = this.validState$.pipe(
+  private _parentNode$ = this._validState$.pipe(
     switchMap(([_, initialNode]) => initialNode._parentNode$),
     filter((v): v is RexNode => v != null),
   );
@@ -66,9 +77,27 @@ export class DirectivePipeline {
     switchMap((node) => node._htmlElement$),
   );
 
+  private _elementsAggregated$ = combineLatest([
+    this._parentElement$,
+    this._transforemenElementNullable$,
+  ]).pipe(
+    map(([parent, transformed]) => {
+      return {
+        parent,
+        transformed,
+      };
+    }),
+  );
+
+  private _values$ = this._validState$.pipe(
+    switchMap(([directives]) =>
+      combineLatest(directives.map((dir) => dir.__value$)),
+    ),
+  );
+
   constructor() {
     /* initial transformation */
-    this.validState$.subscribe(([directives, initialNode]) => {
+    this._validState$.subscribe(([directives, initialNode]) => {
       let transformationStep = directives[0].__applySafe(initialNode);
       for (let i = 1; i < directives.length; i++) {
         const currentDir = directives[i];

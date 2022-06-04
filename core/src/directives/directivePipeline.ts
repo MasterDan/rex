@@ -4,7 +4,6 @@ import {
   filter,
   map,
   Observable,
-  of,
   switchMap,
   take,
 } from 'rxjs';
@@ -18,8 +17,9 @@ export class DirectivePipeline {
   public size$ = new BehaviorSubject<number>(1);
   /** Position in parent node
    * depends on size$ of our neighbous with DirectivePipeline in parent node
+   * @todo should i make it subject instead of behaviour ?
    */
-  public positionInParenNode$ = new BehaviorSubject<number>(1);
+  public positionInParenNode$ = new BehaviorSubject<number>(0);
   private _directives$ = new BehaviorMutable<Directive[] | null>(null);
   private _initialNode$ = new BehaviorSubject<RexNode | null>(null);
   /** if we have initalnode and at least one directive */
@@ -59,16 +59,31 @@ export class DirectivePipeline {
     map(([[node]]) => node),
   );
   /** emits htmlElement of _transformedNode$ */
-  private _transformedElement$ = this._transformedNode$.pipe(
+  private _transformedSameElement$ = this._transformedNode$.pipe(
     switchMap((node) => node._htmlElement$),
   );
-  /** emits htmlElement of _transformedNode$ or null if we not changing single element */
-  private _transforemenElementNullable$ = this._isTheSameElement$.pipe(
+  /** emits [htmlElement] of _transformedNode$
+   * or resolves elements[] from _parentElement$ if we not changing single element */
+  private _transforemenElement$ = this._isTheSameElement$.pipe(
     switchMap((isSame) => {
       if (isSame) {
-        return this._transformedElement$;
+        return this._transformedSameElement$.pipe(map((el) => [el]));
       } else {
-        return of(null);
+        return combineLatest([
+          this._parentElement$,
+          this.positionInParenNode$,
+          this.size$,
+        ]).pipe(
+          map(([parent, position, size]) => {
+            const childNodes = parent.childNodes;
+            const elems: HTMLElement[] = [];
+            for (let i = 0; i < size; i++) {
+              const element = childNodes[i + position] as HTMLElement;
+              elems.push(element);
+            }
+            return elems;
+          }),
+        );
       }
     }),
   );
@@ -86,7 +101,7 @@ export class DirectivePipeline {
 
   private _elementsAggregated$ = combineLatest([
     this._parentElement$,
-    this._transforemenElementNullable$,
+    this._transforemenElement$,
   ]).pipe(
     map(([parent, transformed]) => {
       return {

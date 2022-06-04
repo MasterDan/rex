@@ -242,7 +242,7 @@ export class RexNode extends DependencyResolver {
     );
   }
 
-  insertInto(appendHere: DocumentFragment | HTMLElement) {
+  private __insertInto(appendHere: DocumentFragment | HTMLElement) {
     combineLatest([
       this.resolve<Document>(documentKey),
       this._selfOrTransformed$,
@@ -256,7 +256,7 @@ export class RexNode extends DependencyResolver {
                 if (typeof child === 'string') {
                   appendHere.append(child);
                 } else {
-                  child.insertInto(appendHere);
+                  child.__insertInto(appendHere);
                 }
               }
             }
@@ -280,7 +280,7 @@ export class RexNode extends DependencyResolver {
                   el.append(child);
                 } else {
                   // console.log('adding child', child.toString());
-                  child.insertInto(el);
+                  child.__insertInto(el);
                 }
               }
             }
@@ -312,7 +312,7 @@ export class RexNode extends DependencyResolver {
     return combineLatest([fragment$, this._selfOrTransformed$]).pipe(
       map(([fragment, nodes]) => {
         for (const node of nodes) {
-          node.insertInto(fragment);
+          node.__insertInto(fragment);
         }
         return fragment;
       }),

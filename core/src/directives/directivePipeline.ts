@@ -101,15 +101,17 @@ export class DirectivePipeline {
     switchMap((node) => node._htmlElement$),
   );
 
-  private _elementsAggregated$ = combineLatest([
+  private _elementsAggregated$: Observable<IElems> = combineLatest([
     this._parentElement$,
     this._transforemenElement$,
+    this._initialNode$.pipe(filter((node): node is RexNode => node != null)),
   ]).pipe(
-    map(([parent, transformed]) => {
-      return <IElems>{
+    map(([parent, transformed, node]) => {
+      return {
         parent,
         element: transformed.length === 1 ? transformed[0] : null,
         elements: transformed,
+        node: node,
       };
     }),
   );

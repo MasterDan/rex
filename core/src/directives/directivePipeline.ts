@@ -13,6 +13,13 @@ import { RexNode } from '../domPrototype/rexNode';
 import { Directive } from './directive';
 
 export class DirectivePipeline {
+  /** result size of transformed rex-nodes array
+   * or htmlElements array when mounted  */
+  public size$ = new BehaviorSubject<number>(1);
+  /** Position in parent node
+   * depends on size$ of our neighbous with DirectivePipeline in parent node
+   */
+  public positionInParenNode$ = new BehaviorSubject<number>(1);
   private _directives$ = new BehaviorMutable<Directive[] | null>(null);
   private _initialNode$ = new BehaviorSubject<RexNode | null>(null);
   /** if we have initalnode and at least one directive */
@@ -111,6 +118,7 @@ export class DirectivePipeline {
             : (transformedNodes as []);
       }
       this._transformedNodes$.next(transformationStep);
+      this.size$.next(transformationStep.length);
     });
     /* always mark parent of initial transformation node as updatable */
     this._parentNode$

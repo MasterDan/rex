@@ -105,17 +105,52 @@ export class RexNode extends DependencyResolver {
     });
 
     /* Set current node as parent to children */
-    this.children$.subscribe((children) => {
-      if (children instanceof RexNode) {
-        children._parentNode$.next(this);
-      } else if (Array.isArray(children)) {
+    this.children$
+      .pipe(filter((c): c is Array<string | RexNode> => c != null))
+      .subscribe((children) => {
         children
           .filter((child): child is RexNode => child instanceof RexNode)
           .forEach((child) => {
             child._parentNode$.next(this);
           });
-      }
-    });
+      });
+    /* updating position of our children */
+    this.children$
+      .pipe(
+        filter((c): c is Array<string | RexNode> => c != null),
+        switchMap((children) =>
+          combineLatest(
+            children.map((child, index) => {
+              if (typeof child === 'string') {
+                return of({
+                  index,
+                  size: 1,
+                });
+              } else {
+                return child.directives.size$.pipe(
+                  map((size) => ({
+                    index,
+                    size,
+                  })),
+                );
+              }
+            }),
+          ),
+        ),
+      )
+      .subscribe((sizes: { size: number; index: number }[]) => {
+        const children = this.children$.value ?? [];
+        let currentPosition = 0;
+        for (const item of sizes) {
+          const child = children[item.index];
+          if (child instanceof RexNode) {
+            child.directives.positionInParenNode$.next(currentPosition);
+            currentPosition += item.size;
+          } else {
+            currentPosition++;
+          }
+        }
+      });
     /* Providing mounted state to children */
     this._mounted$
       .pipe(

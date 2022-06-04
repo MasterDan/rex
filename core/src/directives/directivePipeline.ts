@@ -7,6 +7,7 @@ import {
   skip,
   switchMap,
   take,
+  takeUntil,
 } from 'rxjs';
 import { BehaviorMutable } from '../tools/rx/BehaviorMutable';
 import { RexNode } from '../domPrototype/rexNode';
@@ -119,7 +120,7 @@ export class DirectivePipeline {
       combineLatest(directives.map((dir) => dir.__value$)),
     ),
   );
-
+  mounted$ = new BehaviorSubject<boolean>(false);
   /** first value update is mount */
   private mount$ = combineLatest([
     this._elementsAggregated$,
@@ -132,23 +133,25 @@ export class DirectivePipeline {
   ]).pipe(skip(1));
 
   constructor() {
-    /* initial transformation */
-    this._validState$.subscribe(([directives, initialNode]) => {
-      let transformationStep = directives[0].__applySafe(initialNode);
-      for (let i = 1; i < directives.length; i++) {
-        const currentDir = directives[i];
-        const transformedNodes = transformationStep.map((node) => {
-          const transformed = currentDir.__applySafe(node);
-          return transformed;
-        });
-        transformationStep =
-          transformedNodes.length > 0
-            ? transformedNodes.reduce((a, c) => a.concat(c))
-            : (transformedNodes as []);
-      }
-      this._transformedNodes$.next(transformationStep);
-      this.size$.next(transformationStep.length);
-    });
+    /* initial transformation rex-nodes before mount */
+    this._validState$
+      .pipe(filter(() => !this.mounted$.value))
+      .subscribe(([directives, initialNode]) => {
+        let transformationStep = directives[0].__applySafe(initialNode);
+        for (let i = 1; i < directives.length; i++) {
+          const currentDir = directives[i];
+          const transformedNodes = transformationStep.map((node) => {
+            const transformed = currentDir.__applySafe(node);
+            return transformed;
+          });
+          transformationStep =
+            transformedNodes.length > 0
+              ? transformedNodes.reduce((a, c) => a.concat(c))
+              : (transformedNodes as []);
+        }
+        this._transformedNodes$.next(transformationStep);
+        this.size$.next(transformationStep.length);
+      });
     /* always mark parent of initial transformation node as updatable */
     this._parentNode$
       .pipe(filter((node) => !node._updatable$.value))
@@ -161,6 +164,9 @@ export class DirectivePipeline {
       .subscribe((node) => {
         node._updatable$.next(true);
       });
+    this.mount$.subscribe(() => {
+      this.mounted$.next(true);
+    });
   }
 
   get isEmpty(): boolean {

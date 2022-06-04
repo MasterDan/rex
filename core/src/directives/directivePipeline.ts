@@ -50,6 +50,15 @@ export class DirectivePipeline {
       }
       this._transformedNodes$.next(transformationStep);
     });
+    /* always mark parent of initial transformation node as updatable */
+    this.validState$
+      .pipe(
+        switchMap(([_, initialNode]) => initialNode._parentNode$),
+        filter((v): v is RexNode => v != null),
+      )
+      .subscribe((parent) => {
+        parent._updatable$.next(true);
+      });
     /* if we're just mutating single element - then make it updatable */
     combineLatest([this._transformedNodes$, this._isTheSameElement$])
       .pipe(

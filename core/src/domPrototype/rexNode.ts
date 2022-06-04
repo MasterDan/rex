@@ -303,6 +303,7 @@ export class RexNode extends DependencyResolver {
     );
   }
 
+  /** Making copy of current node */
   clone(options: IRexNodeOptions | null = null): RexNode {
     const clonedNode = new RexNode(
       this.tag$.value,

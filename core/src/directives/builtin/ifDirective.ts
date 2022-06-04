@@ -1,5 +1,7 @@
 import { RexNode } from '../../domPrototype/rexNode';
-import { Directive, IDirectiveBinding, IElems } from '../directive';
+import { Directive } from '../directive';
+import { IDirectiveBinding } from '../@types/IDirectiveBinding';
+import { IElems } from '../@types/IElems';
 
 export class ifDirective extends Directive<boolean> {
   name = 'if';

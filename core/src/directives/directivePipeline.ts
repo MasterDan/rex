@@ -10,6 +10,7 @@ import {
 import { BehaviorMutable } from '../tools/rx/BehaviorMutable';
 import { RexNode } from '../domPrototype/rexNode';
 import { Directive } from './directive';
+import { IElems } from './@types/IElems';
 
 export class DirectivePipeline {
   /** result size of transformed rex-nodes array
@@ -104,9 +105,10 @@ export class DirectivePipeline {
     this._transforemenElement$,
   ]).pipe(
     map(([parent, transformed]) => {
-      return {
+      return <IElems>{
         parent,
-        transformed,
+        element: transformed.length === 1 ? transformed[0] : null,
+        elements: transformed,
       };
     }),
   );

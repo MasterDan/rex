@@ -1,7 +1,9 @@
 import { Ref } from 'core/src/scope/ref';
 import { RexNode } from '../../domPrototype/rexNode';
 import { combineLatest, filter, map, Observable, switchMap, take } from 'rxjs';
-import { Directive, IDirectiveBinding, IElems } from '../directive';
+import { Directive } from '../directive';
+import { IDirectiveBinding } from '../@types/IDirectiveBinding';
+import { IElems } from '../@types/IElems';
 import {
   getKeysToInsert,
   parseTemplateString,

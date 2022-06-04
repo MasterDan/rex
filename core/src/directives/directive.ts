@@ -11,19 +11,8 @@ import {
 import { DependencyResolver } from '../di/dependencyResolver';
 import { Ref } from '../scope/ref';
 import { RexNode } from '../domPrototype/rexNode';
-
-export interface IDirectiveBinding<T = string> {
-  argument: string | null;
-  value: T | null;
-  oldValue: T | null;
-  modifiers: Record<string, boolean> | null;
-}
-
-export interface IElems {
-  parent: HTMLElement | null;
-  element: HTMLElement | null;
-  elements: HTMLElement[];
-}
+import { IElems } from './@types/IElems';
+import { IDirectiveBinding } from './@types/IDirectiveBinding';
 
 /**
   Directive is a thing that transforms our tree and detects changes

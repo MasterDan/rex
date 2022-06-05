@@ -14,15 +14,10 @@ export class BindDirective extends Directive {
     if (argument == null) {
       return [node];
     }
-    node.attributes$.mutate((attrs) => {
-      if (attrs == null) {
-        return {
-          argument: value,
-        };
-      } else {
-        attrs[argument] = value;
-        return attrs;
-      }
+    node.attributes$.mutate((old) => {
+      const attrs = old ?? {};
+      attrs[argument] = value;
+      return attrs;
     });
     return [node];
   }

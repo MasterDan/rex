@@ -4,6 +4,7 @@ import {
   filter,
   map,
   Observable,
+  of,
   skip,
   switchMap,
   take,
@@ -68,39 +69,42 @@ export class DirectivePipeline {
     .pipe(tap((v) => console.log('el is', v)));
   /** emits [htmlElement] of _transformedNode$
    * or resolves elements[] from _parentElement$ if we not changing single element */
-  private _transforemenElements$ = this._isTheSameElement$.pipe(
-    switchMap((isSame) => {
-      if (isSame) {
-        return this._transformedSameElement$.pipe(map((el) => [el]));
-      } else {
-        return combineLatest([
-          this._parentElement$,
-          this.positionInParenNode$,
-          this.size$,
-        ]).pipe(
-          map(([parent, position, size]) => {
-            const childNodes = parent.childNodes;
-            const elems: HTMLElement[] = [];
-            for (let i = 0; i < size; i++) {
-              const element = childNodes[i + position] as HTMLElement;
-              elems.push(element);
-            }
-            return elems;
-          }),
-        );
-      }
-    }),
-  );
+  private _transforemenElements$: Observable<HTMLElement[]> =
+    this._isTheSameElement$.pipe(
+      switchMap((isSame) => {
+        if (isSame) {
+          return this._transformedSameElement$.pipe(map((el) => [el]));
+        } else {
+          return combineLatest([
+            this._parentElement$,
+            this.positionInParenNode$,
+            this.size$,
+          ]).pipe(
+            map(([parent, position, size]) => {
+              if (parent == null) {
+                return [];
+              }
+              const childNodes = parent.childNodes;
+              const elems: HTMLElement[] = [];
+              for (let i = 0; i < size; i++) {
+                const element = childNodes[i + position] as HTMLElement;
+                elems.push(element);
+              }
+              return elems;
+            }),
+          );
+        }
+      }),
+    );
   /** Parent of Initial rex node
    * In case if our element/node appears or disapperas
    */
-  private _parentNode$ = this._validState$.pipe(
+  private _parentNode$: Observable<RexNode | null> = this._validState$.pipe(
     switchMap(([_, initialNode]) => initialNode._parentNode$),
-    filter((v): v is RexNode => v != null),
   );
   /** Html element of parent rex node */
-  private _parentElement$ = this._parentNode$
-    .pipe(switchMap((node) => node._htmlElement$))
+  private _parentElement$: Observable<HTMLElement | null> = this._parentNode$
+    .pipe(switchMap((node) => (node != null ? node._htmlElement$ : of(null))))
     .pipe(
       tap((e) => {
         console.log('parent element is', e);
@@ -171,7 +175,11 @@ export class DirectivePipeline {
       });
     /* always mark parent of initial transformation node as updatable */
     this._parentNode$
-      .pipe(filter((node) => !node._updatable$.value))
+      .pipe(
+        filter(
+          (node): node is RexNode => node != null && !node._updatable$.value,
+        ),
+      )
       .subscribe((parent) => {
         parent._updatable$.next(true);
       });

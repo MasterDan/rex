@@ -7,11 +7,12 @@ import {
   skip,
   switchMap,
   take,
+  withLatestFrom,
 } from 'rxjs';
 import { BehaviorMutable } from '../tools/rx/BehaviorMutable';
 import { RexNode } from '../domPrototype/rexNode';
 import { Directive } from './directive';
-import { IElems } from './@types/IElems';
+import { IElems, INode } from './@types/IElems';
 
 export class DirectivePipeline {
   /** result size of transformed rex-nodes array
@@ -66,7 +67,7 @@ export class DirectivePipeline {
   );
   /** emits [htmlElement] of _transformedNode$
    * or resolves elements[] from _parentElement$ if we not changing single element */
-  private _transforemenElement$ = this._isTheSameElement$.pipe(
+  private _transforemenElements$ = this._isTheSameElement$.pipe(
     switchMap((isSame) => {
       if (isSame) {
         return this._transformedSameElement$.pipe(map((el) => [el]));
@@ -101,9 +102,9 @@ export class DirectivePipeline {
     switchMap((node) => node._htmlElement$),
   );
 
-  private _elementsAggregated$: Observable<IElems> = combineLatest([
+  private _elementsAggregated$: Observable<IElems & INode> = combineLatest([
     this._parentElement$,
-    this._transforemenElement$,
+    this._transforemenElements$,
     this._initialNode$.pipe(filter((node): node is RexNode => node != null)),
   ]).pipe(
     map(([parent, transformed, node]) => {
@@ -116,7 +117,7 @@ export class DirectivePipeline {
     }),
   );
 
-  private _values$ = this._validState$.pipe(
+  private _values$: Observable<(string | null)[]> = this._validState$.pipe(
     switchMap(([directives]) =>
       combineLatest(directives.map((dir) => dir.__value$)),
     ),
@@ -163,14 +164,73 @@ export class DirectivePipeline {
       .subscribe((node) => {
         node._updatable$.next(true);
       });
+    /* when successfull mounted - setting explicit flag */
     this.mount$.subscribe(() => {
       this.mounted$.next(true);
     });
+    /* updating all */
+    this.update$
+      .pipe(
+        withLatestFrom(
+          this._directives$.pipe(filter((d): d is Directive[] => d != null)),
+        ),
+      )
+      .subscribe(([[elems, values], directives]) => {
+        this.updateAll(elems, values, directives);
+      });
+    /* updating all */
+    this.mount$
+      .pipe(
+        withLatestFrom(
+          this._directives$.pipe(filter((d): d is Directive[] => d != null)),
+        ),
+      )
+      .subscribe(([[elems, values], directives]) => {
+        this.mountAll(elems, values, directives);
+      });
   }
 
   get isEmpty(): boolean {
     const dirs = this._directives$.value;
     return dirs == null || dirs.length === 0;
+  }
+
+  private updateAll(
+    elems: IElems & INode,
+    values: (string | null)[],
+    directives: Directive[],
+  ) {
+    /* element exists, therefore we're mutating single element */
+    if (elems.element != null) {
+      for (const i in values) {
+        const value = values[i];
+        const directive = directives[i];
+        if (value != directive.__value$.value) {
+          directive.__triggerUpdate(elems);
+        }
+      }
+    } else {
+      // here will be if and for logick
+    }
+  }
+
+  private mountAll(
+    elems: IElems & INode,
+    values: (string | null)[],
+    directives: Directive[],
+  ) {
+    /* element exists, therefore we're mutating single element */
+    if (elems.element != null) {
+      for (const i in values) {
+        const value = values[i];
+        const directive = directives[i];
+        if (value != directive.__value$.value) {
+          directive.__triggerMounted(elems);
+        }
+      }
+    } else {
+      // here will be if and for logick
+    }
   }
 
   setNode(n: RexNode): DirectivePipeline {

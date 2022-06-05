@@ -140,6 +140,16 @@ export abstract class Directive<T = string> extends DependencyResolver {
     }
   }
 
+  /** triggering update from pipeline */
+  __triggerUpdate(elems: IElems): Array<HTMLElement | RexNode> {
+    return this.update(elems, this.__binding);
+  }
+
+  /** triggering mounted from pipeline */
+  __triggerMounted(elems: IElems): Array<HTMLElement | RexNode> {
+    return this.mounted(elems, this.__binding);
+  }
+
   abstract init(node: RexNode, binding: IDirectiveBinding<T>): RexNode[];
 
   protected mounted(

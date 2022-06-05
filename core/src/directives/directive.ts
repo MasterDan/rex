@@ -42,25 +42,6 @@ export abstract class Directive<T = string> extends DependencyResolver {
     map(([was, now]) => now.length === 1 && was.compare(now[0])),
   );
 
-  /** Value changed and we have Element(s) to apply changes */
-  // __readyToUpdate$: Observable<[IElems, T | null]> = combineLatest([
-  //   this.__transformedElements$,
-  //   this.__parentElement$,
-  //   this.__value$,
-  // ]).pipe(
-  //   filter(([els]) => {
-  //     return els != null;
-  //   }),
-  //   map(([els, parent, value]) => [
-  //     {
-  //       element: els != null && els.length === 1 ? els[0] : null,
-  //       parent,
-  //       elements: els,
-  //     } as IElems,
-  //     value,
-  //   ]),
-  // );
-
   get __binding(): IDirectiveBinding<T> {
     return {
       argument: this.__argument$.value,
@@ -86,15 +67,6 @@ export abstract class Directive<T = string> extends DependencyResolver {
         this.__value$.next(val);
         this.__valueOld$.next(oldval);
       });
-
-    /* triggering update */
-    // this.__readyToUpdate$.pipe(skip(1)).subscribe(([elems]) => {
-    //   this.update(elems, this.__binding);
-    // });
-    /* first update is mounted */
-    // this.__readyToUpdate$.pipe(take(1)).subscribe(([elems]) => {
-    //   this.mounted(elems, this.__binding);
-    // });
   }
 
   /** Detects if current directive (if not template string) exists in provideded node.

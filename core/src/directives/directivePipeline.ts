@@ -64,9 +64,9 @@ export class DirectivePipeline {
     map(([[node]]) => node),
   );
   /** emits htmlElement of _transformedNode$ */
-  private _transformedSameElement$ = this._transformedNode$
-    .pipe(switchMap((node) => node._htmlElement$))
-    .pipe(tap((v) => console.log('el is', v)));
+  private _transformedSameElement$ = this._transformedNode$.pipe(
+    switchMap((node) => node._htmlElement$),
+  );
   /** emits [htmlElement] of _transformedNode$
    * or resolves elements[] from _parentElement$ if we not changing single element */
   private _transforemenElements$: Observable<HTMLElement[]> =
@@ -103,42 +103,30 @@ export class DirectivePipeline {
     switchMap(([_, initialNode]) => initialNode._parentNode$),
   );
   /** Html element of parent rex node */
-  private _parentElement$: Observable<HTMLElement | null> = this._parentNode$
-    .pipe(switchMap((node) => (node != null ? node._htmlElement$ : of(null))))
-    .pipe(
-      tap((e) => {
-        console.log('parent element is', e);
-      }),
+  private _parentElement$: Observable<HTMLElement | null> =
+    this._parentNode$.pipe(
+      switchMap((node) => (node != null ? node._htmlElement$ : of(null))),
     );
 
   private _elementsAggregated$: Observable<IElems & INode> = combineLatest([
     this._parentElement$,
     this._transforemenElements$,
     this._initialNode$.pipe(filter((node): node is RexNode => node != null)),
-  ])
-    .pipe(
-      map(([parent, transformed, node]) => {
-        return {
-          parent,
-          element: transformed.length === 1 ? transformed[0] : null,
-          elements: transformed,
-          node: node,
-        };
-      }),
-    )
-    .pipe(
-      tap((ea) => {
-        console.log('elems aggregated', ea);
-      }),
-    );
+  ]).pipe(
+    map(([parent, transformed, node]) => {
+      return {
+        parent,
+        element: transformed.length === 1 ? transformed[0] : null,
+        elements: transformed,
+        node: node,
+      };
+    }),
+  );
 
   private _values$: Observable<(string | null)[]> = this._validState$.pipe(
     switchMap(([directives]) =>
       combineLatest(directives.map((dir) => dir.__value$)),
     ),
-    tap((vals) => {
-      console.log('values changed', vals);
-    }),
   );
   mounted$ = new BehaviorSubject<boolean>(false);
 
@@ -146,7 +134,17 @@ export class DirectivePipeline {
   private change$ = combineLatest([
     this._elementsAggregated$,
     this._values$,
-  ]).pipe(tap((state) => console.log('state changed', state)));
+  ]).pipe(
+    tap(([elems, values]) => {
+      console.log('state changed', {
+        element: elems.element,
+        parent: elems.parent,
+        elements: elems.elements,
+        node: elems.node.toString(),
+        values,
+      });
+    }),
+  );
 
   /** first value update is mount */
   private mount$ = this.change$.pipe(take(1));
@@ -230,7 +228,7 @@ export class DirectivePipeline {
       for (const i in values) {
         const value = values[i];
         const directive = directives[i];
-        if (value != directive.__value$.value) {
+        if (value != directive.__valueOld$.value) {
           directive.__triggerUpdate(elems);
         }
       }

@@ -330,7 +330,7 @@ export class RexNode extends DependencyResolver {
               .subscribe(([di, id]) => {
                 const provideArg: Record<string, HTMLElement> = {};
                 provideArg[id] = el;
-                // console.log('providing element', el);
+                console.log('providing element', el);
                 di.provide(new HtmlElementProvider(provideArg));
               });
             // console.log('appending element', el);

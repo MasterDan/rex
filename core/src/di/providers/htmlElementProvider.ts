@@ -16,6 +16,7 @@ export class HtmlElementProvider extends DependencyProviderClassic {
       .subscribe((container) => {
         for (const key in elems) {
           container.registerReactive(elems[key], key);
+          console.log('registering element', elems[key], key);
         }
       });
   }

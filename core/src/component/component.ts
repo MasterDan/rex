@@ -6,7 +6,7 @@ import {
   take,
   withLatestFrom,
 } from 'rxjs';
-import { documentKey } from '../di/constants';
+import { documentKey, htmlRootKey } from '../di/constants';
 import { DependencyResolver } from '../di/dependencyResolver';
 import { DiContainer } from '../di/diContainer';
 import { HtmlElementProvider } from '../di/providers/htmlElementProvider';
@@ -98,6 +98,16 @@ export class Component extends DependencyResolver {
       this._el$.next(element);
       this.nodes._mounted$.next(true);
       this._mounted$.next(true);
+      this.container$
+        .pipe(
+          filter((di): di is DiContainer => di != null),
+          take(1),
+        )
+        .subscribe((di) => {
+          const state: Record<string, HTMLElement> = {};
+          state[htmlRootKey] = element;
+          di.provide(new HtmlElementProvider(state));
+        });
     });
   }
 }

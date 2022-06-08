@@ -5,3 +5,4 @@ export const registeredDirectiveNamesKey = Symbol(
 export const rootComponentKey = Symbol('__root__');
 export const documentKey = Symbol('__document__');
 export const htmlElementsKey = Symbol('__anchor_html_elements__');
+export const htmlRootKey = '__html_root__';

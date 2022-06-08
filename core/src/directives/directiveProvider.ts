@@ -4,7 +4,8 @@ import type { Ctor } from '../tools/types/ctor';
 import { Directive } from './directive';
 
 export class DirectiveProvider extends DependencyProviderClassic {
-  constructor(...directives: Ctor<Directive>[]) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  constructor(...directives: Ctor<Directive<any>>[]) {
     super();
     this.onContainerSet((di) => {
       const existingKeys =

@@ -7,6 +7,7 @@ import {
 import { DiContainer } from '../di/diContainer';
 import { DiContainerReactive } from '../di/diContainerReactive';
 import { BindDirective } from '../directives/builtin/bindDirective';
+import { ifDirective } from '../directives/builtin/ifDirective';
 import { TemplateStringDirective } from '../directives/builtin/templateStringDirective';
 import { DirectiveDetector } from '../directives/directiveDetector';
 import { DirectiveProvider } from '../directives/directiveProvider';
@@ -23,7 +24,11 @@ export class RexApp {
     this.di.register(root, rootComponentKey);
     this.di.register(DirectiveDetector, directiveDetectorKey);
     this.di.provide(
-      new DirectiveProvider(TemplateStringDirective, BindDirective),
+      new DirectiveProvider(
+        TemplateStringDirective,
+        BindDirective,
+        ifDirective,
+      ),
     );
     this.di.register(new DiContainerReactive(), htmlElementsKey);
   }

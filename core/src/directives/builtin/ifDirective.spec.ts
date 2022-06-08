@@ -2,7 +2,7 @@ import { RexNode } from '../../domPrototype/rexNode';
 import { RexApp } from '../../app/app';
 import { JsDomPlugin } from '../../plugins/jsDomPlugin';
 import { Component } from '../../component/component';
-import { Ref } from 'core/src/scope/ref';
+import { Ref } from '../../scope/ref';
 
 describe('if directive', () => {
   test('simple hiding element', () => {

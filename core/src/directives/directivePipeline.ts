@@ -4,7 +4,6 @@ import {
   filter,
   map,
   Observable,
-  of,
   skip,
   switchMap,
   take,
@@ -102,10 +101,14 @@ export class DirectivePipeline {
     switchMap(([_, initialNode]) => initialNode._parentNode$),
   );
   /** Html element of parent rex node */
-  private _parentElement$: Observable<HTMLElement | null> =
-    this._parentNode$.pipe(
-      switchMap((node) => (node != null ? node._htmlElement$ : of(null))),
-    );
+  private _parentElement$: Observable<HTMLElement | null> = combineLatest([
+    this._initialNode$.pipe(filter((n): n is RexNode => n != null)),
+    this._parentNode$,
+  ]).pipe(
+    switchMap(([current, parent]) =>
+      parent != null ? parent._htmlElement$ : current._rootElement$,
+    ),
+  );
 
   private _elementsAggregated$: Observable<IElems & INode> = combineLatest([
     this._parentElement$,

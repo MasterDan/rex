@@ -13,6 +13,7 @@ import {
   directiveDetectorKey,
   documentKey,
   htmlElementsKey,
+  htmlRootKey,
 } from '../di/constants';
 import { DependencyResolver } from '../di/dependencyResolver';
 import type { DiContainer } from '../di/diContainer';
@@ -68,6 +69,13 @@ export class RexNode extends DependencyResolver {
         filter((el): el is HTMLElement => el != null),
       ),
     ),
+  );
+
+  _rootElement$: Observable<HTMLElement> = this.resolve<DiContainerReactive>(
+    htmlElementsKey,
+  ).pipe(
+    switchMap((htmlDi) => htmlDi.resolveReactive<HTMLElement>(htmlRootKey)),
+    filter((el): el is HTMLElement => el != null),
   );
 
   constructor(

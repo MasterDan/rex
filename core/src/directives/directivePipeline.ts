@@ -8,7 +8,6 @@ import {
   skip,
   switchMap,
   take,
-  tap,
   withLatestFrom,
 } from 'rxjs';
 import { BehaviorMutable } from '../tools/rx/BehaviorMutable';
@@ -131,20 +130,7 @@ export class DirectivePipeline {
   mounted$ = new BehaviorSubject<boolean>(false);
 
   /** if values or elements changed */
-  private change$ = combineLatest([
-    this._elementsAggregated$,
-    this._values$,
-  ]).pipe(
-    tap(([elems, values]) => {
-      console.log('state changed', {
-        element: elems.element,
-        parent: elems.parent,
-        elements: elems.elements,
-        node: elems.node.toString(),
-        values,
-      });
-    }),
-  );
+  private change$ = combineLatest([this._elementsAggregated$, this._values$]);
 
   /** first value update is mount */
   private mount$ = this.change$.pipe(take(1));
@@ -185,6 +171,7 @@ export class DirectivePipeline {
     this._transformedNode$
       .pipe(filter((node) => !node._updatable$.value))
       .subscribe((node) => {
+        // console.log('setting updatable to', node.tag$.value);
         node._updatable$.next(true);
       });
     /* when successfull mounted - setting explicit flag */

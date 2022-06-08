@@ -320,7 +320,7 @@ export class RexNode extends DependencyResolver {
               }
             }
             /* providing self in Di before mount */
-            combineLatest([this.container$, this._id$])
+            combineLatest([this.container$, node._id$])
               .pipe(
                 filter((args): args is [DiContainer, string] =>
                   args.every((e) => e != null),
@@ -330,10 +330,16 @@ export class RexNode extends DependencyResolver {
               .subscribe(([di, id]) => {
                 const provideArg: Record<string, HTMLElement> = {};
                 provideArg[id] = el;
-                console.log('providing element', el);
+                // console.log('providing element', el);
                 di.provide(new HtmlElementProvider(provideArg));
               });
-            // console.log('appending element', el);
+            // console.log(
+            //   'appending element',
+            //   el,
+            //   this.container$.value,
+            //   this._id$.value,
+            //   this.directives.isEmpty,
+            // );
             appendHere.appendChild(el);
           }
         }

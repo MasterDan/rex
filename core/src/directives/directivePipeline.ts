@@ -219,16 +219,13 @@ export class DirectivePipeline {
     func: (dir: Directive, elems: IElems) => (HTMLElement | RexNode)[],
   ) {
     /* element exists, therefore we're mutating single element */
-    if (elems.element != null) {
-      for (const i in values) {
-        const value = values[i];
-        const directive = directives[i];
-        if (value != directive.__valueOld$.value) {
-          func(directive, elems);
-        }
+
+    for (const i in values) {
+      const value = values[i];
+      const directive = directives[i];
+      if (value != directive.__valueOld$.value) {
+        const result = func(directive, elems);
       }
-    } else {
-      // here will be if and for logick
     }
   }
 

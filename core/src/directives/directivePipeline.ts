@@ -189,7 +189,9 @@ export class DirectivePipeline {
         ),
       )
       .subscribe(([[elems, values], directives]) => {
-        this.updateAll(elems, values, directives);
+        this.updateAll(elems, values, directives, (d, e) =>
+          d.__triggerUpdate(e),
+        );
       });
     /* updating all */
     this.mount$
@@ -199,7 +201,9 @@ export class DirectivePipeline {
         ),
       )
       .subscribe(([[elems, values], directives]) => {
-        this.mountAll(elems, values, directives);
+        this.updateAll(elems, values, directives, (d, e) =>
+          d.__triggerMounted(e),
+        );
       });
   }
 
@@ -212,6 +216,7 @@ export class DirectivePipeline {
     elems: IElems & INode,
     values: (string | null)[],
     directives: Directive[],
+    func: (dir: Directive, elems: IElems) => (HTMLElement | RexNode)[],
   ) {
     /* element exists, therefore we're mutating single element */
     if (elems.element != null) {
@@ -219,26 +224,7 @@ export class DirectivePipeline {
         const value = values[i];
         const directive = directives[i];
         if (value != directive.__valueOld$.value) {
-          directive.__triggerUpdate(elems);
-        }
-      }
-    } else {
-      // here will be if and for logick
-    }
-  }
-
-  private mountAll(
-    elems: IElems & INode,
-    values: (string | null)[],
-    directives: Directive[],
-  ) {
-    /* element exists, therefore we're mutating single element */
-    if (elems.element != null) {
-      for (const i in values) {
-        const value = values[i];
-        const directive = directives[i];
-        if (value != directive.__value$.value) {
-          directive.__triggerMounted(elems);
+          func(directive, elems);
         }
       }
     } else {

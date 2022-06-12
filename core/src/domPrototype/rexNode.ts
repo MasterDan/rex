@@ -354,6 +354,7 @@ export class RexNode extends DependencyResolver {
       });
   }
 
+  /** Creates Document fragment and renders node into it as Observable */
   render(): Observable<DocumentFragment> {
     const fragment$ = this.resolve<Document>(documentKey).pipe(
       map((doc) => doc.createDocumentFragment()),
@@ -373,7 +374,9 @@ export class RexNode extends DependencyResolver {
     const clonedNode = new RexNode(
       this.tag$.value,
       this.attributes$.value,
-      this.children$.value,
+      this.children$.value?.map((node) =>
+        typeof node === 'string' ? node : node.clone(),
+      ),
       options,
     );
     this.container$

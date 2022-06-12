@@ -14,6 +14,8 @@ import { RexNode } from '../domPrototype/rexNode';
 import { IElems } from './@types/IElems';
 import { IDirectiveBinding } from './@types/IDirectiveBinding';
 
+export type DirectiveTransformResult = Array<HTMLElement | RexNode>;
+
 /**
   Directive is a thing that transforms our tree and detects changes
  */
@@ -29,6 +31,7 @@ export abstract class Directive<T = string> extends DependencyResolver {
   __valueKey$: BehaviorSubject<string | null>;
   __value$ = new BehaviorSubject<T | null>(null);
   __valueOld$ = new BehaviorSubject<T | null>(null);
+  __lastTransformation: DirectiveTransformResult | null = null;
   __initialized = false;
 
   __isTheSameElement$ = combineLatest([
@@ -113,13 +116,17 @@ export abstract class Directive<T = string> extends DependencyResolver {
   }
 
   /** triggering update from pipeline */
-  __triggerUpdate(elems: IElems): Array<HTMLElement | RexNode> {
-    return this.update(elems, this.__binding);
+  __triggerUpdate(elems: IElems): DirectiveTransformResult {
+    const transformed = this.update(elems, this.__binding);
+    this.__lastTransformation = transformed;
+    return transformed;
   }
 
   /** triggering mounted from pipeline */
-  __triggerMounted(elems: IElems): Array<HTMLElement | RexNode> {
-    return this.mounted(elems, this.__binding);
+  __triggerMounted(elems: IElems): DirectiveTransformResult {
+    const transformed = this.mounted(elems, this.__binding);
+    this.__lastTransformation = transformed;
+    return transformed;
   }
 
   abstract init(node: RexNode, binding: IDirectiveBinding<T>): RexNode[];
@@ -127,14 +134,14 @@ export abstract class Directive<T = string> extends DependencyResolver {
   protected mounted(
     elems: IElems,
     binding: IDirectiveBinding<T>,
-  ): Array<HTMLElement | RexNode> {
+  ): DirectiveTransformResult {
     return this.update(elems, binding);
   }
 
   abstract update(
     elems: IElems,
     binding: IDirectiveBinding<T>,
-  ): Array<HTMLElement | RexNode>;
+  ): DirectiveTransformResult;
 
   /** If directive already applyed returns existing transformation result */
   __applySafe(node: RexNode): RexNode[] {

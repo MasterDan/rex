@@ -11,7 +11,7 @@ import {
 } from 'rxjs';
 import { BehaviorMutable } from '../tools/rx/BehaviorMutable';
 import { RexNode } from '../domPrototype/rexNode';
-import { Directive } from './directive';
+import { Directive, DirectiveTransformResult } from './directive';
 import { IElems, INode } from './@types/IElems';
 
 export class DirectivePipeline {
@@ -216,15 +216,73 @@ export class DirectivePipeline {
     elems: IElems & INode,
     values: (string | null)[],
     directives: Directive[],
-    func: (dir: Directive, elems: IElems) => (HTMLElement | RexNode)[],
+    mountOrUpdate: (dir: Directive, elems: IElems) => (HTMLElement | RexNode)[],
   ) {
-    /* element exists, therefore we're mutating single element */
+    /**  after previous transformation element was the same */
+    let wasTheSameElement = elems.element != null;
+    /** element from previous transformation */
+    let previousElement = elems.element;
+    let previousTransformation: HTMLElement[] = elems.elements;
+
+    /** support function that renders Raw RexNodes into HtmlElements */
+    const renderResult: (nodes: DirectiveTransformResult) => HTMLElement[] = (
+      nodes: DirectiveTransformResult,
+    ) => {
+      const elementsArray: HTMLElement[] = [];
+      for (const node of nodes) {
+        if (node instanceof RexNode) {
+          node.render().subscribe((fragment) => {
+            const child = fragment.childNodes[0] as HTMLElement;
+            elementsArray.push(child);
+          });
+        } else {
+          elementsArray.push(node);
+        }
+      }
+      return elementsArray;
+    };
 
     for (const i in values) {
       const value = values[i];
       const directive = directives[i];
-      if (value != directive.__valueOld$.value) {
-        const result = func(directive, elems);
+      if (wasTheSameElement) {
+        // apply directive if we need
+        if (value != directive.__valueOld$.value) {
+          elems.element = previousElement;
+          elems.elements = previousTransformation;
+          previousTransformation = renderResult(
+            mountOrUpdate(directive, elems),
+          );
+        } else if (directive.__lastTransformation != null) {
+          previousTransformation = renderResult(directive.__lastTransformation);
+        }
+      } else if (directives.length === 1) {
+        /* if we have only one directive that strongly modifies our Dom 
+         we still can provide it Raw Elements */
+        if (value != directive.__valueOld$.value) {
+          elems.element = previousElement;
+          elems.elements = previousTransformation;
+          previousTransformation = renderResult(
+            mountOrUpdate(directive, elems),
+          );
+        } else if (directive.__lastTransformation != null) {
+          previousTransformation = renderResult(directive.__lastTransformation);
+        }
+      } else {
+        throw new Error(
+          `Cannot apply dom tansformation in pipline: ${directives
+            .map((d) => d.name)
+            .join(', ')}. Please, separate structural directives`,
+        );
+      }
+      wasTheSameElement =
+        previousTransformation.length === 1 &&
+        !(previousTransformation[0] instanceof RexNode) &&
+        previousTransformation[0].nodeName === previousElement?.nodeName;
+      if (wasTheSameElement) {
+        previousElement = previousTransformation[0] as HTMLElement;
+      } else {
+        previousElement = null;
       }
     }
   }

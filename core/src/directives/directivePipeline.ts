@@ -285,6 +285,10 @@ export class DirectivePipeline {
         previousElement = null;
       }
     }
+    /** if after transformation number of elements somehow changed */
+    if (!wasTheSameElement) {
+      throw new Error('Not implemented this part yet');
+    }
   }
 
   setNode(n: RexNode): DirectivePipeline {

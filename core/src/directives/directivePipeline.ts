@@ -67,7 +67,7 @@ export class DirectivePipeline {
   );
   /** emits [htmlElement] of _transformedNode$
    * or resolves elements[] from _parentElement$ if we not changing single element */
-  private _transforemenElements$: Observable<HTMLElement[]> =
+  private _transforemedElements$: Observable<HTMLElement[]> =
     this._isTheSameElement$.pipe(
       switchMap((isSame) => {
         if (isSame) {
@@ -112,7 +112,7 @@ export class DirectivePipeline {
 
   private _elementsAggregated$: Observable<IElems & INode> = combineLatest([
     this._parentElement$,
-    this._transforemenElements$,
+    this._transforemedElements$,
     this._initialNode$.pipe(filter((node): node is RexNode => node != null)),
   ]).pipe(
     map(([parent, transformed, node]) => {

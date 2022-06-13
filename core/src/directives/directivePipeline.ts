@@ -212,11 +212,18 @@ export class DirectivePipeline {
     return dirs == null || dirs.length === 0;
   }
 
+  /**
+   * Applying cureent pipeline to HtmlElements
+   * @param elems Result of initial or previous transformation
+   * @param values Last value of each directive in pipeline
+   * @param directives current directives
+   * @param mountOrUpdate triggers mount function or update function in directive
+   */
   private updateAll(
     elems: IElems & INode,
     values: (string | null)[],
     directives: Directive[],
-    mountOrUpdate: (dir: Directive, elems: IElems) => (HTMLElement | RexNode)[],
+    mountOrUpdate: (dir: Directive, elems: IElems) => DirectiveTransformResult,
   ) {
     /**  after previous transformation element was the same */
     let wasTheSameElement = elems.element != null;
@@ -287,7 +294,42 @@ export class DirectivePipeline {
     }
     /** if after transformation number of elements somehow changed */
     if (!wasTheSameElement) {
-      throw new Error('Not implemented this part yet');
+      const position = this.positionInParenNode$.value;
+      const oldSize = this.size$.value;
+      const newSize = previousTransformation.length;
+      const parent = elems.parent;
+      if (parent == null) {
+        throw new Error('Cannot apply transformation on non mounted Node');
+        return;
+      }
+      if (newSize < oldSize) {
+        let diff = oldSize - newSize;
+        const lastIndex = position + oldSize - 1;
+        let transformationIndex = previousTransformation.length - 1;
+        for (let i = lastIndex; i >= position; i--) {
+          const child = parent.childNodes[i];
+          if (diff > 0) {
+            parent.removeChild(child);
+            diff--;
+          } else {
+            const newChild = previousTransformation[transformationIndex];
+            parent.replaceChild(newChild, child);
+          }
+          transformationIndex--;
+        }
+      } else {
+        const lastOldIndex = oldSize - 1;
+        for (let i = 0; i < newSize; i++) {
+          const child = parent.childNodes[i];
+          const newChild = previousTransformation[i];
+          if (i > lastOldIndex) {
+            parent.insertBefore(child, newChild);
+          } else {
+            parent.replaceChild(newChild, child);
+          }
+        }
+      }
+      this.size$.next(newSize);
     }
   }
 

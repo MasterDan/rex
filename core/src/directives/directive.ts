@@ -67,9 +67,16 @@ export abstract class Directive<T = string> extends DependencyResolver {
         ),
       )
       .subscribe(([oldval, val]) => {
-        this.__value$.next(val);
+        console.log('value changed from', oldval, 'to', val);
         this.__valueOld$.next(oldval);
+        this.__value$.next(val);
       });
+    this.__value$.subscribe((v) => {
+      console.log('value is now', v);
+    });
+    this.__valueOld$.subscribe((v) => {
+      console.log('old value is now', v);
+    });
   }
 
   /** Detects if current directive (if not template string) exists in provideded node.

@@ -232,7 +232,7 @@ export class DirectivePipeline {
     );
 
     /**  after previous transformation element was the same */
-    let wasTheSameElement = elems.element != null;
+    let wasTheSameElement = elems.element != null && this.size$.value === 1;
     /** element from previous transformation */
     let previousElement = elems.element;
     let previousTransformation: HTMLElement[] = elems.elements;
@@ -272,6 +272,13 @@ export class DirectivePipeline {
       } else if (directives.length === 1) {
         /* if we have only one directive that strongly modifies our Dom 
          we still can provide it Raw Elements */
+        console.log(
+          'values are',
+          value,
+          directive.__value$.value,
+          directive.__valueOld$.value,
+        );
+
         if (value != directive.__valueOld$.value) {
           elems.element = previousElement;
           elems.elements = previousTransformation;

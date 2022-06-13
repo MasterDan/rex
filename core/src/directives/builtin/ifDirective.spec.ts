@@ -5,7 +5,7 @@ import { Component } from '../../component/component';
 import { Ref } from '../../scope/ref';
 
 describe('if directive', () => {
-  test('simple hiding element', () => {
+  test('toggling single element', () => {
     const flag = new Ref<boolean>(true);
     const rootComponent = new Component({
       nodes: new RexNode('div', { '[if]': 'flag' }, ['now you see me']),

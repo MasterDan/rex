@@ -225,12 +225,6 @@ export class DirectivePipeline {
     directives: Directive[],
     mountOrUpdate: (dir: Directive, elems: IElems) => DirectiveTransformResult,
   ) {
-    console.log(
-      'updating pipeline',
-      directives.map((d) => d.name),
-      values,
-    );
-
     /**  after previous transformation element was the same */
     let wasTheSameElement = elems.element != null && this.size$.value === 1;
     /** element from previous transformation */
@@ -272,12 +266,6 @@ export class DirectivePipeline {
       } else if (directives.length === 1) {
         /* if we have only one directive that strongly modifies our Dom 
          we still can provide it Raw Elements */
-        console.log(
-          'values are',
-          value,
-          directive.__value$.value,
-          directive.__valueOld$.value,
-        );
 
         if (value != directive.__valueOld$.value) {
           elems.element = previousElement;
@@ -296,6 +284,7 @@ export class DirectivePipeline {
         );
       }
       wasTheSameElement =
+        this.size$.value === 1 &&
         previousTransformation.length === 1 &&
         !(previousTransformation[0] instanceof RexNode) &&
         previousTransformation[0].nodeName === previousElement?.nodeName;
@@ -333,12 +322,21 @@ export class DirectivePipeline {
       } else {
         const lastOldIndex = oldSize - 1;
         for (let i = 0; i < newSize; i++) {
-          const child = parent.childNodes[i];
+          const child =
+            parent.childNodes.length > 0 ? parent.childNodes[i] : null;
           const newChild = previousTransformation[i];
           if (i > lastOldIndex) {
-            parent.insertBefore(child, newChild);
+            if (child) {
+              parent.insertBefore(child, newChild);
+            } else {
+              parent.appendChild(newChild);
+            }
           } else {
-            parent.replaceChild(newChild, child);
+            if (child) {
+              parent.replaceChild(newChild, child);
+            } else {
+              parent.appendChild(newChild);
+            }
           }
         }
       }

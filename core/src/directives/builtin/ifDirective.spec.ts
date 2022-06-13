@@ -18,9 +18,12 @@ describe('if directive', () => {
     expect(jsDom.dom.window.document.body.innerHTML).toMatch(
       /<div id="rexApp"><div __rex__anchor=".*">now you see me<\/div><\/div>/gm,
     );
-    flag.next(false);
     expect(jsDom.dom.window.document.body.innerHTML).toMatch(
       /<div id="rexApp"><\/div>/gm,
+    );
+    flag.next(true);
+    expect(jsDom.dom.window.document.body.innerHTML).toMatch(
+      /<div id="rexApp"><div __rex__anchor=".*">now you see me<\/div><\/div>/gm,
     );
   });
 });

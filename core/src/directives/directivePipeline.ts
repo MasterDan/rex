@@ -225,6 +225,12 @@ export class DirectivePipeline {
     directives: Directive[],
     mountOrUpdate: (dir: Directive, elems: IElems) => DirectiveTransformResult,
   ) {
+    console.log(
+      'updating pipeline',
+      directives.map((d) => d.name),
+      values,
+    );
+
     /**  after previous transformation element was the same */
     let wasTheSameElement = elems.element != null;
     /** element from previous transformation */

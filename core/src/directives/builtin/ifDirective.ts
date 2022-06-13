@@ -15,6 +15,7 @@ export class ifDirective extends Directive<boolean> {
     { elements }: IElems,
     { value }: IDirectiveBinding<boolean>,
   ): HTMLElement[] {
+    console.log('upddating value', value);
     if (value) {
       return elements;
     } else return [];

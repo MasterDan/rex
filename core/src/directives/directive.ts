@@ -11,7 +11,7 @@ import {
 import { DependencyResolver } from '../di/dependencyResolver';
 import { Ref } from '../scope/ref';
 import { RexNode } from '../domPrototype/rexNode';
-import { IElems } from './@types/IElems';
+import { ElemsWithNode } from './@types/IElems';
 import { IDirectiveBinding } from './@types/IDirectiveBinding';
 
 export type DirectiveTransformResult = Array<HTMLElement | RexNode>;
@@ -116,14 +116,14 @@ export abstract class Directive<T = string> extends DependencyResolver {
   }
 
   /** triggering update from pipeline */
-  __triggerUpdate(elems: IElems): DirectiveTransformResult {
+  __triggerUpdate(elems: ElemsWithNode): DirectiveTransformResult {
     const transformed = this.update(elems, this.__binding);
     this.__lastTransformation = transformed;
     return transformed;
   }
 
   /** triggering mounted from pipeline */
-  __triggerMounted(elems: IElems): DirectiveTransformResult {
+  __triggerMounted(elems: ElemsWithNode): DirectiveTransformResult {
     const transformed = this.mounted(elems, this.__binding);
     this.__lastTransformation = transformed;
     return transformed;
@@ -132,14 +132,14 @@ export abstract class Directive<T = string> extends DependencyResolver {
   abstract init(node: RexNode, binding: IDirectiveBinding<T>): RexNode[];
 
   protected mounted(
-    elems: IElems,
+    elems: ElemsWithNode,
     binding: IDirectiveBinding<T>,
   ): DirectiveTransformResult {
     return this.update(elems, binding);
   }
 
   abstract update(
-    elems: IElems,
+    elems: ElemsWithNode,
     binding: IDirectiveBinding<T>,
   ): DirectiveTransformResult;
 

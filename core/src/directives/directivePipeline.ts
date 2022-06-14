@@ -12,7 +12,7 @@ import {
 import { BehaviorMutable } from '../tools/rx/BehaviorMutable';
 import { RexNode } from '../domPrototype/rexNode';
 import { Directive, DirectiveTransformResult } from './directive';
-import { IElems, INode } from './@types/IElems';
+import { ElemsWithNode, IElems, INode } from './@types/IElems';
 
 export class DirectivePipeline {
   /** result size of transformed rex-nodes array
@@ -223,7 +223,10 @@ export class DirectivePipeline {
     elems: IElems & INode,
     values: (string | null)[],
     directives: Directive[],
-    mountOrUpdate: (dir: Directive, elems: IElems) => DirectiveTransformResult,
+    mountOrUpdate: (
+      dir: Directive,
+      elems: ElemsWithNode,
+    ) => DirectiveTransformResult,
   ) {
     /**  after previous transformation element was the same */
     let wasTheSameElement = elems.element != null && this.size$.value === 1;

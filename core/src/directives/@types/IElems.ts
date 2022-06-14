@@ -9,3 +9,5 @@ export interface IElems {
 export interface INode {
   node: RexNode;
 }
+
+export type ElemsWithNode = IElems & INode;

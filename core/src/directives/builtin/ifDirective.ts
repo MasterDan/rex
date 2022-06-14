@@ -1,7 +1,7 @@
 import { RexNode } from '../../domPrototype/rexNode';
-import { Directive } from '../directive';
+import { Directive, DirectiveTransformResult } from '../directive';
 import { IDirectiveBinding } from '../@types/IDirectiveBinding';
-import { IElems } from '../@types/IElems';
+import { ElemsWithNode } from '../@types/IElems';
 
 export class ifDirective extends Directive<boolean> {
   name = 'if';
@@ -12,10 +12,13 @@ export class ifDirective extends Directive<boolean> {
   }
 
   update(
-    { elements }: IElems,
+    { elements, node }: ElemsWithNode,
     { value }: IDirectiveBinding<boolean>,
-  ): HTMLElement[] {
+  ): DirectiveTransformResult {
     if (value) {
+      if (elements.length === 0) {
+        return [node];
+      }
       return elements;
     } else return [];
   }

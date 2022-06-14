@@ -230,6 +230,13 @@ export class DirectivePipeline {
     /** element from previous transformation */
     let previousElement = elems.element;
     let previousTransformation: HTMLElement[] = elems.elements;
+    console.log(
+      'pipe upd',
+      values,
+      elems.element,
+      elems.elements,
+      elems.parent,
+    );
 
     /** support function that renders Raw RexNodes into HtmlElements */
     const renderResult: (nodes: DirectiveTransformResult) => HTMLElement[] = (

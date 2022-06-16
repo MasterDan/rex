@@ -159,8 +159,8 @@ export class RexNode extends DependencyResolver {
           }
         }
       });
-    /* Providing mounted state to children */
 
+    /* Providing mounted state to children */
     this._mounted$
       .pipe(
         filter((val) => val),
@@ -177,6 +177,27 @@ export class RexNode extends DependencyResolver {
             .filter((child): child is RexNode => child instanceof RexNode)
             .forEach((child) => {
               child._mounted$.next(true);
+            });
+        }
+      });
+
+    /* Providing unmounted state to children */
+    this._mounted$
+      .pipe(
+        filter((val) => !val),
+        switchMap(() => this._selfOrTransformed$),
+      )
+      .subscribe((sot) => {
+        for (const node of sot) {
+          node._mounted$.next(false);
+        }
+        if (children instanceof RexNode) {
+          children._mounted$.next(false);
+        } else if (Array.isArray(children)) {
+          children
+            .filter((child): child is RexNode => child instanceof RexNode)
+            .forEach((child) => {
+              child._mounted$.next(false);
             });
         }
       });

@@ -160,12 +160,16 @@ export class RexNode extends DependencyResolver {
         }
       });
     /* Providing mounted state to children */
+
     this._mounted$
       .pipe(
         filter((val) => val),
-        switchMap(() => this.children$),
+        switchMap(() => this._selfOrTransformed$),
       )
-      .subscribe(() => {
+      .subscribe((sot) => {
+        for (const node of sot) {
+          node._mounted$.next(true);
+        }
         if (children instanceof RexNode) {
           children._mounted$.next(true);
         } else if (Array.isArray(children)) {

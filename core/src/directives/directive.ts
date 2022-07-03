@@ -13,6 +13,11 @@ import { Ref } from '../scope/ref';
 import { RexNode } from '../domPrototype/rexNode';
 import { ElemsWithNode } from './@types/IElems';
 import { IDirectiveBinding } from './@types/IDirectiveBinding';
+import { DirectiveType } from './@types/DirectiveType';
+
+export interface IDirectiveConfiguration {
+  type: DirectiveType;
+}
 
 export type DirectiveTransformResult = Array<HTMLElement | RexNode>;
 

@@ -1,13 +1,13 @@
-import { DependencyResolver } from '../di/dependencyResolver';
-import { RexNode } from '../domPrototype/rexNode';
-import { getKeysToInsert } from './stringParser/stringParser';
+import { DependencyResolver } from '../../di/dependencyResolver';
+import { RexNode } from '../../domPrototype/rexNode';
+import { getKeysToInsert } from '../stringParser/stringParser';
 import {
   TemplateStringDirective,
   templateStringDirName,
-} from './builtin/templateStringDirective';
-import { Directive } from './directive';
+} from '../builtin/templateStringDirective';
+import { DirectiveBase } from '../directiveBase';
 import { combineLatest, map, Observable, switchMap, take } from 'rxjs';
-import { registeredDirectiveNamesKey } from '../di/constants';
+import { registeredDirectiveNamesKey } from '../../di/constants';
 
 export class DirectiveDetector extends DependencyResolver {
   scanNode(node: RexNode): void {
@@ -53,7 +53,7 @@ export class DirectiveDetector extends DependencyResolver {
         map((dirs) =>
           dirs
             .map((dir) => dir.__detectSelfIn(node))
-            .filter((arg): arg is Directive[] => arg != null),
+            .filter((arg): arg is DirectiveBase[] => arg != null),
         ),
         map((dirs) =>
           dirs.length > 0 ? dirs.reduce((a, b) => a.concat(b)) : (dirs as []),
@@ -64,7 +64,9 @@ export class DirectiveDetector extends DependencyResolver {
       });
   }
 
-  private resolveDirective<T extends Directive>(name: string): Observable<T> {
+  private resolveDirective<T extends DirectiveBase>(
+    name: string,
+  ): Observable<T> {
     return this.resolve<T>(name);
   }
 }

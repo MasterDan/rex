@@ -24,7 +24,7 @@ export type DirectiveTransformResult = Array<HTMLElement | RexNode>;
 /**
   Directive is a thing that transforms our tree and detects changes
  */
-export abstract class Directive<T = string> extends DependencyResolver {
+export abstract class DirectiveBase<T = string> extends DependencyResolver {
   protected frame: RegExp | null = null;
   abstract name: string;
 
@@ -80,13 +80,13 @@ export abstract class Directive<T = string> extends DependencyResolver {
   /** Detects if current directive (if not template string) exists in provideded node.
    *  May be more, than once.
    */
-  __detectSelfIn(node: RexNode): Directive[] | null {
+  __detectSelfIn(node: RexNode): DirectiveBase[] | null {
     const attrs = node.attributes$.value;
     if (attrs == null) {
       return null;
     }
     let notFoundSelf = true;
-    const foundedSelf: Directive[] = [];
+    const foundedSelf: DirectiveBase[] = [];
     for (const attributeName of Object.keys(attrs)) {
       const fallbackRegExp = new RegExp(`rex-${this.name}:([\\w-]*)`);
       const match =
@@ -96,7 +96,7 @@ export abstract class Directive<T = string> extends DependencyResolver {
       if (match == null) {
         continue;
       } else {
-        this.resolve<Directive>(this.name).subscribe((directive) => {
+        this.resolve<DirectiveBase>(this.name).subscribe((directive) => {
           notFoundSelf = false;
           const argumentDetected = match[1];
           if (argumentDetected != null) {

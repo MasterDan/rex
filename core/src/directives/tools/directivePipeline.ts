@@ -10,10 +10,10 @@ import {
   withLatestFrom,
   distinctUntilChanged,
 } from 'rxjs';
-import { BehaviorMutable } from '../tools/rx/BehaviorMutable';
-import { RexNode } from '../domPrototype/rexNode';
-import { Directive, DirectiveTransformResult } from './directive';
-import { ElemsWithNode, IElems, INode } from './@types/IElems';
+import { BehaviorMutable } from '../../tools/rx/BehaviorMutable';
+import { RexNode } from '../../domPrototype/rexNode';
+import { DirectiveBase, DirectiveTransformResult } from '../directiveBase';
+import { ElemsWithNode, IElems, INode } from '../@types/IElems';
 
 export class DirectivePipeline {
   /** result size of transformed rex-nodes array
@@ -24,14 +24,14 @@ export class DirectivePipeline {
    * @todo should i make it subject instead of behaviour ?
    */
   public positionInParenNode$ = new BehaviorSubject<number>(0);
-  private _directives$ = new BehaviorMutable<Directive[] | null>(null);
+  private _directives$ = new BehaviorMutable<DirectiveBase[] | null>(null);
   private _initialNode$ = new BehaviorSubject<RexNode | null>(null);
   /** if we have initalnode and at least one directive */
-  private _validState$: Observable<[Directive[], RexNode]> = combineLatest([
+  private _validState$: Observable<[DirectiveBase[], RexNode]> = combineLatest([
     this._directives$,
     this._initialNode$,
   ]).pipe(
-    filter((arr): arr is [Directive[], RexNode] => {
+    filter((arr): arr is [DirectiveBase[], RexNode] => {
       const [dirs, node] = arr;
       return dirs != null && node != null && dirs.length > 0;
     }),
@@ -42,7 +42,7 @@ export class DirectivePipeline {
    * and not replaced it with something else
    */
   private _isTheSameElement$: Observable<boolean> = this._directives$.pipe(
-    filter((val): val is Directive[] => val != null),
+    filter((val): val is DirectiveBase[] => val != null),
     switchMap((dirs) =>
       combineLatest(dirs.map((dir) => dir.__isTheSameElement$)),
     ),
@@ -186,7 +186,9 @@ export class DirectivePipeline {
     this.update$
       .pipe(
         withLatestFrom(
-          this._directives$.pipe(filter((d): d is Directive[] => d != null)),
+          this._directives$.pipe(
+            filter((d): d is DirectiveBase[] => d != null),
+          ),
         ),
       )
       .subscribe(([[elems, values], directives]) => {
@@ -198,7 +200,9 @@ export class DirectivePipeline {
     this.mount$
       .pipe(
         withLatestFrom(
-          this._directives$.pipe(filter((d): d is Directive[] => d != null)),
+          this._directives$.pipe(
+            filter((d): d is DirectiveBase[] => d != null),
+          ),
         ),
       )
       .subscribe(([[elems, values], directives]) => {
@@ -223,9 +227,9 @@ export class DirectivePipeline {
   private updateAll(
     elems: IElems & INode,
     values: (string | null)[],
-    directives: Directive[],
+    directives: DirectiveBase[],
     mountOrUpdate: (
-      dir: Directive,
+      dir: DirectiveBase,
       elems: ElemsWithNode,
     ) => DirectiveTransformResult,
   ) {
@@ -353,7 +357,7 @@ export class DirectivePipeline {
     return this;
   }
 
-  pushDirectives(...dirs: Directive[]): DirectivePipeline {
+  pushDirectives(...dirs: DirectiveBase[]): DirectivePipeline {
     this._directives$.mutate((old) => {
       const newDirs = old ?? [];
       newDirs.push(...dirs);

@@ -9,8 +9,8 @@ import { DiContainerReactive } from '../di/diContainerReactive';
 import { BindDirective } from '../directives/builtin/bindDirective';
 import { ifDirective } from '../directives/builtin/ifDirective';
 import { TemplateStringDirective } from '../directives/builtin/templateStringDirective';
-import { DirectiveDetector } from '../directives/directiveDetector';
-import { DirectiveProvider } from '../directives/directiveProvider';
+import { DirectiveDetector } from '../directives/tools/directiveDetector';
+import { DirectiveProvider } from '../directives/tools/directiveProvider';
 import { DomPlugin } from '../plugins/domPlugin';
 import { RexPlugin } from '../plugins/plugin';
 

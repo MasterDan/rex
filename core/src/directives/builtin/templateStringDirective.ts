@@ -1,7 +1,7 @@
 import { Ref } from 'core/src/scope/ref';
 import { RexNode } from '../../domPrototype/rexNode';
 import { combineLatest, filter, map, Observable, switchMap, take } from 'rxjs';
-import { Directive } from '../directive';
+import { DirectiveBase } from '../directiveBase';
 import { IDirectiveBinding } from '../@types/IDirectiveBinding';
 import { IElems } from '../@types/IElems';
 import {
@@ -10,7 +10,7 @@ import {
 } from '../stringParser/stringParser';
 
 export const templateStringDirName = '__template_String__';
-export class TemplateStringDirective extends Directive {
+export class TemplateStringDirective extends DirectiveBase {
   name = templateStringDirName;
   childIndex = 0;
 

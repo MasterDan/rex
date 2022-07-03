@@ -1,9 +1,9 @@
 import { RexNode } from '../../domPrototype/rexNode';
-import { Directive, DirectiveTransformResult } from '../directive';
+import { DirectiveBase, DirectiveTransformResult } from '../directiveBase';
 import { IDirectiveBinding } from '../@types/IDirectiveBinding';
 import { ElemsWithNode } from '../@types/IElems';
 
-export class ifDirective extends Directive<boolean> {
+export class ifDirective extends DirectiveBase<boolean> {
   name = 'if';
   frame = /\[if\]/gm;
 

@@ -1,9 +1,9 @@
 import { RexNode } from '../../domPrototype/rexNode';
-import { Directive } from '../directive';
+import { DirectiveBase } from '../directiveBase';
 import { IDirectiveBinding } from '../@types/IDirectiveBinding';
 import { IElems } from '../@types/IElems';
 
-export class BindDirective extends Directive {
+export class BindDirective extends DirectiveBase {
   frame = /([\w-]*):$/;
   name = 'bind';
 

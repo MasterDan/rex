@@ -17,13 +17,13 @@ import {
 } from '../di/constants';
 import { DependencyResolver } from '../di/dependencyResolver';
 import type { DiContainer } from '../di/diContainer';
-import type { Directive } from '../directives/directive';
-import type { DirectiveDetector } from '../directives/directiveDetector';
+import type { DirectiveBase } from '../directives/directiveBase';
+import type { DirectiveDetector } from '../directives/tools/directiveDetector';
 import { BehaviorMutable } from '../tools/rx/BehaviorMutable';
 import { isNullOrWhiteSpace } from '../tools/stringTools';
 import { newId } from '../tools/idGeneratorSimple';
 import { pipeIt } from '../tools/pipe';
-import { DirectivePipeline } from '../directives/directivePipeline';
+import { DirectivePipeline } from '../directives/tools/directivePipeline';
 import { HtmlElementProvider } from '../di/providers/htmlElementProvider';
 import { DiContainerReactive } from '../di/diContainerReactive';
 
@@ -423,7 +423,7 @@ export class RexNode extends DependencyResolver {
     );
   }
 
-  __addDirective(...dirs: Directive[]) {
+  __addDirective(...dirs: DirectiveBase[]) {
     this.directives.pushDirectives(...dirs);
   }
 

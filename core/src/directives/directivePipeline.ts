@@ -3,7 +3,6 @@ import {
   combineLatest,
   filter,
   map,
-  tap,
   Observable,
   skip,
   switchMap,
@@ -73,27 +72,12 @@ export class DirectivePipeline {
     this._isTheSameElement$.pipe(
       switchMap((isSame) => {
         if (isSame) {
-          return this._transformedSameElement$.pipe(
-            map((el) => [el]),
-            tap((el) => {
-              console.log('_transforemedElements$ changed (isSame)', el);
-            }),
-          );
+          return this._transformedSameElement$.pipe(map((el) => [el]));
         } else {
           return combineLatest([
             this._parentElement$.pipe(distinctUntilChanged()),
-            this.positionInParenNode$.pipe(
-              distinctUntilChanged(),
-              tap((p) => {
-                console.log('pipn', p);
-              }),
-            ),
-            this.size$.pipe(
-              distinctUntilChanged(),
-              tap((s) => {
-                console.log('new size is', s);
-              }),
-            ),
+            this.positionInParenNode$.pipe(distinctUntilChanged()),
+            this.size$.pipe(distinctUntilChanged()),
           ]).pipe(
             map(([parent, position, size]) => {
               if (parent == null) {
@@ -106,9 +90,6 @@ export class DirectivePipeline {
                 elems.push(element);
               }
               return elems;
-            }),
-            tap((el) => {
-              console.log('_transforemedElements$ changed (!isSame)', el);
             }),
           );
         }
@@ -131,22 +112,9 @@ export class DirectivePipeline {
   );
 
   private _elementsAggregated$: Observable<IElems & INode> = combineLatest([
-    this._parentElement$.pipe(
-      tap(() => {
-        console.log('parent element changed');
-      }),
-    ),
-    this._transforemedElements$.pipe(
-      tap(() => {
-        console.log('transformed elements changed');
-      }),
-    ),
-    this._initialNode$.pipe(
-      filter((node): node is RexNode => node != null),
-      tap(() => {
-        console.log('initial node changed');
-      }),
-    ),
+    this._parentElement$,
+    this._transforemedElements$,
+    this._initialNode$.pipe(filter((node): node is RexNode => node != null)),
   ]).pipe(
     map(([parent, transformed, node]) => {
       return {
@@ -166,22 +134,7 @@ export class DirectivePipeline {
   mounted$ = new BehaviorSubject<boolean>(false);
 
   /** if values or elements changed */
-  private change$ = combineLatest([
-    this._elementsAggregated$.pipe(
-      tap(() => {
-        console.log('_elementsAggregated$ changed');
-      }),
-    ),
-    this._values$.pipe(
-      tap((v) => {
-        console.log('_values$ changed', v);
-      }),
-    ),
-  ]).pipe(
-    tap(() => {
-      console.log('change$ emitted');
-    }),
-  );
+  private change$ = combineLatest([this._elementsAggregated$, this._values$]);
 
   /** first value update is mount */
   private mount$ = this.change$.pipe(take(1));
@@ -237,7 +190,6 @@ export class DirectivePipeline {
         ),
       )
       .subscribe(([[elems, values], directives]) => {
-        console.log('update triggered');
         this.updateAll(elems, values, directives, (d, e) =>
           d.__triggerUpdate(e),
         );
@@ -250,7 +202,6 @@ export class DirectivePipeline {
         ),
       )
       .subscribe(([[elems, values], directives]) => {
-        console.log('mounted triggered');
         this.updateAll(elems, values, directives, (d, e) =>
           d.__triggerMounted(e),
         );
@@ -283,13 +234,6 @@ export class DirectivePipeline {
     /** element from previous transformation */
     let previousElement = elems.element;
     let previousTransformation: HTMLElement[] = elems.elements;
-    console.log(
-      'pipe upd',
-      values,
-      elems.element,
-      elems.elements,
-      elems.parent,
-    );
 
     /** support function that renders Raw RexNodes into HtmlElements */
     const renderResult: (nodes: DirectiveTransformResult) => HTMLElement[] = (

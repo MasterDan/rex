@@ -15,10 +15,6 @@ import { ElemsWithNode } from './@types/IElems';
 import { IDirectiveBinding } from './@types/IDirectiveBinding';
 import { DirectiveType } from './@types/DirectiveType';
 
-export interface IDirectiveConfiguration {
-  type: DirectiveType;
-}
-
 export type DirectiveTransformResult = Array<HTMLElement | RexNode>;
 
 /**
@@ -27,6 +23,7 @@ export type DirectiveTransformResult = Array<HTMLElement | RexNode>;
 export abstract class DirectiveBase<T = string> extends DependencyResolver {
   protected frame: RegExp | null = null;
   abstract name: string;
+  abstract type: DirectiveType;
 
   __argument$ = new BehaviorSubject<string | null>(null);
   __modifiers$ = new BehaviorSubject<Record<string, boolean> | null>(null);

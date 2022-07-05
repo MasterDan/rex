@@ -23,9 +23,10 @@ import { BehaviorMutable } from '../tools/rx/BehaviorMutable';
 import { isNullOrWhiteSpace } from '../tools/stringTools';
 import { newId } from '../tools/idGeneratorSimple';
 import { pipeIt } from '../tools/pipe';
-import { DirectivePipeline } from '../directives/tools/directivePipeline';
 import { HtmlElementProvider } from '../di/providers/htmlElementProvider';
 import { DiContainerReactive } from '../di/diContainerReactive';
+import { TransformationSimple } from './transformations/transformationSimpe';
+import { TransformationRadical } from './transformations/transformationRadical';
 
 export type RexNodeChildren = Array<string | RexNode> | null;
 
@@ -46,7 +47,11 @@ export class RexNode extends DependencyResolver {
 
   directives = new DirectivePipeline().setNode(this);
 
-  _updatable$ = new BehaviorSubject<boolean>(false);
+  transformationSimple = new TransformationSimple().setNode(this);
+
+  transformationRadical = new TransformationRadical().setNode(this);
+
+  _willChange$ = new BehaviorSubject<boolean>(false);
 
   _id$ = new BehaviorSubject<string | null>(null);
 
@@ -98,7 +103,7 @@ export class RexNode extends DependencyResolver {
       .then((result) => new BehaviorMutable<RexNodeChildren>(result))
       .run();
     /* we need unique id if we're planning to update current node in runtime */
-    combineLatest([this._updatable$, this._id$.pipe(distinctUntilChanged())])
+    combineLatest([this._willChange$, this._id$.pipe(distinctUntilChanged())])
       .pipe(filter(([needsUpdate, id]) => needsUpdate == true && id == null))
       .subscribe(() => {
         this._id$.next(newId(anchorPrefix));

@@ -2,8 +2,10 @@ import { BehaviorSubject, combineLatest, filter, Observable } from 'rxjs';
 import { RexNode } from '../rexNode';
 import { DirectiveStructural } from '../../directives/directiveStructural';
 import { DirectiveTransformResult } from '../../directives/directiveBase';
+import { IDirectiveDefinition } from 'core/src/directives/@types/DirectiveDefinition';
+import { DependencyResolverClassic } from 'core/src/di/dependencyResolverClassic';
 
-export class TransformationRadical {
+export class TransformationRadical extends DependencyResolverClassic {
   private _initialNode$ = new BehaviorSubject<RexNode | null>(null);
   private _mainDirective$ = new BehaviorSubject<DirectiveStructural | null>(
     null,
@@ -27,8 +29,12 @@ export class TransformationRadical {
     return this;
   }
 
-  setDirective(dir: DirectiveStructural) {
-    this._mainDirective$.next(dir);
+  defineDirective(definition: IDirectiveDefinition) {
+    this.resolve<DirectiveStructural>(definition.name)
+      .pipe(filter((d): d is DirectiveStructural => d != null))
+      .subscribe((dir) => {
+        this._mainDirective$.next(dir);
+      });
   }
 
   private renderResult(nodes: DirectiveTransformResult): HTMLElement[] {

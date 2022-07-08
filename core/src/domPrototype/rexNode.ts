@@ -27,6 +27,7 @@ import { HtmlElementProvider } from '../di/providers/htmlElementProvider';
 import { DiContainerReactive } from '../di/diContainerReactive';
 import { TransformationSimple } from './transformations/transformationSimpe';
 import { TransformationRadical } from './transformations/transformationRadical';
+import { Attributes } from './@types/attributes';
 
 export type RexNodeChildren = Array<string | RexNode> | null;
 
@@ -85,7 +86,7 @@ export class RexNode extends DependencyResolver {
 
   constructor(
     tag = '',
-    attributes: Record<string, string | null> | null = null,
+    attributes: Attributes = null,
     children: RexNodeChildren | RexNode | string = null,
     options: IRexNodeOptions | null = null,
   ) {

@@ -1,9 +1,11 @@
 import { BehaviorMutable } from '../../tools/rx/BehaviorMutable';
-import { BehaviorSubject, combineLatest, filter, Observable } from 'rxjs';
+import { BehaviorSubject, combineLatest, filter, Observable, take } from 'rxjs';
 import { RexNode } from '../rexNode';
 import { Directive } from '../../directives/directive';
+import { DependencyResolverClassic } from 'core/src/di/dependencyResolverClassic';
+import { IDirectiveDefinition } from 'core/src/directives/@types/DirectiveDefinition';
 
-export class TransformationSimple {
+export class TransformationSimple extends DependencyResolverClassic {
   private _initialNode$ = new BehaviorSubject<RexNode | null>(null);
   private _directives$ = new BehaviorMutable<Directive[] | null>(null);
 
@@ -20,11 +22,21 @@ export class TransformationSimple {
     return this;
   }
 
-  pushDirectives(...dirs: Directive[]) {
-    this._directives$.mutate((old) => {
-      const val = old ?? [];
-      val.push(...dirs);
-      return val;
-    });
+  defineDirectives(...definitions: IDirectiveDefinition[]) {
+    combineLatest(
+      definitions.map((def) =>
+        this.resolve<Directive>(def.name).pipe(
+          filter((d): d is Directive => d != null),
+        ),
+      ),
+    )
+      .pipe(take(1))
+      .subscribe((directives) => {
+        this._directives$.mutate((old) => {
+          const val = old ?? [];
+          val.push(...directives);
+          return val;
+        });
+      });
   }
 }

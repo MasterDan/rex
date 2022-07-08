@@ -12,7 +12,7 @@ import { DirectiveType } from '../@types/DirectiveType';
 
 export const templateStringDirName = '__template_String__';
 export class TemplateStringDirective extends DirectiveBase {
-  type: DirectiveType = DirectiveType.Classic;
+  _type: DirectiveType = DirectiveType.Classic;
   name = templateStringDirName;
   childIndex = 0;
 

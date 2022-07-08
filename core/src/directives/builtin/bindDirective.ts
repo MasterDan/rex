@@ -4,7 +4,7 @@ import { IElems } from '../@types/IElems';
 import { Directive, IClassicDirectiveConfig } from '../directive';
 
 export class BindDirective extends Directive {
-  frame = /([\w-]*):$/;
+  _frame = /([\w-]*):$/;
   name = 'bind';
   config: Partial<IClassicDirectiveConfig> = {
     init(node: RexNode, { argument, value }: IDirectiveBinding<string>) {

@@ -1,6 +1,7 @@
 import { registeredDirectiveNamesKey } from '../../di/constants';
 import { DependencyProviderClassic } from '../../di/dependencyProviderClassic';
 import type { Ctor } from '../../tools/types/ctor';
+import { IDirectiveDefinition } from '../@types/DirectiveDefinition';
 import { DirectiveBase } from '../directiveBase';
 
 export class DirectiveProvider extends DependencyProviderClassic {
@@ -9,7 +10,7 @@ export class DirectiveProvider extends DependencyProviderClassic {
     super();
     this.onContainerSet((di) => {
       const existingKeys =
-        di.resolve<string[]>(registeredDirectiveNamesKey) ?? [];
+        di.resolve<IDirectiveDefinition[]>(registeredDirectiveNamesKey) ?? [];
       for (const dirCtor of directives) {
         const dir = new dirCtor();
         const resolvedDir = di.resolve<DirectiveBase>(dir.name);
@@ -17,7 +18,11 @@ export class DirectiveProvider extends DependencyProviderClassic {
           throw new Error(`Directive with name ${dir.name} already exists!`);
         }
         di.register(dirCtor, dir.name);
-        existingKeys.push(dir.name);
+        existingKeys.push({
+          name: dir.name,
+          frame: dir._frame,
+          type: dir._type,
+        });
       }
       di.register(existingKeys, registeredDirectiveNamesKey);
     });

@@ -18,7 +18,7 @@ export interface IStructuralDirectiveConfig<T = string> {
 
 export abstract class DirectiveStructural<T = string> extends DirectiveBase<T> {
   abstract name: string;
-  type: DirectiveType = DirectiveType.Structural;
+  _type: DirectiveType = DirectiveType.Structural;
   abstract config: Partial<IStructuralDirectiveConfig<T>>;
   init(node: RexNode, binding: IDirectiveBinding<T>): RexNode[] {
     if (this.config.init) {

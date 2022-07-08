@@ -9,7 +9,7 @@ import {
 
 export class ifDirective extends DirectiveStructural<boolean> {
   name = 'if';
-  frame = /\[if\]/gm;
+  _frame = /\[if\]/gm;
   config: Partial<IStructuralDirectiveConfig<boolean>> = {
     init(node: RexNode, { value }: IDirectiveBinding<boolean>): RexNode[] {
       return value ? [node] : [];

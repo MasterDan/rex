@@ -12,7 +12,7 @@ export interface IClassicDirectiveConfig<T = string> {
 
 export abstract class Directive<T = string> extends DirectiveBase<T> {
   abstract config: Partial<IClassicDirectiveConfig<T>>;
-  type = DirectiveType.Classic;
+  _type = DirectiveType.Classic;
 
   init(node: RexNode, binding: IDirectiveBinding<T>): RexNode[] {
     if (this.config.init) {

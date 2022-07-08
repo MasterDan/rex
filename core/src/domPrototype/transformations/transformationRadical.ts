@@ -4,25 +4,26 @@ import { DirectiveStructural } from '../../directives/directiveStructural';
 import { DirectiveTransformResult } from '../../directives/directiveBase';
 
 export class TransformationRadical {
-  private _node$ = new BehaviorSubject<RexNode | null>(null);
+  private _initialNode$ = new BehaviorSubject<RexNode | null>(null);
   private _mainDirective$ = new BehaviorSubject<DirectiveStructural | null>(
     null,
   );
   size$ = new BehaviorSubject<number>(1);
   positionInParent$ = new BehaviorSubject<number>(0);
 
-  private _validState$: Observable<[DirectiveStructural, RexNode]> =
-    combineLatest([this._mainDirective$, this._node$]).pipe(
-      filter((arr): arr is [DirectiveStructural, RexNode] => {
-        const [dir, node] = arr;
-        return dir != null && node != null;
-      }),
-    );
+  private _validNodeWithStructDirective$: Observable<
+    [DirectiveStructural, RexNode]
+  > = combineLatest([this._mainDirective$, this._initialNode$]).pipe(
+    filter((arr): arr is [DirectiveStructural, RexNode] => {
+      const [dir, node] = arr;
+      return dir != null && node != null;
+    }),
+  );
 
   private _transformedNodes$ = new BehaviorSubject<RexNode[] | null>(null);
 
   setNode(node: RexNode): TransformationRadical {
-    this._node$.next(node);
+    this._initialNode$.next(node);
     return this;
   }
 

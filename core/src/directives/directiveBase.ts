@@ -21,9 +21,9 @@ export type DirectiveTransformResult = Array<HTMLElement | RexNode>;
   Directive is a thing that transforms our tree and detects changes
  */
 export abstract class DirectiveBase<T = string> extends DependencyResolver {
-  protected frame: RegExp | null = null;
+  _frame: RegExp | null = null;
   abstract name: string;
-  abstract type: DirectiveType;
+  abstract _type: DirectiveType;
 
   __argument$ = new BehaviorSubject<string | null>(null);
   __modifiers$ = new BehaviorSubject<Record<string, boolean> | null>(null);
@@ -87,8 +87,8 @@ export abstract class DirectiveBase<T = string> extends DependencyResolver {
     for (const attributeName of Object.keys(attrs)) {
       const fallbackRegExp = new RegExp(`rex-${this.name}:([\\w-]*)`);
       const match =
-        this.frame != null
-          ? this.frame.exec(attributeName)
+        this._frame != null
+          ? this._frame.exec(attributeName)
           : fallbackRegExp.exec(attributeName);
       if (match == null) {
         continue;

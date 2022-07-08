@@ -4,21 +4,19 @@ import { RexNode } from '../rexNode';
 import { Directive } from '../../directives/directive';
 
 export class TransformationSimple {
-  private _node$ = new BehaviorSubject<RexNode | null>(null);
+  private _initialNode$ = new BehaviorSubject<RexNode | null>(null);
   private _directives$ = new BehaviorMutable<Directive[] | null>(null);
 
-  private _validState$: Observable<[Directive[], RexNode]> = combineLatest([
-    this._directives$,
-    this._node$,
-  ]).pipe(
-    filter((arr): arr is [Directive[], RexNode] => {
-      const [dirs, node] = arr;
-      return dirs != null && node != null && dirs.length > 0;
-    }),
-  );
+  private _validNodeWithDirectives$: Observable<[Directive[], RexNode]> =
+    combineLatest([this._directives$, this._initialNode$]).pipe(
+      filter((arr): arr is [Directive[], RexNode] => {
+        const [dirs, node] = arr;
+        return dirs != null && node != null && dirs.length > 0;
+      }),
+    );
 
   setNode(node: RexNode): TransformationSimple {
-    this._node$.next(node);
+    this._initialNode$.next(node);
     return this;
   }
 

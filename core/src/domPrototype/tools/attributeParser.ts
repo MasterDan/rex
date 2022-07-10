@@ -5,8 +5,9 @@ import { Attributes } from '../@types/attributes';
 import { Observable, map } from 'rxjs';
 import { DirectiveBase } from 'core/src/directives/directiveBase';
 import { DependencyResolver } from 'core/src/di/dependencyResolver';
+import { DirectiveType } from 'core/src/directives/@types/DirectiveType';
 
-interface ICheckResult {
+export interface IDirectiveDefinitionExtended {
   definition: IDirectiveDefinition;
   argument: string | null;
   valueKey: string | null;
@@ -14,6 +15,8 @@ interface ICheckResult {
 
 export class AttributeParser extends DependencyResolver {
   nonDirectiveAttributes: Attributes = null;
+  directiveDefinitionStructural: IDirectiveDefinitionExtended | null = null;
+  directiveDefinitionsClassic: IDirectiveDefinitionExtended[] | null = null;
   constructor(public initialAttributes: Attributes) {
     super();
 
@@ -26,19 +29,41 @@ export class AttributeParser extends DependencyResolver {
         map((defs) => defs.filter((def) => def.name !== templateStringDirName)),
       )
       .subscribe((definitions) => {
+        const definitionsExtended: IDirectiveDefinitionExtended[] = [];
         for (const attribute in initialAttributes) {
           const checkResult = this.checkAttributeOnDirective(
             attribute,
             definitions,
           );
+          if (checkResult != null) {
+            definitionsExtended.push(checkResult);
+          } else {
+            const attrs = this.nonDirectiveAttributes ?? {};
+            attrs[attribute] = initialAttributes[attribute];
+            this.nonDirectiveAttributes = attrs;
+          }
         }
+        const classicDirsDefs = definitionsExtended.filter(
+          (de) => (de.definition.type = DirectiveType.Classic),
+        );
+        const structDirsDefs = definitionsExtended.filter(
+          (de) => (de.definition.type = DirectiveType.Structural),
+        );
+        if (structDirsDefs.length > 1) {
+          throw new Error(
+            'It cannot be more than one structural Directive on RexNode',
+          );
+        } else if (structDirsDefs.length === 1) {
+          this.directiveDefinitionStructural = structDirsDefs[0];
+        }
+        this.directiveDefinitionsClassic = classicDirsDefs;
       });
   }
 
   private checkAttributeOnDirective(
     attributeName: string,
     definitions: IDirectiveDefinition[],
-  ): ICheckResult | null {
+  ): IDirectiveDefinitionExtended | null {
     const attrs = this.initialAttributes as Record<string, string | null>;
     for (const definition of definitions) {
       const fallbackRegExp = new RegExp(`rex-${definition.name}:([\\w-]*)`);
@@ -49,7 +74,7 @@ export class AttributeParser extends DependencyResolver {
       if (match == null) {
         continue;
       } else {
-        const positiveCheck: ICheckResult = {
+        const positiveCheck: IDirectiveDefinitionExtended = {
           definition: definition,
           argument: null,
           valueKey: attrs[attributeName],

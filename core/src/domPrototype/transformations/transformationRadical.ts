@@ -1,4 +1,10 @@
-import { BehaviorSubject, combineLatest, filter, Observable } from 'rxjs';
+import {
+  BehaviorSubject,
+  combineLatest,
+  switchMap,
+  filter,
+  Observable,
+} from 'rxjs';
 import { RexNode } from '../rexNode';
 import { DirectiveStructural } from '../../directives/directiveStructural';
 import { DirectiveTransformResult } from '../../directives/directiveBase';
@@ -20,6 +26,19 @@ export class TransformationRadical extends DependencyResolverClassic {
       const [dir, node] = arr;
       return dir != null && node != null;
     }),
+  );
+
+  private _parentNode$: Observable<RexNode | null> =
+    this._validNodeWithStructDirective$.pipe(
+      switchMap(([_, initialNode]) => initialNode._parentNode$),
+    );
+  private _parentElement$: Observable<HTMLElement | null> = combineLatest([
+    this._validNodeWithStructDirective$,
+    this._parentNode$,
+  ]).pipe(
+    switchMap(([[_, initial], parent]) =>
+      parent != null ? parent._htmlElement$ : initial._rootElement$,
+    ),
   );
 
   private _transformedNodes$ = new BehaviorSubject<RexNode[] | null>(null);

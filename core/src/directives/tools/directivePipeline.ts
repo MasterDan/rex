@@ -165,18 +165,18 @@ export class DirectivePipeline {
     this._parentNode$
       .pipe(
         filter(
-          (node): node is RexNode => node != null && !node._updatable$.value,
+          (node): node is RexNode => node != null && !node._willChange$.value,
         ),
       )
       .subscribe((parent) => {
-        parent._updatable$.next(true);
+        parent._willChange$.next(true);
       });
     /* if we're just mutating single element - then make it updatable */
     this._transformedNode$
-      .pipe(filter((node) => !node._updatable$.value))
+      .pipe(filter((node) => !node._willChange$.value))
       .subscribe((node) => {
         // console.log('setting updatable to', node.tag$.value);
-        node._updatable$.next(true);
+        node._willChange$.next(true);
       });
     /* when successfull mounted - setting explicit flag */
     this.mount$.subscribe(() => {

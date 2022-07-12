@@ -12,7 +12,7 @@ export interface IDirectiveDefinitionExtended {
   argument: string | null;
   valueKey: string | null;
 }
-
+/** Separates attributes from directives */
 export class AttributeParser extends DependencyResolver {
   nonDirectiveAttributes: Attributes = null;
   directiveDefinitionStructural: IDirectiveDefinitionExtended | null = null;

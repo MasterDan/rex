@@ -1,4 +1,5 @@
-export type RenderResult = Array<Element | string>;
+import { RenderResult } from './renderResultResult';
+
 export interface IRenderable {
   render(): RenderResult;
 }

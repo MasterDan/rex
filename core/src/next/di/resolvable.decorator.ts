@@ -8,7 +8,7 @@ export function Resolvable(arg?: {
   dependencies?: ResolveArg[];
 }) {
   return (constructor: Ctor): Ctor => {
-    const wrapper = {
+    const newClass = {
       [constructor.name]: class extends constructor {
         constructor(..._args: unknown[]) {
           if (
@@ -22,8 +22,7 @@ export function Resolvable(arg?: {
           }
         }
       },
-    };
-    const newClass = wrapper[constructor.name];
+    }[constructor.name];
     diContainer.register({
       key: arg?.key ?? newClass.name,
       ctor: newClass as unknown as Ctor,

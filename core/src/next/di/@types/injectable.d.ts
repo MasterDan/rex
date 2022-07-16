@@ -1,6 +1,5 @@
 import { Ctor } from 'core/src/tools/types/ctor';
-import { Observable } from 'rxjs';
-import { Factory } from './fabric';
+import { Factory } from './Афсещкнн';
 import { InjectionKey } from './InjectionKey';
 
 export interface IInjectable<T = unknown> {
@@ -8,5 +7,5 @@ export interface IInjectable<T = unknown> {
   value?: T;
   ctor?: Ctor<T>;
   factory?: Factory<T>;
-  reactive?: Observable<T>;
+  reactive?: T;
 }

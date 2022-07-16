@@ -1,11 +1,16 @@
 import { diContainer } from './container';
+import { Provide } from './provide.decorator';
 
-@ToString
+@Provide('foo')
 class Foo {
   bar = 'bar';
 }
 
-type Consturctor = { new (...args: any[]): any };
+@Provide()
+class Bar {
+  foo = 5;
+}
+/* type Consturctor = { new (...args: any[]): any };
 
 function ToString<T extends Consturctor>(BaseClass: T) {
   return class extends BaseClass {
@@ -13,16 +18,20 @@ function ToString<T extends Consturctor>(BaseClass: T) {
       return JSON.stringify(this);
     }
   };
-}
+} */
 
 describe('provide', () => {
-  test('decorator test', () => {
+  /*   test('decorator test', () => {
     const foo = new Foo();
     expect(foo.toString()).toBe('{"bar":"bar"}');
-  });
-  test('provide foo', () => {
+  }); */
+  test('resolve foo using key', () => {
     // const _foo = new Foo();
-    const fooResolved = diContainer.resolveCtor<Foo>('foo');
+    const fooResolved = diContainer.resolve<Foo>('foo');
     expect(fooResolved.bar).toBe('bar');
+  });
+  test("resolve bar by it's type", () => {
+    const bar = diContainer.resolve(Bar);
+    expect(bar.foo).toBe(5);
   });
 });

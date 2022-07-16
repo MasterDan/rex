@@ -1,10 +1,10 @@
 import { IInjectable } from './@types/injectable';
 import { Resolver } from './@types/Resolver';
-import { InjectionKey } from './@types/InjectionKey';
 import { Ctor } from 'core/src/tools/types/ctor';
 import { Dependency } from './@types/Dependency';
 import { Factory } from './@types/Factory';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
+import { ResolveArg } from './@types/ResolveArg';
 
 function buildResolver<T = unknown>(i: IInjectable<T>): Resolver<T> {
   if (i.ctor != null) {
@@ -56,7 +56,7 @@ class DiContainer {
     }
   }
 
-  resolve<T>(key: InjectionKey | Ctor<T> | Factory<T>): T {
+  resolve<T>(key: ResolveArg<T>): T | null {
     const symbol =
       typeof key === 'function'
         ? Symbol.for(key.name)
@@ -69,7 +69,29 @@ class DiContainer {
         'Using classic resolve for reactive dependency. Please use method resolve$',
       );
     }
-    return injected();
+    return injected != null ? injected() : null;
+  }
+
+  resolve$<T>(key: ResolveArg<T>): Observable<T | null> {
+    const symbol =
+      typeof key === 'function'
+        ? Symbol.for(key.name)
+        : typeof key === 'string'
+        ? Symbol.for(key)
+        : key;
+    const injected = this.dictionary[symbol] as Dependency<T>;
+    if (isBehaviour(injected)) {
+      if (injected != null) {
+        return injected;
+      } else {
+        this.dictionary[symbol] = new BehaviorSubject<unknown | null>(null);
+        return this.dictionary[symbol] as BehaviorSubject<T | null>;
+      }
+    } else {
+      throw new Error(
+        'Using reactive resolve for classic dependency. Please use method resolve$',
+      );
+    }
   }
 }
 

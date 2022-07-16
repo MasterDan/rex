@@ -28,10 +28,12 @@ describe('provide', () => {
   test('resolve foo using key', () => {
     // const _foo = new Foo();
     const fooResolved = diContainer.resolve<Foo>('foo');
-    expect(fooResolved.bar).toBe('bar');
+    expect(fooResolved).not.toBeNull();
+    expect(fooResolved?.bar).toBe('bar');
   });
   test("resolve bar by it's type", () => {
     const bar = diContainer.resolve(Bar);
-    expect(bar.foo).toBe(5);
+    expect(bar).not.toBeNull();
+    expect(bar?.foo).toBe(5);
   });
 });

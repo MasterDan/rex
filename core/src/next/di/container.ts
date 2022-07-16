@@ -26,7 +26,7 @@ export class DiContainer {
           placeholder.next(resolver());
         } else {
           throw new Error(
-            `Value with key ${symbol.toString} already exists or it's format id not reactive!`,
+            `Value with key ${symbol.toString()} already exists or it's format id not reactive!`,
           );
         }
       } else {
@@ -66,13 +66,11 @@ export class DiContainer {
         ? Symbol.for(key)
         : key;
     const injected = this.dictionary[symbol] as Dependency<T>;
-    if (isBehaviour(injected)) {
-      if (injected != null) {
-        return injected;
-      } else {
-        this.dictionary[symbol] = new BehaviorSubject<unknown | null>(null);
-        return this.dictionary[symbol] as BehaviorSubject<T | null>;
-      }
+    if (injected == null) {
+      this.dictionary[symbol] = new BehaviorSubject<unknown | null>(null);
+      return this.dictionary[symbol] as BehaviorSubject<T | null>;
+    } else if (isBehaviour(injected)) {
+      return injected;
     } else {
       throw new Error(
         'Using reactive resolve for classic dependency. Please use method resolve$',

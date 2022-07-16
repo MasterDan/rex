@@ -3,23 +3,35 @@ import { InjectionKey } from './@types/InjectionKey';
 import { ResolveArg } from './@types/ResolveArg';
 import { diContainer } from './container';
 
+export interface IResolveOptions {
+  reactive?: boolean;
+}
+
+export type ResolveDefinition =
+  | ResolveArg
+  | ({ key: ResolveArg } & IResolveOptions);
+
 export function Resolvable(arg?: {
   key?: InjectionKey;
-  dependencies?: ResolveArg[];
+  dependencies?: ResolveDefinition[];
 }) {
   return (constructor: Ctor): Ctor => {
     const newClass = {
       [constructor.name]: class extends constructor {
         constructor(..._args: unknown[]) {
-          if (
-            arg != null &&
-            arg.dependencies != null &&
-            arg.dependencies.length > 0
-          ) {
-            super(...arg.dependencies.map((key) => diContainer.resolve(key)));
-          } else {
-            super();
-          }
+          super(
+            ...(arg?.dependencies ?? []).map((key) => {
+              if (typeof key === 'object') {
+                if (key.reactive) {
+                  return diContainer.resolve$(key.key);
+                } else {
+                  diContainer.resolve(key.key);
+                }
+              } else {
+                return diContainer.resolve(key);
+              }
+            }),
+          );
         }
       },
     }[constructor.name];

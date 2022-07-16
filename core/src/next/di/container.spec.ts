@@ -1,3 +1,4 @@
+import { filter, Observable } from 'rxjs';
 import { diContainer } from './container';
 import { Resolvable } from './resolvable.decorator';
 
@@ -14,6 +15,16 @@ class Bar {
 @Resolvable({ dependencies: ['foo', Bar] })
 class Baz {
   constructor(public foo: Foo, public bar: Bar) {}
+}
+
+@Resolvable({ dependencies: [{ key: 'xxx', reactive: true }] })
+class Fooz {
+  constructor(public xxx: Observable<string | null>) {}
+}
+
+@Resolvable({ dependencies: [Fooz, Baz] })
+class Bazz {
+  constructor(public fooz: Fooz, public baz: Baz) {}
 }
 
 describe('provide', () => {
@@ -37,5 +48,25 @@ describe('provide', () => {
     expect(baz?.bar).not.toBeNull();
     expect(baz?.bar).not.toBeUndefined();
     expect(baz?.bar.foo).toBe(5);
+  });
+  test('resolve reactive', () => {
+    const fooz = diContainer.resolve(Fooz);
+    expect(fooz).not.toBeNull();
+    fooz?.xxx.pipe(filter((x): x is string => x != null)).subscribe((v) => {
+      expect(v).toBe('yyy');
+    });
+    diContainer.register<string>({
+      key: 'xxx',
+      reactive: 'yyy',
+    });
+  });
+  test('complex resolve', () => {
+    const bazz = diContainer.resolve(Bazz);
+    expect(bazz).not.toBeNull();
+    expect(bazz?.baz.bar.foo).toBe(5);
+    expect(bazz?.baz.foo.bar).toBe('bar');
+    bazz?.fooz.xxx
+      .pipe(filter((x): x is string => x != null))
+      .subscribe((v) => expect(v).toBe('yyy'));
   });
 });

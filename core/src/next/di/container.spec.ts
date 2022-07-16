@@ -1,30 +1,22 @@
 import { diContainer } from './container';
-import { Provide } from './provide.decorator';
+import { Resolvable } from './resolvable.decorator';
 
-@Provide('foo')
+@Resolvable({ key: 'foo' })
 class Foo {
   bar = 'bar';
 }
 
-@Provide()
+@Resolvable()
 class Bar {
   foo = 5;
 }
-/* type Consturctor = { new (...args: any[]): any };
 
-function ToString<T extends Consturctor>(BaseClass: T) {
-  return class extends BaseClass {
-    toString() {
-      return JSON.stringify(this);
-    }
-  };
-} */
+@Resolvable({ dependencies: ['foo', Bar] })
+class Baz {
+  constructor(public foo: Foo, public bar: Bar) {}
+}
 
 describe('provide', () => {
-  /*   test('decorator test', () => {
-    const foo = new Foo();
-    expect(foo.toString()).toBe('{"bar":"bar"}');
-  }); */
   test('resolve foo using key', () => {
     // const _foo = new Foo();
     const fooResolved = diContainer.resolve<Foo>('foo');
@@ -35,5 +27,15 @@ describe('provide', () => {
     const bar = diContainer.resolve(Bar);
     expect(bar).not.toBeNull();
     expect(bar?.foo).toBe(5);
+  });
+  test('create Baz that resolves from Di', () => {
+    const baz = diContainer.resolve<Baz>(Baz);
+    expect(baz).not.toBeNull();
+    expect(baz?.foo).not.toBeNull();
+    expect(baz?.foo).not.toBeUndefined();
+    expect(baz?.foo.bar).toBe('bar');
+    expect(baz?.bar).not.toBeNull();
+    expect(baz?.bar).not.toBeUndefined();
+    expect(baz?.bar.foo).toBe(5);
   });
 });

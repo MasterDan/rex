@@ -1,1 +1,1 @@
-export type Factory<T> = (...args) => T;
+export type Factory<T, X = unknown> = (...args: X) => T;

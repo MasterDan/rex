@@ -6,24 +6,10 @@ import { Factory } from './@types/Factory';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { ResolveArg } from './@types/ResolveArg';
 
-function buildResolver<T = unknown>(i: IInjectable<T>): Resolver<T> {
-  if (i.ctor != null) {
-    return (): T => new (i.ctor as Ctor<T>)();
-  } else if (i.value) {
-    return (): T => i.value as T;
-  } else if (i.reactive) {
-    return (): T => i.reactive as T;
-  } else if (i.factory) {
-    return () => (i.factory as Factory<T>)();
-  }
-  throw new Error('Incoorect injectable');
-}
-
 function isBehaviour<T>(d: Dependency<T>): d is BehaviorSubject<T | null> {
   return d instanceof BehaviorSubject;
 }
-
-class DiContainer {
+export class DiContainer {
   protected dictionary: Record<symbol, Dependency> = {};
 
   register<T>(injectable: IInjectable<T>) {
@@ -32,7 +18,7 @@ class DiContainer {
         ? Symbol.for(injectable.key)
         : injectable.key;
 
-    const resolver = buildResolver(injectable);
+    const resolver = this.buildResolver(injectable);
     const placeholder = this.dictionary[symbol];
     if (injectable.reactive) {
       if (placeholder != null) {
@@ -50,7 +36,7 @@ class DiContainer {
       }
     } else {
       if (this.dictionary[symbol] != null) {
-        throw new Error(`Value with key ${symbol.toString} already exists!`);
+        throw new Error(`Value with key ${symbol.toString()} already exists!`);
       }
       this.dictionary[symbol] = resolver;
     }
@@ -92,6 +78,19 @@ class DiContainer {
         'Using reactive resolve for classic dependency. Please use method resolve$',
       );
     }
+  }
+
+  private buildResolver<T = unknown>(i: IInjectable<T>): Resolver<T> {
+    if (i.ctor != null) {
+      return (): T => new (i.ctor as Ctor<T>)();
+    } else if (i.value) {
+      return (): T => i.value as T;
+    } else if (i.reactive) {
+      return (): T => i.reactive as T;
+    } else if (i.factory) {
+      return () => (i.factory as Factory<T, [DiContainer]>)(this);
+    }
+    throw new Error('Incoorect injectable');
   }
 }
 

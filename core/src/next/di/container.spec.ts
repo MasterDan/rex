@@ -1,4 +1,5 @@
 import { filter, Observable } from 'rxjs';
+import { testScope } from '../constants';
 import { diContainer } from './container';
 import { Resolvable } from './resolvable.decorator';
 
@@ -27,8 +28,7 @@ class Bazz {
   constructor(public fooz: Fooz, public baz: Baz) {}
 }
 
-const scopeTest = Symbol();
-@Resolvable({ scope: scopeTest, dependencies: [Fooz, Baz] })
+@Resolvable({ scope: testScope, dependencies: [Fooz, Baz] })
 class BazzScoped {
   constructor(public fooz: Fooz, public baz: Baz) {}
 }
@@ -76,7 +76,7 @@ describe('provide', () => {
       .subscribe((v) => expect(v).toBe('yyy'));
   });
   test('complex resolve Scoped', () => {
-    diContainer.startScope(scopeTest);
+    diContainer.startScope(testScope);
     const bazz = diContainer.resolve(BazzScoped);
     expect(bazz).not.toBeNull();
     expect(bazz?.baz.bar.foo).toBe(5);

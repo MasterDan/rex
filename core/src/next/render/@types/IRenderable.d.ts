@@ -1,5 +1,6 @@
-import { RenderResult } from './renderResultResult';
+import { RenderResult } from './renderResult';
+import { RenderResultGroup } from './RenderResultGroup';
 
 export interface IRenderable {
-  render(): RenderResult;
+  render(): RenderResult | RenderResultGroup;
 }

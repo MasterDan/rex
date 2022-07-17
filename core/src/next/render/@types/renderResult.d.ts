@@ -1,1 +1,1 @@
-export type RenderResult = Array<Element | string>;
+export type RenderResult = Element | string;

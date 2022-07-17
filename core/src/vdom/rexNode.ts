@@ -144,6 +144,7 @@ export class RexNode extends DependencyResolver {
       );
     }
   }
+
   /** Concat multiple strings into one  */
   private __simplifyChildren__(children: RexNodeChildren): RexNodeChildren {
     if (children == null || !Array.isArray(children) || children.length < 2) {

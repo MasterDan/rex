@@ -27,6 +27,12 @@ class Bazz {
   constructor(public fooz: Fooz, public baz: Baz) {}
 }
 
+const scopeTest = Symbol();
+@Resolvable({ scope: scopeTest, dependencies: [Fooz, Baz] })
+class BazzScoped {
+  constructor(public fooz: Fooz, public baz: Baz) {}
+}
+
 describe('provide', () => {
   test('resolve foo using key', () => {
     // const _foo = new Foo();
@@ -68,5 +74,16 @@ describe('provide', () => {
     bazz?.fooz.xxx
       .pipe(filter((x): x is string => x != null))
       .subscribe((v) => expect(v).toBe('yyy'));
+  });
+  test('complex resolve Scoped', () => {
+    diContainer.startScope(scopeTest);
+    const bazz = diContainer.resolve(BazzScoped);
+    expect(bazz).not.toBeNull();
+    expect(bazz?.baz.bar.foo).toBe(5);
+    expect(bazz?.baz.foo.bar).toBe('bar');
+    bazz?.fooz.xxx
+      .pipe(filter((x): x is string => x != null))
+      .subscribe((v) => expect(v).toBe('yyy'));
+    diContainer.endScope();
   });
 });

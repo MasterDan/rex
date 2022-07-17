@@ -13,6 +13,7 @@ export type ResolveDefinition =
 
 export function Resolvable(arg?: {
   key?: InjectionKey;
+  scope?: InjectionKey;
   dependencies?: ResolveDefinition[];
 }) {
   return (constructor: Ctor): Ctor => {
@@ -38,6 +39,7 @@ export function Resolvable(arg?: {
     diContainer.register({
       key: arg?.key ?? newClass.name,
       ctor: newClass as unknown as Ctor,
+      scope: arg?.scope,
     });
     return newClass;
   };

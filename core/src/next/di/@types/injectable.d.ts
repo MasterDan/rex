@@ -9,4 +9,5 @@ export interface IInjectable<T = unknown> {
   ctor?: Ctor<T>;
   factory?: Factory<T, [DiContainer]>;
   reactive?: T;
+  scope?: InjectionKey;
 }

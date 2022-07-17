@@ -10,7 +10,20 @@ function isBehaviour<T>(d: Dependency<T>): d is BehaviorSubject<T | null> {
   return d instanceof BehaviorSubject;
 }
 export class DiContainer {
-  protected dictionary: Record<symbol, Dependency> = {};
+  protected di: Record<symbol, Dependency> = {};
+
+  protected scopes: Record<symbol, Record<symbol, Dependency>> = {};
+
+  private currentScope: symbol | null = null;
+
+  startScope(key: string | symbol) {
+    const symbol = typeof key === 'string' ? Symbol.for(key) : key;
+    this.currentScope = symbol;
+  }
+
+  endScope() {
+    this.currentScope = null;
+  }
 
   register<T>(injectable: IInjectable<T>) {
     const symbol =
@@ -19,7 +32,21 @@ export class DiContainer {
         : injectable.key;
 
     const resolver = this.buildResolver(injectable);
-    const placeholder = this.dictionary[symbol];
+    const di: Record<symbol, Dependency> = (() => {
+      if (injectable.scope != null) {
+        const symbolScope: symbol =
+          typeof injectable.scope === 'string'
+            ? Symbol.for(injectable.scope)
+            : injectable.scope;
+        if (this.scopes[symbolScope] == undefined) {
+          this.scopes[symbolScope] = {};
+        }
+        return this.scopes[symbolScope];
+      } else {
+        return this.di;
+      }
+    })();
+    const placeholder = di[symbol];
     if (injectable.reactive) {
       if (placeholder != null) {
         if (isBehaviour(placeholder) && placeholder.value == null) {
@@ -30,15 +57,13 @@ export class DiContainer {
           );
         }
       } else {
-        this.dictionary[symbol] = new BehaviorSubject<unknown | null>(
-          resolver(),
-        );
+        di[symbol] = new BehaviorSubject<unknown | null>(resolver());
       }
     } else {
-      if (this.dictionary[symbol] != null) {
+      if (di[symbol] != null) {
         throw new Error(`Value with key ${symbol.toString()} already exists!`);
       }
-      this.dictionary[symbol] = resolver;
+      di[symbol] = resolver;
     }
   }
 
@@ -49,13 +74,17 @@ export class DiContainer {
         : typeof key === 'string'
         ? Symbol.for(key)
         : key;
-    const injected = this.dictionary[symbol] as Dependency<T>;
+
+    const injected =
+      this.currentScope != null
+        ? this.scopes[this.currentScope][symbol] ?? this.di[symbol]
+        : this.di[symbol];
     if (isBehaviour(injected)) {
       throw new Error(
         'Using classic resolve for reactive dependency. Please use method resolve$',
       );
     }
-    return injected != null ? injected() : null;
+    return injected != null ? (injected as () => T)() : null;
   }
 
   resolve$<T>(key: ResolveArg<T>): Observable<T | null> {
@@ -65,10 +94,10 @@ export class DiContainer {
         : typeof key === 'string'
         ? Symbol.for(key)
         : key;
-    const injected = this.dictionary[symbol] as Dependency<T>;
+    const injected = this.di[symbol] as Dependency<T>;
     if (injected == null) {
-      this.dictionary[symbol] = new BehaviorSubject<unknown | null>(null);
-      return this.dictionary[symbol] as BehaviorSubject<T | null>;
+      this.di[symbol] = new BehaviorSubject<unknown | null>(null);
+      return this.di[symbol] as BehaviorSubject<T | null>;
     } else if (isBehaviour(injected)) {
       return injected;
     } else {

@@ -103,5 +103,25 @@ describe('provide', () => {
     baz!.bar.single.counter++;
     expect(baz?.bar.single.counter).toBe(1);
     expect(baz?.foo.single.counter).toBe(1);
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    baz!.bar.single.counter = 0;
+    expect(baz?.foo.single.counter).toBe(0);
+  });
+  test('singleTon resolve in spec', () => {
+    const baz = diContainer.resolve(Baz);
+    expect(baz).not.toBeNull();
+    expect(baz?.bar.single.counter).toBe(0);
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    baz!.bar.single.counter++;
+    expect(baz?.bar.single.counter).toBe(1);
+    expect(baz?.foo.single.counter).toBe(1);
+    diContainer.startScope(testScope);
+    const bazz = diContainer.resolve(BazzScoped);
+    expect(bazz).not.toBeNull();
+    expect(bazz?.baz.bar.single.counter).toBe(1);
+    diContainer.endScope();
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    baz!.bar.single.counter--;
+    expect(bazz?.baz.bar.single.counter).toBe(0);
   });
 });

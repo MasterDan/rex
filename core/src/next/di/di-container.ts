@@ -119,9 +119,9 @@ export class DiContainer {
     key: symbol,
   ): Resolver<T> {
     const isSingleTone = i.singletone === true;
-    const scopeSymbol = this.currentScope ?? defaultScope;
-    const ifSingletone: (resolver: Resolver<T>) => Resolver<T> = isSingleTone
+    const valueExtractor: (resolver: Resolver<T>) => Resolver<T> = isSingleTone
       ? (resolver) => {
+          const scopeSymbol = this.currentScope ?? defaultScope;
           return () => {
             const existingValue: T | null =
               (this.values[scopeSymbol][key] as T) ?? null;
@@ -136,13 +136,15 @@ export class DiContainer {
         }
       : (resolver) => resolver;
     if (i.ctor != null) {
-      return ifSingletone((): T => new (i.ctor as Ctor<T>)());
+      return valueExtractor((): T => new (i.ctor as Ctor<T>)());
     } else if (i.value) {
-      return ifSingletone((): T => i.value as T);
+      return valueExtractor((): T => i.value as T);
     } else if (i.reactive) {
-      return ifSingletone((): T => i.reactive as T);
+      return valueExtractor((): T => i.reactive as T);
     } else if (i.factory) {
-      return ifSingletone(() => (i.factory as Factory<T, [DiContainer]>)(this));
+      return valueExtractor(() =>
+        (i.factory as Factory<T, [DiContainer]>)(this),
+      );
     }
     throw new Error('Incoorect injectable');
   }

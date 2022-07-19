@@ -9,11 +9,14 @@ import { ResolveArg } from './@types/ResolveArg';
 function isBehaviour<T>(d: Dependency<T>): d is BehaviorSubject<T | null> {
   return d instanceof BehaviorSubject;
 }
+
+const defaultScope = Symbol.for('default');
+
 export class DiContainer {
   protected di: Record<symbol, Dependency> = {};
 
   protected values: Record<symbol, Record<symbol, unknown>> = {
-    [Symbol.for('default')]: {},
+    [defaultScope]: {},
   };
 
   protected scopes: Record<symbol, Record<symbol, Dependency>> = {};
@@ -116,18 +119,20 @@ export class DiContainer {
     key: symbol,
   ): Resolver<T> {
     const isSingleTone = i.singletone === true;
-    const scopeSymbol = this.currentScope ?? Symbol.for('default');
+    const scopeSymbol = this.currentScope ?? defaultScope;
     const ifSingletone: (resolver: Resolver<T>) => Resolver<T> = isSingleTone
       ? (resolver) => {
-          const existingValue: T | null =
-            (this.values[scopeSymbol][key] as T) ?? null;
-          if (existingValue == null) {
-            const val = resolver();
-            this.values[scopeSymbol][key] = val;
-            return () => val;
-          } else {
-            return () => existingValue as T;
-          }
+          return () => {
+            const existingValue: T | null =
+              (this.values[scopeSymbol][key] as T) ?? null;
+            if (existingValue == null) {
+              const val = resolver();
+              this.values[scopeSymbol][key] = val;
+              return val;
+            } else {
+              return existingValue as T;
+            }
+          };
         }
       : (resolver) => resolver;
     if (i.ctor != null) {

@@ -116,24 +116,20 @@ export class DiContainer {
     key: symbol,
   ): Resolver<T> {
     const isSingleTone = i.singletone === true;
-    let existingValue: T | null = null;
     const scopeSymbol = this.currentScope ?? Symbol.for('default');
-    if (isSingleTone) {
-      existingValue = (this.values[scopeSymbol][key] as T) ?? null;
-    }
-    const ifSingletone = (resolver: Resolver<T>): Resolver<T> => {
-      if (isSingleTone) {
-        if (existingValue == null) {
-          const val = resolver();
-          this.values[scopeSymbol][key] = val;
-          return () => val;
-        } else {
-          return () => existingValue as T;
+    const ifSingletone: (resolver: Resolver<T>) => Resolver<T> = isSingleTone
+      ? (resolver) => {
+          const existingValue: T | null =
+            (this.values[scopeSymbol][key] as T) ?? null;
+          if (existingValue == null) {
+            const val = resolver();
+            this.values[scopeSymbol][key] = val;
+            return () => val;
+          } else {
+            return () => existingValue as T;
+          }
         }
-      } else {
-        return resolver;
-      }
-    };
+      : (resolver) => resolver;
     if (i.ctor != null) {
       return ifSingletone((): T => new (i.ctor as Ctor<T>)());
     } else if (i.value) {

@@ -3,8 +3,8 @@ import { JSDOM } from 'jsdom';
 import { testScope } from '../../constants';
 import { diContainer } from '../../di/di-container';
 import { RexarTag } from './rexar-tag';
-// import { IRenderable } from '../@types/IRenderable';
-// import { RenderKind } from '../@types/RenderableType';
+import { IRenderable } from '../@types/IRenderable';
+import { RenderKind } from '../@types/RenderableType';
 
 describe('rexar-tags', () => {
   beforeAll(() => {
@@ -26,7 +26,7 @@ describe('rexar-tags', () => {
   });
   test('simple tag', () => {
     const tag = new RexarTag('div', { foo: 'bar' });
-    // expect((tag as IRenderable).kind).toBe(RenderKind.Static);
+    expect((tag as IRenderable).kind).toBe(RenderKind.Static);
     const div = tag.render();
     expect(div.nodeName).toBe('DIV');
     expect(div.getAttribute('foo')).toBe('bar');

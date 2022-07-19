@@ -2,10 +2,10 @@ import { IRenderable } from '../@types/IRenderable';
 import { Resolvable } from '../../di/resolvable.decorator';
 import { documentKey } from '../../../di/constants';
 import { diContainer } from '../../di/di-container';
-import { Static } from '../decorators/static.decorator';
+// import { Static } from '../decorators/static.decorator';
 
 export type Attributes = Record<string, string | null> | null;
-@Static
+// @Static
 export class RexarTag implements IRenderable {
   constructor(public name: string, public attibutes: Attributes = null) {}
 

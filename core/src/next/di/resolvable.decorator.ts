@@ -1,7 +1,7 @@
 import { Ctor } from 'core/src/tools/types/ctor';
 import { InjectionKey } from './@types/InjectionKey';
 import { ResolveArg } from './@types/ResolveArg';
-import { diContainer } from './container';
+import { diContainer } from './di-container';
 
 export interface IResolveOptions {
   reactive?: boolean;

@@ -1,7 +1,7 @@
 import { documentKey } from '../../../di/constants';
 import { JSDOM } from 'jsdom';
 import { testScope } from '../../constants';
-import { diContainer } from '../../di/container';
+import { diContainer } from '../../di/di-container';
 import { RexarTag } from './rexar-tag';
 
 describe('rexar-tags', () => {

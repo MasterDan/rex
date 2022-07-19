@@ -1,6 +1,6 @@
 import { filter, Observable } from 'rxjs';
 import { testScope } from '../constants';
-import { diContainer } from './container';
+import { diContainer } from './di-container';
 import { Resolvable } from './resolvable.decorator';
 
 @Resolvable({ key: 'foo' })

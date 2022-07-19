@@ -1,7 +1,7 @@
 import { Ctor } from 'core/src/tools/types/ctor';
 import { Factory } from './Factory';
 import { InjectionKey } from './InjectionKey';
-import { DiContainer } from '../container';
+import { DiContainer } from '../di-container';
 
 export interface IInjectable<T = unknown> {
   key: InjectionKey;

@@ -1,7 +1,7 @@
 import { IRenderable } from '../@types/IRenderable';
 import { Resolvable } from '../../di/resolvable.decorator';
 import { documentKey } from '../../../di/constants';
-import { diContainer } from '../../di/container';
+import { diContainer } from '../../di/di-container';
 
 type Attributes = Record<string, string | null> | null;
 export class RexarTag implements IRenderable {

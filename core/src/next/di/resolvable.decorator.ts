@@ -19,20 +19,20 @@ export function Resolvable(
   } & IInjectionOptions,
 ) {
   return (constructor: Ctor): Ctor => {
-    const dependencies = (arg?.dependencies ?? []).map((key) => {
-      if (typeof key === 'object') {
-        if (key.reactive) {
-          return diContainer.resolve$(key.key);
-        } else {
-          diContainer.resolve(key.key);
-        }
-      } else {
-        return diContainer.resolve(key);
-      }
-    });
     const newClass = {
       [constructor.name]: class extends constructor {
         constructor(..._args: unknown[]) {
+          const dependencies = (arg?.dependencies ?? []).map((key) => {
+            if (typeof key === 'object') {
+              if (key.reactive) {
+                return diContainer.resolve$(key.key);
+              } else {
+                diContainer.resolve(key.key);
+              }
+            } else {
+              return diContainer.resolve(key);
+            }
+          });
           super(...dependencies);
         }
       },

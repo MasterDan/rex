@@ -18,7 +18,7 @@ export class RexarTag implements IRenderable {
   }
 }
 
-@Resolvable({ dependencies: [documentKey] })
+@Resolvable({ dependencies: [documentKey], singletone: true })
 class RexarTagRenderer {
   constructor(private doc: Document) {}
 

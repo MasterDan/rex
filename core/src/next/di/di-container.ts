@@ -12,6 +12,10 @@ function isBehaviour<T>(d: Dependency<T>): d is BehaviorSubject<T | null> {
 export class DiContainer {
   protected di: Record<symbol, Dependency> = {};
 
+  protected values: Record<symbol, Record<symbol, unknown>> = {
+    [Symbol.for('default')]: {},
+  };
+
   protected scopes: Record<symbol, Record<symbol, Dependency>> = {};
 
   private currentScope: symbol | null = null;
@@ -31,7 +35,7 @@ export class DiContainer {
         ? Symbol.for(injectable.key)
         : injectable.key;
 
-    const resolver = this.buildResolver(injectable);
+    const resolver = this.buildResolver(injectable, symbol);
     const di: Record<symbol, Dependency> = (() => {
       if (injectable.scope != null) {
         const symbolScope: symbol =
@@ -107,15 +111,37 @@ export class DiContainer {
     }
   }
 
-  private buildResolver<T = unknown>(i: IInjectable<T>): Resolver<T> {
+  private buildResolver<T = unknown>(
+    i: IInjectable<T>,
+    key: symbol,
+  ): Resolver<T> {
+    const isSingleTone = i.singletone === true;
+    let existingValue: T | null = null;
+    const scopeSymbol = this.currentScope ?? Symbol.for('default');
+    if (isSingleTone) {
+      existingValue = (this.values[scopeSymbol][key] as T) ?? null;
+    }
+    const ifSingletone = (resolver: Resolver<T>): Resolver<T> => {
+      if (isSingleTone) {
+        if (existingValue == null) {
+          const val = resolver();
+          this.values[scopeSymbol][key] = val;
+          return () => val;
+        } else {
+          return () => existingValue as T;
+        }
+      } else {
+        return resolver;
+      }
+    };
     if (i.ctor != null) {
-      return (): T => new (i.ctor as Ctor<T>)();
+      return ifSingletone((): T => new (i.ctor as Ctor<T>)());
     } else if (i.value) {
-      return (): T => i.value as T;
+      return ifSingletone((): T => i.value as T);
     } else if (i.reactive) {
-      return (): T => i.reactive as T;
+      return ifSingletone((): T => i.reactive as T);
     } else if (i.factory) {
-      return () => (i.factory as Factory<T, [DiContainer]>)(this);
+      return ifSingletone(() => (i.factory as Factory<T, [DiContainer]>)(this));
     }
     throw new Error('Incoorect injectable');
   }

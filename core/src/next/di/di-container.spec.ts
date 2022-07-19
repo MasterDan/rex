@@ -3,13 +3,22 @@ import { testScope } from '../constants';
 import { diContainer } from './di-container';
 import { Resolvable } from './resolvable.decorator';
 
-@Resolvable({ key: 'foo' })
+@Resolvable({ singletone: true })
+class Single {
+  counter = 0;
+}
+
+@Resolvable({ key: 'foo', dependencies: [Single] })
 class Foo {
+  constructor(public single: Single) {}
+
   bar = 'bar';
 }
 
-@Resolvable()
+@Resolvable({ dependencies: [Single] })
 class Bar {
+  constructor(public single: Single) {}
+
   foo = 5;
 }
 
@@ -85,5 +94,14 @@ describe('provide', () => {
       .pipe(filter((x): x is string => x != null))
       .subscribe((v) => expect(v).toBe('yyy'));
     diContainer.endScope();
+  });
+  test('singleTon resolve', () => {
+    const baz = diContainer.resolve(Baz);
+    expect(baz).not.toBeNull();
+    expect(baz?.bar.single.counter).toBe(0);
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    baz!.bar.single.counter++;
+    expect(baz?.bar.single.counter).toBe(1);
+    expect(baz?.foo.single.counter).toBe(1);
   });
 });

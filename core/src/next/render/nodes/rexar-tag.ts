@@ -3,7 +3,7 @@ import { Resolvable } from '../../di/resolvable.decorator';
 import { documentKey } from '../../../di/constants';
 import { diContainer } from '../../di/di-container';
 
-type Attributes = Record<string, string | null> | null;
+export type Attributes = Record<string, string | null> | null;
 export class RexarTag implements IRenderable {
   constructor(public name: string, public attibutes: Attributes = null) {}
 
@@ -16,7 +16,7 @@ export class RexarTag implements IRenderable {
   }
 }
 
-@Resolvable({ dependencies: [documentKey] })
+@Resolvable({ dependencies: [documentKey], singletone: true })
 class RexarTagRenderer {
   constructor(private doc: Document) {}
 

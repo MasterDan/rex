@@ -1,23 +1,35 @@
-import { IRenderable } from '../@types/IRenderable';
+import {
+  IContainerBinding,
+  IContainerTarget,
+  IRenderable,
+} from '../@types/IRenderable';
+import { RexarContainer } from '../containers/rexar-container';
+import { Dynamic } from '../decorators/dynamic.decorator';
 import { RexarTag, Attributes } from './rexar-tag';
 
-export class RexarTagWithChildren extends RexarTag implements IRenderable {
+@Dynamic
+export class RexarTagWithChildren
+  extends RexarTag
+  implements IRenderable, IContainerTarget
+{
   constructor(
     name: string,
     attibutes: Attributes = null,
-    private children: IRenderable,
+    private children: (IRenderable | RexarContainer)[],
   ) {
     super(name, attibutes);
   }
 
+  bindContainer(container: RexarContainer): IContainerBinding {
+    const index = this.children.indexOf(container);
+
+    throw new Error('Method not implemented.');
+  }
+
   override render(): Element {
+    throw new Error('Method not implemented.');
     const element = super.render();
-    const children = this.children.render();
-    if (Array.isArray(children)) {
-      element.append(...children);
-    } else {
-      element.append(children);
-    }
+
     return element;
   }
 }

@@ -20,10 +20,10 @@ export class RexarTag implements IRenderable {
 
 @Resolvable({ dependencies: [documentKey], singletone: true })
 class RexarTagRenderer {
-  constructor(private doc: Document) {}
+  constructor(private document: Document) {}
 
   render(tag: RexarTag): Element {
-    const element = this.doc.createElement(tag.name);
+    const element = this.document.createElement(tag.name);
     if (tag.attibutes != null) {
       for (const key in tag.attibutes) {
         element.setAttribute(key, tag.attibutes[key] ?? '');

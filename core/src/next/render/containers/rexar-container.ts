@@ -4,37 +4,25 @@ import { Resolvable } from '../../di/resolvable.decorator';
 import { ElementRole } from '../@types/ElementRole';
 import { IContainerBinding, IRenderable } from '../@types/IRenderable';
 
-export interface IContainerSize {
-  size: number;
-  length: number;
-}
-
-function insertAfter(newNode: Node, existingNode: Node) {
-  existingNode.parentNode.insertBefore(newNode, existingNode.nextSibling);
-}
-
 @Resolvable({ dependencies: [documentKey] })
 export class RexarContainer {
   template: IRenderable | undefined;
 
   binding: IContainerBinding | undefined;
 
-  size$ = new BehaviorSubject<IContainerSize>({
-    length: 0,
-    size: 0,
-  });
+  size$ = new BehaviorSubject(0);
 
   constructor(private document: Document) {}
 
   protected inject(): void {
     if (this.template == undefined || this.binding == undefined) {
-      this.size$.next({ length: 0, size: 0 });
+      this.size$.next(0);
       return;
     }
     let reendered = this.template?.render();
     const target = this.binding.target();
     if (reendered === undefined) {
-      this.size$.next({ length: 0, size: 0 });
+      this.size$.next(0);
       return;
     }
     const fragment = this.document.createDocumentFragment();
@@ -47,5 +35,6 @@ export class RexarContainer {
     } else if (target.role == ElementRole.PreviousSibling) {
       target.parent?.insertBefore(fragment, target.element.nextSibling);
     }
+    this.size$.next(reendered.length);
   }
 }

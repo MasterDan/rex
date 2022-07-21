@@ -8,13 +8,15 @@ export interface IRenderable {
   kind?: RenderKind;
 }
 
-export type ContainerBinding =
-  | {
-      parent: Element;
-      element: Element;
-      role: ElementRole.NextSibling | ElementRole.PreviousSibling;
-    }
-  | {
-      element: Element;
-      role: ElementRole.Parent;
-    };
+export interface INextOrPreviousBinding {
+  parent: Element;
+  element: Element;
+  role: ElementRole.NextSibling | ElementRole.PreviousSibling;
+}
+
+export interface IParentBinding {
+  element: Element;
+  role: ElementRole.Parent;
+}
+
+export type ContainerBinding = INextOrPreviousBinding | IParentBinding;

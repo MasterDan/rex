@@ -38,7 +38,7 @@ export class RexarContainer {
     }
 
     fragment.append(...reendered);
-    if (target.role == ElementRole.Parent) {
+    if (target.role === ElementRole.Parent) {
       target.element.prepend(fragment);
     } else if (target.role == ElementRole.NextSibling) {
       target.parent.insertBefore(fragment, target.element);
@@ -47,7 +47,8 @@ export class RexarContainer {
     }
     this.size$.next(reendered.length);
     this.bindingOwn$.next({
-      parent: target.parent,
+      parent:
+        target.role === ElementRole.Parent ? target.element : target.parent,
       element: lastRenderedItem,
       role: ElementRole.PreviousSibling,
     });

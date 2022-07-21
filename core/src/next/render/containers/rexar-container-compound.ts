@@ -12,7 +12,7 @@ export class RexarContainerCompound extends RexarContainer {
     this.bindChildern();
   }
 
-  bindChildern() {
+  private bindChildern() {
     if (isEmpty(this.children)) {
       return;
     }

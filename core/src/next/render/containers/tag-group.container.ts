@@ -9,12 +9,16 @@ class TagGroup extends RexarContainer {
   constructor(document: Document) {
     super(document);
   }
+
+  setTemplate(...elems: RexarTag[]) {
+    this.template = {
+      render: () => elems.map((child) => child.render()),
+    };
+  }
 }
 
 export function tagGroup(...children: RexarTag[]): TagGroup {
   const group = diContainer.resolve(TagGroup) as TagGroup;
-  group.template = {
-    render: () => children.map((child) => child.render()),
-  };
+  group.setTemplate(...children);
   return group;
 }

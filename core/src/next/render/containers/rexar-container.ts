@@ -40,7 +40,7 @@ export class RexarContainer {
 
     fragment.append(...reendered);
     if (target.role == ElementRole.Parent) {
-      target.element.append(fragment);
+      target.element.prepend(fragment);
     } else if (target.role == ElementRole.NextSibling) {
       target.parent?.insertBefore(fragment, target.element);
     } else if (target.role == ElementRole.PreviousSibling) {

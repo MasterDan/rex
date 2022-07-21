@@ -31,9 +31,11 @@ export class RexarContainer {
     }
     const fragment = this.document.createDocumentFragment();
     reendered = Array.isArray(reendered) ? reendered : [reendered];
-    const lastRenderedItem = lastEl(reendered);
+    let lastRenderedItem = lastEl(reendered);
     if (typeof lastRenderedItem === 'string') {
-      reendered.push(this.document.createElement('template'));
+      const template = this.document.createElement('template');
+      reendered.push(template);
+      lastRenderedItem = template;
     }
 
     fragment.append(...reendered);
@@ -45,16 +47,9 @@ export class RexarContainer {
       target.parent?.insertBefore(fragment, target.element.nextSibling);
     }
     this.size$.next(reendered.length);
-    const lastItem = lastEl(reendered);
-    if (typeof lastItem !== 'string') {
-      this.bindingOwn$.next({
-        element: lastItem,
-        role: ElementRole.PreviousSibling,
-      });
-    } else {
-      throw new Error(
-        'Container template ends with text! Rendering cannot continue',
-      );
-    }
+    this.bindingOwn$.next({
+      element: lastRenderedItem,
+      role: ElementRole.PreviousSibling,
+    });
   }
 }

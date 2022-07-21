@@ -15,7 +15,6 @@ export type ContainerBinding =
       role: ElementRole.NextSibling | ElementRole.PreviousSibling;
     }
   | {
-      parent: never;
       element: Element;
       role: ElementRole.Parent;
     };

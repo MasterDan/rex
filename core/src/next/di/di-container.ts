@@ -3,7 +3,7 @@ import { Resolver } from './@types/Resolver';
 import { Ctor } from 'core/src/tools/types/ctor';
 import { Dependency } from './@types/Dependency';
 import { Factory } from './@types/Factory';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, filter, Observable } from 'rxjs';
 import { ResolveArg } from './@types/ResolveArg';
 
 function isBehaviour<T>(d: Dependency<T>): d is BehaviorSubject<T | null> {
@@ -12,7 +12,7 @@ function isBehaviour<T>(d: Dependency<T>): d is BehaviorSubject<T | null> {
 
 const defaultScope = Symbol.for('default');
 
-export class DiContainer {
+class DiContainer {
   protected di: Record<symbol, Dependency> = {};
 
   protected values: Record<symbol, Record<symbol, unknown>> = {
@@ -150,4 +150,46 @@ export class DiContainer {
   }
 }
 
-export const diContainer = new DiContainer();
+const diContainer = new DiContainer();
+
+export function register<T>(injectable: IInjectable<T>) {
+  diContainer.register<T>(injectable);
+}
+
+export function resolve<T>(key: ResolveArg<T>): T {
+  const dependency = diContainer.resolve<T>(key);
+  if (dependency == null) {
+    throw new Error(`Cannot resolve dependency "${key.toString()}"`);
+  }
+  return dependency;
+}
+
+export function resolve$<T>(key: ResolveArg<T>): Observable<T | null> {
+  return diContainer.resolve$<T>(key);
+}
+
+export const safe = {
+  resolve<T>(key: ResolveArg<T>): T | null {
+    return diContainer.resolve<T>(key);
+  },
+
+  resolve$<T>(key: ResolveArg<T>): Observable<T> {
+    return diContainer
+      .resolve$<T>(key)
+      .pipe(filter((value): value is T => value != null));
+  },
+};
+
+export function startScope(key: string | symbol) {
+  diContainer.startScope(key);
+}
+
+export function endScope() {
+  diContainer.endScope();
+}
+
+export function scoped(key: string | symbol, body: () => void) {
+  diContainer.startScope(key);
+  body();
+  diContainer.endScope();
+}

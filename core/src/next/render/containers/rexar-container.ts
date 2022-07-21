@@ -1,21 +1,20 @@
 import { documentKey } from 'core/src/di/constants';
 import { lastEl } from 'core/src/tools/array';
 import { BehaviorSubject, Subject } from 'rxjs';
-import { Resolvable } from '../../di/resolvable.decorator';
+import { resolve } from '../../di/di-container';
 import { ElementRole } from '../@types/ElementRole';
 import { IContainerBinding, IRenderable } from '../@types/IRenderable';
 
-@Resolvable({ dependencies: [documentKey] })
 export class RexarContainer {
-  template: IRenderable | undefined;
-
   binding$ = new BehaviorSubject<IContainerBinding | null>(null);
 
   bindingOwn$ = new Subject<IContainerBinding>();
 
   size$ = new BehaviorSubject(0);
 
-  constructor(private document: Document) {}
+  private document = resolve<Document>(documentKey);
+
+  constructor(private template?: IRenderable) {}
 
   public inject(): void {
     if (this.template == undefined || this.binding$.value == null) {

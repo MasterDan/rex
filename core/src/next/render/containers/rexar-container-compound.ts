@@ -4,13 +4,18 @@ import { IContainerBinding } from '../@types/IRenderable';
 import { RexarContainer } from './rexar-container';
 
 export class RexarContainerCompound extends RexarContainer {
-  children: RexarContainer[] = [];
+  children: RexarContainer[];
 
-  pushContainers(...containers: RexarContainer[]) {
-    if (isEmpty(containers)) {
+  constructor(...containers: RexarContainer[]) {
+    super();
+    this.children = containers;
+    this.bindChildern();
+  }
+
+  bindChildern() {
+    if (isEmpty(this.children)) {
       return;
     }
-    this.children.push(...containers);
     from(this.children)
       .pipe(startWith(null), pairwise())
       .subscribe(([previous, current]) => {

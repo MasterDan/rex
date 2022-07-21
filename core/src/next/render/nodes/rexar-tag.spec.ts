@@ -1,26 +1,26 @@
 import { documentKey } from '../../../di/constants';
 import { JSDOM } from 'jsdom';
 import { testScope } from '../../constants';
-import { diContainer } from '../../di/di-container';
 import { RexarTag } from './rexar-tag';
 import { IRenderable } from '../@types/IRenderable';
 import { RenderKind } from '../@types/RenderableType';
+import { endScope, register, resolve, startScope } from '../../di/di-container';
 
 describe('rexar-tags', () => {
   beforeAll(() => {
     const dom = new JSDOM();
-    diContainer.register({
+    register({
       key: documentKey,
       value: dom.window.document,
       scope: testScope,
     });
-    diContainer.startScope(testScope);
+    startScope(testScope);
   });
   afterAll(() => {
-    diContainer.endScope();
+    endScope();
   });
-  test('resolve dovument', () => {
-    const document = diContainer.resolve<Document>(documentKey);
+  test('resolve document', () => {
+    const document = resolve<Document>(documentKey);
     expect(document).not.toBeUndefined();
     expect(document).not.toBeNull();
   });

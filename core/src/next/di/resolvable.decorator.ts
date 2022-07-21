@@ -2,7 +2,7 @@ import { Ctor } from 'core/src/tools/types/ctor';
 import { IInjectionOptions } from './@types/injectable';
 import { InjectionKey } from './@types/InjectionKey';
 import { ResolveArg } from './@types/ResolveArg';
-import { diContainer } from './di-container';
+import { register, resolve, resolve$ } from './di-container';
 
 export interface IResolveOptions {
   reactive?: boolean;
@@ -25,19 +25,19 @@ export function Resolvable(
           const dependencies = (arg?.dependencies ?? []).map((key) => {
             if (typeof key === 'object') {
               if (key.reactive) {
-                return diContainer.resolve$(key.key);
+                return resolve$(key.key);
               } else {
-                diContainer.resolve(key.key);
+                resolve(key.key);
               }
             } else {
-              return diContainer.resolve(key);
+              return resolve(key);
             }
           });
           super(...dependencies);
         }
       },
     }[constructor.name];
-    diContainer.register({
+    register({
       key: arg?.key ?? newClass.name,
       ctor: newClass as unknown as Ctor,
       scope: arg?.scope,

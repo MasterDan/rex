@@ -1,32 +1,20 @@
 import { IRenderable } from '../@types/IRenderable';
-import { Resolvable } from '../../di/resolvable.decorator';
 import { documentKey } from '../../../di/constants';
-import { diContainer } from '../../di/di-container';
 import { Static } from '../decorators/static.decorator';
+import { resolve } from '../../di/di-container';
 
 export type Attributes = Record<string, string | null> | null;
 @Static
 export class RexarTag implements IRenderable {
+  document = resolve<Document>(documentKey);
+
   constructor(public name: string, public attibutes: Attributes = null) {}
 
   render(): Element {
-    const renderer = diContainer.resolve(RexarTagRenderer);
-    if (renderer == null) {
-      throw new Error('Tag renderer not been resolved properly');
-    }
-    return renderer.render(this);
-  }
-}
-
-@Resolvable({ dependencies: [documentKey], singletone: true })
-class RexarTagRenderer {
-  constructor(private document: Document) {}
-
-  render(tag: RexarTag): Element {
-    const element = this.document.createElement(tag.name);
-    if (tag.attibutes != null) {
-      for (const key in tag.attibutes) {
-        element.setAttribute(key, tag.attibutes[key] ?? '');
+    const element = this.document.createElement(this.name);
+    if (this.attibutes != null) {
+      for (const key in this.attibutes) {
+        element.setAttribute(key, this.attibutes[key] ?? '');
       }
     }
     return element;

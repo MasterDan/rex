@@ -118,6 +118,6 @@ describe('provide', () => {
     endScope();
 
     baz.bar.single.counter--;
-    expect(bazz?.baz.bar.single.counter).toBe(0);
+    expect(bazz.baz.bar.single.counter).toBe(0);
   });
 });

@@ -1,5 +1,6 @@
 import { documentKey } from 'core/src/di/constants';
-import { BehaviorSubject } from 'rxjs';
+import { lastEl } from 'core/src/tools/array';
+import { BehaviorSubject, Subject } from 'rxjs';
 import { Resolvable } from '../../di/resolvable.decorator';
 import { ElementRole } from '../@types/ElementRole';
 import { IContainerBinding, IRenderable } from '../@types/IRenderable';
@@ -8,21 +9,24 @@ import { IContainerBinding, IRenderable } from '../@types/IRenderable';
 export class RexarContainer {
   template: IRenderable | undefined;
 
-  binding: IContainerBinding | undefined;
+  binding$ = new BehaviorSubject<IContainerBinding | null>(null);
+
+  bindingOwn$ = new Subject<IContainerBinding>();
 
   size$ = new BehaviorSubject(0);
 
   constructor(private document: Document) {}
 
-  protected inject(): void {
-    if (this.template == undefined || this.binding == undefined) {
+  public inject(): void {
+    if (this.template == undefined || this.binding$.value == null) {
       this.size$.next(0);
       return;
     }
     let reendered = this.template?.render();
-    const target = this.binding.target();
+    const target = this.binding$.value;
     if (reendered === undefined) {
       this.size$.next(0);
+      this.bindingOwn$.next(this.binding$.value);
       return;
     }
     const fragment = this.document.createDocumentFragment();
@@ -36,5 +40,9 @@ export class RexarContainer {
       target.parent?.insertBefore(fragment, target.element.nextSibling);
     }
     this.size$.next(reendered.length);
+    const lastItem = lastEl(reendered)
+    const lastChild = ;
+    this.bindingOwn$.next({
+      element:
   }
 }

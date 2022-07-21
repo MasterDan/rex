@@ -8,8 +8,14 @@ export interface IRenderable {
   kind?: RenderKind;
 }
 
-export interface IContainerBinding {
-  parent?: Element;
-  element: Element;
-  role: ElementRole;
-}
+export type ContainerBinding =
+  | {
+      parent: Element;
+      element: Element;
+      role: ElementRole.NextSibling | ElementRole.PreviousSibling;
+    }
+  | {
+      parent: never;
+      element: Element;
+      role: ElementRole.Parent;
+    };

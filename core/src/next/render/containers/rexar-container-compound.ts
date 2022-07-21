@@ -1,6 +1,6 @@
 import { isEmpty, lastEl } from 'core/src/tools/array';
 import { filter, from, pairwise, startWith } from 'rxjs';
-import { IContainerBinding } from '../@types/IRenderable';
+import { ContainerBinding } from '../@types/IRenderable';
 import { RexarContainer } from './rexar-container';
 
 export class RexarContainerCompound extends RexarContainer {
@@ -34,7 +34,7 @@ export class RexarContainerCompound extends RexarContainer {
     );
   }
 
-  public override inject(): IContainerBinding | undefined {
+  public override inject(): ContainerBinding | undefined {
     if (this.binding$.value == null || isEmpty(this.children)) {
       this.size$.next(0);
       return;

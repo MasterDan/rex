@@ -3,12 +3,12 @@ import { lastEl } from 'core/src/tools/array';
 import { BehaviorSubject, Subject } from 'rxjs';
 import { resolve } from '../../di/di-container';
 import { ElementRole } from '../@types/ElementRole';
-import { IContainerBinding, IRenderable } from '../@types/IRenderable';
+import { ContainerBinding, IRenderable } from '../@types/IRenderable';
 
 export class RexarContainer {
-  binding$ = new BehaviorSubject<IContainerBinding | null>(null);
+  binding$ = new BehaviorSubject<ContainerBinding | null>(null);
 
-  bindingOwn$ = new Subject<IContainerBinding>();
+  bindingOwn$ = new Subject<ContainerBinding>();
 
   size$ = new BehaviorSubject(0);
 
@@ -41,12 +41,13 @@ export class RexarContainer {
     if (target.role == ElementRole.Parent) {
       target.element.prepend(fragment);
     } else if (target.role == ElementRole.NextSibling) {
-      target.parent?.insertBefore(fragment, target.element);
+      target.parent.insertBefore(fragment, target.element);
     } else if (target.role == ElementRole.PreviousSibling) {
-      target.parent?.insertBefore(fragment, target.element.nextSibling);
+      target.parent.insertBefore(fragment, target.element.nextSibling);
     }
     this.size$.next(reendered.length);
     this.bindingOwn$.next({
+      parent: target.parent,
       element: lastRenderedItem,
       role: ElementRole.PreviousSibling,
     });

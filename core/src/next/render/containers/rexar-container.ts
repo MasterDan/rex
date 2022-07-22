@@ -1,7 +1,7 @@
-import { documentKey } from '../../../di/constants';
-import { lastEl } from '../../../tools/array';
+import { documentKey } from '@/di/constants';
+import { lastEl } from '@/tools/array';
 import { BehaviorSubject, Subject } from 'rxjs';
-import { resolve } from '../../di/di-container';
+import { resolve } from '@/next/di/di-container';
 import { ElementRole } from '../@types/ElementRole';
 import { ContainerBinding, IRenderable } from '../@types/IRenderable';
 

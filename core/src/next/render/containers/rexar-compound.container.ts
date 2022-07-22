@@ -1,9 +1,9 @@
-import { isEmpty, lastEl } from 'core/src/tools/array';
+import { isEmpty, lastEl } from '@/tools/array';
 import { filter, from, pairwise, startWith } from 'rxjs';
 import { ContainerBinding } from '../@types/IRenderable';
 import { RexarContainer } from './rexar-container';
 
-export class RexarContainerCompound extends RexarContainer {
+export class RexarCompoundContainer extends RexarContainer {
   children: RexarContainer[];
 
   constructor(...containers: RexarContainer[]) {

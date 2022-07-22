@@ -6,5 +6,8 @@ export default async (): Promise<Config.InitialOptions> => {
     transform: {
       '\\.[jt]s$': 'ts-jest',
     },
+    moduleNameMapper: {
+      '@/(.*)': '<rootDir>/src/$1',
+    },
   };
 };

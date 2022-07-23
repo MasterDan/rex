@@ -21,6 +21,15 @@ describe('vanishing container', () => {
   afterAll(() => {
     endScope();
   });
+  test('empty vanish', () => {
+    const vanishing = new VanishingContainer(new TagGroupContainer());
+    const root = new RexarTagWithChildren('div', null, vanishing);
+    const rendered = root.render();
+    expect(rendered.outerHTML).toBe('<div></div>');
+    vanishing.vanish();
+    expect(rendered.outerHTML).toBe('<div></div>');
+    vanishing.inject();
+  });
   test('simple vanish', () => {
     const vanishing = new VanishingContainer(
       new TagGroupContainer(

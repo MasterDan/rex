@@ -14,7 +14,7 @@ export class RexarContainer {
 
   private document = resolve<Document>(documentKey);
 
-  constructor(private template?: IRenderable) {}
+  constructor(protected template?: IRenderable) {}
 
   public inject(): void {
     if (this.template == undefined || this.binding$.value == null) {
@@ -38,12 +38,17 @@ export class RexarContainer {
     }
 
     fragment.append(...reendered);
-    if (target.role === ElementRole.Parent) {
-      target.element.prepend(fragment);
-    } else if (target.role == ElementRole.NextSibling) {
-      target.parent.insertBefore(fragment, target.element);
-    } else if (target.role == ElementRole.PreviousSibling) {
-      target.parent.insertBefore(fragment, target.element.nextSibling);
+
+    switch (target.role) {
+      case ElementRole.Parent:
+        target.element.prepend(fragment);
+        break;
+      case ElementRole.NextSibling:
+        target.parent.insertBefore(fragment, target.element);
+        break;
+      case ElementRole.PreviousSibling:
+        target.parent.insertBefore(fragment, target.element.nextSibling);
+        break;
     }
     this.size$.next(reendered.length);
     this.bindingOwn$.next({

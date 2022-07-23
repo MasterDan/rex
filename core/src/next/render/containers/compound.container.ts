@@ -3,7 +3,7 @@ import { filter, from, pairwise, startWith } from 'rxjs';
 import { ContainerBinding } from '../@types/IRenderable';
 import { RexarContainer } from './rexar-container';
 
-export class RexarCompoundContainer extends RexarContainer {
+export class CompoundContainer extends RexarContainer {
   children: RexarContainer[];
 
   constructor(...containers: RexarContainer[]) {

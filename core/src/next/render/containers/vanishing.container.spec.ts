@@ -4,11 +4,10 @@ import { register, startScope, endScope } from '@/next/di/di-container';
 import { JSDOM } from 'jsdom';
 import { RexarTag } from '../nodes/rexar-tag';
 import { RexarTagWithChildren } from '../nodes/rexar-tag.with-children';
-import { RexarContainer } from './rexar-container';
-import { RexarCompoundContainer } from './rexar-compound.container';
 import { TagGroupContainer } from './tag-group.container';
+import { VanishingContainer } from './vanishing.container';
 
-describe('compound container', () => {
+describe('vanishing container', () => {
   beforeAll(() => {
     const dom = new JSDOM();
     register({
@@ -21,18 +20,24 @@ describe('compound container', () => {
   afterAll(() => {
     endScope();
   });
-  test('simple render', () => {
-    const tree = new RexarTagWithChildren(
-      'div',
-      null,
-      new RexarCompoundContainer(
-        new RexarContainer(new RexarTag('span')),
-        new TagGroupContainer(new RexarTag('div'), new RexarTag('span')),
+  test('simple vanish', () => {
+    const vanishing = new VanishingContainer(
+      new TagGroupContainer(
+        new RexarTag('div'),
+        new RexarTag('span'),
+        new RexarTag('div'),
       ),
     );
-    const rendered = tree.render();
+    const root = new RexarTagWithChildren('div', null, vanishing);
+    const rendered = root.render();
     expect(rendered.outerHTML).toBe(
-      '<div><span></span><div></div><span></span></div>',
+      '<div><div></div><span></span><div></div></div>',
+    );
+    vanishing.vanish();
+    expect(rendered.outerHTML).toBe('<div></div>');
+    vanishing.inject();
+    expect(rendered.outerHTML).toBe(
+      '<div><div></div><span></span><div></div></div>',
     );
   });
 });

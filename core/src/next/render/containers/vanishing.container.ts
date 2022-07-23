@@ -3,7 +3,6 @@ import { RexarContainer } from './rexar-container';
 
 export class VanishingContainer extends RexarContainer {
   vanish() {
-    //
     if (this.binding$.value == null || this.size$.value === 0) {
       return;
     }

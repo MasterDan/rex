@@ -2,8 +2,8 @@ import { documentKey } from '@/di/constants';
 import { JSDOM } from 'jsdom';
 import { testScope } from '../../constants';
 import { register, startScope, endScope } from '@/next/di/di-container';
-import { RexarTag } from '../nodes/rexar-tag';
-import { RexarTagWithChildren } from '../nodes/rexar-tag.with-children';
+import { RexarTag } from '../renderable/rexar-tag';
+import { RexarTagWithChildren } from '../renderable/rexar-tag.with-children';
 import { TagGroupContainer } from './tag-group.container';
 
 describe('tag-group', () => {

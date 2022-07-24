@@ -2,10 +2,10 @@ import { documentKey } from '@/di/constants';
 import { testScope } from '@/next/constants';
 import { register, startScope, endScope } from '@/next/di/di-container';
 import { JSDOM } from 'jsdom';
-import { RexarString } from '../nodes/rexar-string';
-import { RexarTag } from '../nodes/rexar-tag';
-import { RexarTagWithChildren } from '../nodes/rexar-tag.with-children';
-import { RexarTemplate } from '../nodes/rexar-template';
+import { RexarString } from '../renderable/rexar-string';
+import { RexarTag } from '../renderable/rexar-tag';
+import { RexarTagWithChildren } from '../renderable/rexar-tag.with-children';
+import { RexarTemplate } from '../renderable/rexar-template';
 import { CompoundContainer } from './compound.container';
 import { VanishingContainer } from './vanishing.container';
 

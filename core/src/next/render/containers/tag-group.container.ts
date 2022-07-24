@@ -1,4 +1,4 @@
-import { RexarTag } from '../nodes/rexar-tag';
+import { RexarTag } from '../renderable/rexar-tag';
 import { RexarContainer } from './rexar-container';
 
 export class TagGroupContainer extends RexarContainer {

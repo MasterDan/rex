@@ -13,8 +13,9 @@ module.exports = {
     'no-console': 'warn',
     'no-debugger': 'error',
     'import/no-unresolved': 'off',
-    'quotes': ['error', 'single'],
+    'quotes': 'off',
     'linebreak-style': ['error', 'windows'],
+    '@typescript-eslint/lines-between-class-members': ['error'],
     '@typescript-eslint/naming-convention': [
       'error',
       {

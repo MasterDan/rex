@@ -13,7 +13,9 @@ import { DirectiveType } from '../@types/DirectiveType';
 export const templateStringDirName = '__template_String__';
 export class TemplateStringDirective extends DirectiveBase {
   _type: DirectiveType = DirectiveType.Classic;
+
   name = templateStringDirName;
+
   childIndex = 0;
 
   templateString$: Observable<string> = this.__sourceNode$.pipe(
@@ -99,10 +101,13 @@ export class TemplateStringDirective extends DirectiveBase {
       return elements;
     }
     if (this.childIndex == null) {
-      element.innerHTML = value ?? '';
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      element!.innerHTML = value ?? '';
     } else {
-      element.childNodes[this.childIndex].nodeValue = value;
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      element!.childNodes[this.childIndex].nodeValue = value;
     }
-    return [element];
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    return [element!];
   }
 }

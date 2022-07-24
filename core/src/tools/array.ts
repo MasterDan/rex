@@ -13,6 +13,10 @@ export function isEmpty<T>(arr: Array<T>): boolean {
   return !isAny(arr);
 }
 
+export function lastEl<T>(arr: Array<T>): T {
+  return arr[arr.length - 1];
+}
+
 export function arrayEquals<T>(arr1: Array<T>, arr2: Array<T>): boolean {
   if (isEmpty(arr1) && isEmpty(arr2)) {
     return true;

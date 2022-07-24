@@ -20,6 +20,7 @@ export function createApp(root: Component): RexApp {
 
 export class RexApp {
   di = new DiContainer();
+
   constructor(root: Component) {
     this.di.register(root, rootComponentKey);
     this.di.register(DirectiveDetector, directiveDetectorKey);

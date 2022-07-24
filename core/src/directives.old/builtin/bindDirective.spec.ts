@@ -1,7 +1,7 @@
 import { RexApp } from '../../app/app';
 import { Component } from '../../component/component';
 import { JsDomPlugin } from '../../plugins/jsDomPlugin';
-import { Ref } from '../../scope/ref';
+import { Ref } from '../../state/ref';
 import { RexNode } from '../../domPrototype/rexNode';
 
 describe('bind attribute directive', () => {

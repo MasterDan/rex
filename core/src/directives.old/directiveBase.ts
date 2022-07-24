@@ -9,7 +9,7 @@ import {
   switchMap,
 } from 'rxjs';
 import { DependencyResolver } from '../di/dependencyResolver';
-import { Ref } from '../scope/ref';
+import { Ref } from '../state/ref';
 import { RexNode } from '../domPrototype/rexNode';
 import { ElemsWithNode } from './@types/IElems';
 import { IDirectiveBinding } from './@types/IDirectiveBinding';

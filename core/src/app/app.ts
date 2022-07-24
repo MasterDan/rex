@@ -6,11 +6,11 @@ import {
 } from '../di/constants';
 import { DiContainer } from '../di/diContainer';
 import { DiContainerReactive } from '../di/diContainerReactive';
-import { BindDirective } from '../directives/builtin/bindDirective';
-import { ifDirective } from '../directives/builtin/ifDirective';
-import { TemplateStringDirective } from '../directives/builtin/templateStringDirective';
-import { DirectiveDetector } from '../directives/tools/directiveDetector';
-import { DirectiveProvider } from '../directives/tools/directiveProvider';
+import { BindDirective } from '../directives.old/builtin/bindDirective';
+import { ifDirective } from '../directives.old/builtin/ifDirective';
+import { TemplateStringDirective } from '../directives.old/builtin/templateStringDirective';
+import { DirectiveDetector } from '../directives.old/tools/directiveDetector';
+import { DirectiveProvider } from '../directives.old/tools/directiveProvider';
 import { DomPlugin } from '../plugins/domPlugin';
 import { RexPlugin } from '../plugins/plugin';
 

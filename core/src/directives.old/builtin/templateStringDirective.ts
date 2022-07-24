@@ -1,4 +1,4 @@
-import { Ref } from 'core/src/scope/ref';
+import { Ref } from '@/state/ref';
 import { RexNode } from '../../domPrototype/rexNode';
 import { combineLatest, filter, map, Observable, switchMap, take } from 'rxjs';
 import { DirectiveBase } from '../directiveBase';

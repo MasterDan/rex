@@ -1,6 +1,6 @@
 import { Component } from '../../component/component';
 import { JsDomPlugin } from '../../plugins/jsDomPlugin';
-import { Ref } from '../../scope/ref';
+import { Ref } from '../../state/ref';
 import { RexNode } from '../../domPrototype/rexNode';
 import { RexApp } from '../../app/app';
 

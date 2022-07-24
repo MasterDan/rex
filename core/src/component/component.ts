@@ -10,8 +10,8 @@ import { documentKey, htmlRootKey } from '../di/constants';
 import { DependencyResolver } from '../di/dependencyResolver';
 import { DiContainer } from '../di/diContainer';
 import { HtmlElementProvider } from '../di/providers/htmlElementProvider';
-import { Ref } from '../scope/ref';
-import { Scope } from '../scope/scope';
+import { Ref } from '../state/ref';
+import { Scope } from '../state/scope';
 import { RexNode, anchorAttribute } from '../domPrototype/rexNode';
 
 export interface IComponentConstructorArgs {

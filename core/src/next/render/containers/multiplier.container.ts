@@ -10,7 +10,14 @@ import { CompoundContainer } from './compound.container';
 import { RexarContainer } from './rexar-container';
 import { VanishingContainer } from './vanishing.container';
 
+/** This container repeats it's own template several times */
 export class MultiplierContainer extends RexarContainer {
+  /**
+   * times to repeat
+   *
+   * after first injection changing value of this variable wil
+   * automatically trigger redraw of template
+   */
   repeat$: BehaviorSubject<number>;
 
   unbindRepeatWatch$ = new Subject();

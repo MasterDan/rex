@@ -1,7 +1,9 @@
 import { ElementRole } from '../@types/ElementRole';
 import { RexarContainer } from './rexar-container';
 
+/** This container can remove it's own template by calling vanish method */
 export class VanishingContainer extends RexarContainer {
+  /** vanishing current template */
   vanish() {
     if (this.binding$.value == null || this.size$.value === 0) {
       return;

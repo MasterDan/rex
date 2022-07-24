@@ -16,6 +16,12 @@ export class CompoundContainer<
     this.bindChildern();
   }
 
+  /**
+   * Binds next child to previous,
+   * current binding to the first item,
+   * and current ownBinding to the last item,
+   *
+   * This method should be called after every childen mutation */
   bindChildern() {
     if (isEmpty(this.children)) {
       return;

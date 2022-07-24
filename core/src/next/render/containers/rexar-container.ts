@@ -5,11 +5,17 @@ import { resolve } from '@/next/di/di-container';
 import { ElementRole } from '../@types/ElementRole';
 import { ContainerBinding, IRenderable } from '../@types/IRenderable';
 
+/**
+ * Container is something that can inject one Irenderable template into another
+ */
 export class RexarContainer {
+  /** Where to inject current template */
   binding$ = new BehaviorSubject<ContainerBinding | null>(null);
 
+  /** Where to inject next sibling container */
   bindingOwn$ = new BehaviorSubject<ContainerBinding | null>(null);
 
+  /** Number of rendered nodes */
   size$ = new BehaviorSubject(0);
 
   private document = resolve<Document>(documentKey);

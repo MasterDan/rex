@@ -2,10 +2,11 @@ import { documentKey } from '@/di/constants';
 import { testScope } from '@/next/constants';
 import { register, startScope, endScope } from '@/next/di/di-container';
 import { JSDOM } from 'jsdom';
+import { RexarString } from '../nodes/rexar-string';
 import { RexarTag } from '../nodes/rexar-tag';
 import { RexarTagWithChildren } from '../nodes/rexar-tag.with-children';
+import { RexarTemplate } from '../nodes/rexar-template';
 import { CompoundContainer } from './compound.container';
-import { TagGroupContainer } from './tag-group.container';
 import { VanishingContainer } from './vanishing.container';
 
 describe('vanishing container', () => {
@@ -22,7 +23,7 @@ describe('vanishing container', () => {
     endScope();
   });
   test('empty vanish', () => {
-    const vanishing = new VanishingContainer(new TagGroupContainer());
+    const vanishing = new VanishingContainer(new RexarTemplate());
     const root = new RexarTagWithChildren('div', null, vanishing);
     const rendered = root.render();
     expect(rendered.outerHTML).toBe('<div></div>');
@@ -32,7 +33,7 @@ describe('vanishing container', () => {
   });
   test('simple vanish', () => {
     const vanishing = new VanishingContainer(
-      new TagGroupContainer(
+      new RexarTemplate(
         new RexarTag('div'),
         new RexarTag('span'),
         new RexarTag('div'),
@@ -52,16 +53,16 @@ describe('vanishing container', () => {
   });
   test('multi vanish', () => {
     const vanishingOne = new VanishingContainer(
-      new TagGroupContainer(new RexarTag('div', { id: 'first' })),
+      new RexarTemplate(new RexarTag('div', { id: 'first' })),
     );
     const vanishingTwo = new VanishingContainer(
-      new TagGroupContainer(
+      new RexarTemplate(
         new RexarTag('div', { id: 'second' }),
         new RexarTag('span', { role: 'second' }),
       ),
     );
     const vanishingThree = new VanishingContainer(
-      new TagGroupContainer(new RexarTag('div', { id: 'third' })),
+      new RexarTemplate(new RexarTag('div', { id: 'third' })),
     );
     const root = new RexarTagWithChildren(
       'div',
@@ -113,6 +114,64 @@ describe('vanishing container', () => {
     vanishingOne.inject();
     expect(rendered.outerHTML).toBe(
       '<div><div id="first"></div><div id="second"></div><span role="second"></span><div id="third"></div></div>',
+    );
+  });
+  test('vanish string', () => {
+    const vanishing = new VanishingContainer(
+      new RexarTemplate(new RexarString('Foo')),
+    );
+    const root = new RexarTagWithChildren('div', { role: 'root' }, vanishing);
+    const rendered = root.render();
+    expect(rendered.outerHTML).toBe(
+      '<div role="root">Foo<template></template></div>',
+    );
+    vanishing.vanish();
+    expect(rendered.outerHTML).toBe('<div role="root"></div>');
+    vanishing.inject();
+    expect(rendered.outerHTML).toBe(
+      '<div role="root">Foo<template></template></div>',
+    );
+  });
+  test('vanish multiple strings', () => {
+    const vanishingOne = new VanishingContainer(
+      new RexarTemplate(new RexarString('Foo')),
+    );
+    const vanishingTwo = new VanishingContainer(
+      new RexarTemplate(new RexarString('Bar')),
+    );
+    const vanishingThree = new VanishingContainer(
+      new RexarTemplate(new RexarString('Baz')),
+    );
+    const root = new RexarTagWithChildren(
+      'div',
+      { role: 'root' },
+      new CompoundContainer(vanishingOne, vanishingTwo, vanishingThree),
+    );
+    const rendered = root.render();
+    expect(rendered.outerHTML).toBe(
+      '<div role="root">Foo<template></template>Bar<template></template>Baz<template></template></div>',
+    );
+    vanishingOne.vanish();
+    expect(rendered.outerHTML).toBe(
+      '<div role="root">Bar<template></template>Baz<template></template></div>',
+    );
+    vanishingThree.vanish();
+    expect(rendered.outerHTML).toBe(
+      '<div role="root">Bar<template></template></div>',
+    );
+    vanishingTwo.vanish();
+    expect(rendered.outerHTML).toBe('<div role="root"></div>');
+    vanishingTwo.inject();
+    expect(rendered.outerHTML).toBe(
+      '<div role="root">Bar<template></template></div>',
+    );
+    vanishingOne.inject();
+    expect(rendered.outerHTML).toBe(
+      '<div role="root">Foo<template></template>Bar<template></template></div>',
+    );
+    vanishingThree.inject();
+    expect(rendered.outerHTML).toBe(
+      '<div role="root">Foo<template></template>Bar<template></template>Baz<template></template></div>',
     );
   });
 });

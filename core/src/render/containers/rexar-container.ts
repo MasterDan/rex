@@ -1,4 +1,4 @@
-import { documentKey } from '@/di/constants';
+import { documentKey } from '@/constants';
 import { lastEl } from '@/tools/array';
 import { BehaviorSubject } from 'rxjs';
 import { resolve } from '@/di/di-container';

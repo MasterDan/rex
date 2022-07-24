@@ -1,7 +1,7 @@
 import { IRenderable } from '../@types/IRenderable';
-import { documentKey } from '../../../di/constants';
 import { Static } from '../decorators/static.decorator';
 import { resolve } from '../../di/di-container';
+import { documentKey } from '@/constants';
 
 export type Attributes = Record<string, string | null> | null;
 @Static

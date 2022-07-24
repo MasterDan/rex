@@ -1,4 +1,4 @@
-import { documentKey } from '@/di/constants';
+import { documentKey } from '@/constants';
 import { JSDOM } from 'jsdom';
 import { testScope } from '@/constants';
 import { register, startScope, endScope } from '@/di/di-container';

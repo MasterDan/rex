@@ -1,6 +1,5 @@
-import { documentKey } from '../../../di/constants';
 import { JSDOM } from 'jsdom';
-import { testScope } from '../../constants';
+import { documentKey, testScope } from '@/constants';
 import { RexarTag } from './rexar-tag';
 import { IRenderable } from '../@types/IRenderable';
 import { RenderKind } from '../@types/RenderableType';

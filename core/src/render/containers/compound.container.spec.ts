@@ -1,5 +1,4 @@
-import { documentKey } from '@/di/constants';
-import { testScope } from '@/constants';
+import { documentKey, testScope } from '@/constants';
 import { register, startScope, endScope } from '@/di/di-container';
 import { JSDOM } from 'jsdom';
 import { RexarTag } from '../renderable/rexar-tag';

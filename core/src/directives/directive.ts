@@ -12,6 +12,7 @@ export interface IClassicDirectiveConfig<T = string> {
 
 export abstract class Directive<T = string> extends DirectiveBase<T> {
   abstract config: Partial<IClassicDirectiveConfig<T>>;
+
   _type = DirectiveType.Classic;
 
   init(node: RexNode, binding: IDirectiveBinding<T>): RexNode[] {
@@ -20,6 +21,7 @@ export abstract class Directive<T = string> extends DirectiveBase<T> {
     }
     return [node];
   }
+
   update(
     elems: ElemsWithNode,
     binding: IDirectiveBinding<T>,
@@ -29,6 +31,7 @@ export abstract class Directive<T = string> extends DirectiveBase<T> {
     }
     return elems.elements;
   }
+
   protected override mounted(
     elems: ElemsWithNode,
     binding: IDirectiveBinding<T>,

@@ -1,6 +1,6 @@
 import { documentKey } from '@/di/constants';
 import { lastEl } from '@/tools/array';
-import { BehaviorSubject, Subject } from 'rxjs';
+import { BehaviorSubject } from 'rxjs';
 import { resolve } from '@/next/di/di-container';
 import { ElementRole } from '../@types/ElementRole';
 import { ContainerBinding, IRenderable } from '../@types/IRenderable';
@@ -8,7 +8,7 @@ import { ContainerBinding, IRenderable } from '../@types/IRenderable';
 export class RexarContainer {
   binding$ = new BehaviorSubject<ContainerBinding | null>(null);
 
-  bindingOwn$ = new Subject<ContainerBinding>();
+  bindingOwn$ = new BehaviorSubject<ContainerBinding | null>(null);
 
   size$ = new BehaviorSubject(0);
 

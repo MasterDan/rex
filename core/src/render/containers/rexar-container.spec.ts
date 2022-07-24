@@ -1,9 +1,9 @@
 import { documentKey } from '@/di/constants';
 import { JSDOM } from 'jsdom';
-import { testScope } from '@/next/constants';
-import { register, startScope, endScope } from '@/next/di/di-container';
+import { testScope } from '@/constants';
+import { register, startScope, endScope } from '@/di/di-container';
 import { RexarTag } from '../renderable/rexar-tag';
-import { RexarTagWithChildren } from '@/next/render/renderable/rexar-tag.with-children';
+import { RexarTagWithChildren } from '@/render/renderable/rexar-tag.with-children';
 import { RexarContainer } from './rexar-container';
 
 describe('testing cotainer', () => {

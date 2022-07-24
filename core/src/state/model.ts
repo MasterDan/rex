@@ -16,3 +16,7 @@ export function createModel(arg: Record<string, unknown>): Model {
   });
   return model;
 }
+
+export class ViewModel implements Model {
+  foo = new Ref('bar');
+}

@@ -6,10 +6,10 @@ export function removeItem<T>(arr: Array<T>, value: T): Array<T> {
   return arr;
 }
 
-export function isAny<T>(arr: Array<T>): boolean {
+export function isAny<T>(arr: Array<T> | null): arr is Array<T> {
   return arr != null && arr.length > 0;
 }
-export function isEmpty<T>(arr: Array<T>): boolean {
+export function isEmpty<T>(arr: Array<T> | null): arr is null {
   return !isAny(arr);
 }
 

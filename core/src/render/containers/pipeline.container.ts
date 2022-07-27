@@ -1,14 +1,15 @@
+import { lastEl } from '@/tools/array';
 import { IRenderable } from '../@types/IRenderable';
 import { FragmentTemplate } from '../renderable/fragment.template';
 import { RexarContainer } from './rexar-container';
 
-export type ContainerFactory = (template?: IRenderable) => RexarContainer;
+export type ContainerFactory = (template: IRenderable) => RexarContainer;
 
 export class PipelineContainer extends RexarContainer {
-  containers: RexarContainer[];
+  container: RexarContainer;
 
   constructor(
-    protected template?: IRenderable,
+    protected template: IRenderable,
     ...factories: ContainerFactory[]
   ) {
     super(template);
@@ -22,6 +23,12 @@ export class PipelineContainer extends RexarContainer {
       }
       containersTemp.push(previousContainer);
     }
-    this.containers = containersTemp.reverse();
+    this.container = lastEl(containersTemp);
+    this.binding$.subscribe((b) => this.container.binding$.next(b));
+    this.container.bindingOwn$.subscribe((b) => this.bindingOwn$.next(b));
+  }
+
+  public override inject(): void {
+    this.container.inject();
   }
 }

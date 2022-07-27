@@ -8,14 +8,16 @@ export interface IRenderable {
   kind?: RenderKind;
 }
 
+export type BindingTarget = Element | DocumentFragment;
+
 export interface INextOrPreviousBinding {
-  parent: Element;
-  element: Element;
+  parent: BindingTarget;
+  element: BindingTarget;
   role: ElementRole.NextSibling | ElementRole.PreviousSibling;
 }
 
 export interface IParentBinding {
-  element: Element;
+  element: BindingTarget;
   role: ElementRole.Parent;
 }
 

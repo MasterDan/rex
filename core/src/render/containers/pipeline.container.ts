@@ -1,4 +1,5 @@
 import { lastEl } from '@/tools/array';
+import { distinctUntilChanged, from, pairwise, skip } from 'rxjs';
 import { IRenderable } from '../@types/IRenderable';
 import { FragmentTemplate } from '../renderable/fragment.template';
 import { RexarContainer } from './rexar-container';
@@ -15,11 +16,13 @@ export class PipelineContainer extends RexarContainer {
     super(template);
     const containersTemp: RexarContainer[] = [];
     let previousContainer: RexarContainer | null = null;
-    for (const item of factories.reverse()) {
+    for (const createContainer of factories.reverse()) {
       if (previousContainer == null) {
-        previousContainer = item(template);
+        previousContainer = createContainer(template);
       } else {
-        previousContainer = item(new FragmentTemplate(previousContainer));
+        previousContainer = createContainer(
+          new FragmentTemplate(previousContainer),
+        );
       }
       containersTemp.push(previousContainer);
     }

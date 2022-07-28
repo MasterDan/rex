@@ -1,5 +1,4 @@
 import { lastEl } from '@/tools/array';
-import { distinctUntilChanged, from, pairwise, skip } from 'rxjs';
 import { IRenderable } from '../@types/IRenderable';
 import { FragmentTemplate } from '../renderable/fragment.template';
 import { RexarContainer } from './rexar-container';
